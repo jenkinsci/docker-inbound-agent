@@ -4,7 +4,8 @@
 
 A [Jenkins](https://jenkins-ci.org) slave using JNLP to establish connection.
 
-See [Jenkins Distributed builds](https://wiki.jenkins-ci.org/display/JENKINS/Distributed+builds) for more info.
+See [GitHub docker-jnlp-slave](https://github.com/jenkinsci/docker-jnlp-slave) and
+[Jenkins Distributed builds](https://wiki.jenkins-ci.org/display/JENKINS/Distributed+builds) for more info.
 
 ## Running
 
