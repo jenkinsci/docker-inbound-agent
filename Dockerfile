@@ -20,17 +20,19 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-FROM openjdk:8-jdk
+FROM openjdk:8-jdk-alpine
 MAINTAINER Nicolas De Loof <nicolas.deloof@gmail.com>
 
 ENV HOME /home/jenkins
-RUN useradd -c "Jenkins user" -d $HOME -m jenkins
+RUN adduser -S -h $HOME jenkins jenkins
 
 ARG VERSION=2.60
 
-RUN curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${VERSION}/remoting-${VERSION}.jar \
+RUN apk add --update --no-cache curl \
+  && curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${VERSION}/remoting-${VERSION}.jar \
   && chmod 755 /usr/share/jenkins \
-  && chmod 644 /usr/share/jenkins/slave.jar
+  && chmod 644 /usr/share/jenkins/slave.jar \
+  && apk del curl
 
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
