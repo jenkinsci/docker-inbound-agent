@@ -30,6 +30,12 @@ RUN curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-c
   && chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/slave.jar
 
+# Download and verify signature
+RUN curl -sSLo /usr/share/jenkins/slave.jar.asc https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/2.52/remoting-2.52.jar.asc
+COPY jenkins.gpg /tmp/jenkins.gpg
+RUN gpg --import /tmp/jenkins.gpg && rm /tmp/jenkins.gpg
+RUN gpg --verify /usr/share/jenkins/slave.jar.asc /usr/share/jenkins/slave.jar
+
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
 VOLUME /home/jenkins
