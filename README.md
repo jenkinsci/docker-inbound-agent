@@ -8,6 +8,11 @@ See [Jenkins Distributed builds](https://wiki.jenkins-ci.org/display/JENKINS/Dis
 
 Make sure your ECS container agent is [updated](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-update.html) before running. Older versions do not properly handle the entryPoint parameter. See the [entryPoint](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#container_definitions) definition for more information.
 
+## Configuration specifics
+
+By default, JnlpProtocol3 is disabled due to the known issues in this protocol implementation.
+You can enable this protocol on your own risk using the <code>JNLP_PROTOCOL_OPTS</code> property.
+
 ## Running
 
 To run a Docker container
