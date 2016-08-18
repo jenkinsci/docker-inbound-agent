@@ -10,8 +10,9 @@ Make sure your ECS container agent is [updated](http://docs.aws.amazon.com/Amazo
 
 ## Configuration specifics
 
-By default, JnlpProtocol3 is disabled due to the known issues in this protocol implementation.
-You can enable this protocol on your own risk using the <code>JNLP_PROTOCOL_OPTS</code> property.
+By default, JnlpProtocol3 is disabled due to the known stability and scalability issues.
+You can enable this protocol on your own risk using the 
+<code>JNLP_PROTOCOL_OPTS=-Dorg.jenkinsci.remoting.engine.JnlpProtocol3.disabled=false</code> property.
 
 ## Running
 

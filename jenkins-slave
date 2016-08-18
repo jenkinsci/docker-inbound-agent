@@ -46,7 +46,7 @@ else
 	fi
 
 	if [ ! -z "$JNLP_PROTOCOL_OPTS" ]; then
-		echo "Warning: JnlpProtocol3 is disabled by defaulr, use JNLP_PROTOCOL_OPTS to alter the behavior"
+		echo "Warning: JnlpProtocol3 is disabled by default, use JNLP_PROTOCOL_OPTS to alter the behavior"
 		JNLP_PROTOCOL_OPTS="-Dorg.jenkinsci.remoting.engine.JnlpProtocol3.disabled=true"
 	fi
 
