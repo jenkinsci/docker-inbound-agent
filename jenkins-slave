@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # The MIT License
 #
@@ -35,7 +35,7 @@ if [ $# -eq 1 ]; then
 else
 
 	# if -tunnel is not provided try env vars
-	if [ "$@" != *"-tunnel "* ]; then
+	if [[ "$@" != *"-tunnel "* ]]; then
 		if [ ! -z "$JENKINS_TUNNEL" ]; then
 			TUNNEL="-tunnel $JENKINS_TUNNEL"
 		fi
