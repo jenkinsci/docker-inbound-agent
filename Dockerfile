@@ -28,7 +28,7 @@ RUN adduser -S -h $HOME jenkins jenkins
 
 ARG VERSION=2.60
 
-RUN apk add --update --no-cache curl bash \
+RUN apk add --update --no-cache curl bash git \
   && curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${VERSION}/remoting-${VERSION}.jar \
   && chmod 755 /usr/share/jenkins \
   && chmod 644 /usr/share/jenkins/slave.jar \
