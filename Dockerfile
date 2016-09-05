@@ -36,7 +36,7 @@ RUN apk add --update --no-cache curl bash git \
 
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
-VOLUME /home/jenkins
+VOLUME /home/jenkins/.jenkins
 WORKDIR /home/jenkins
 USER jenkins
 
