@@ -36,8 +36,9 @@ RUN apk add --update --no-cache curl bash git \
 
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
+USER jenkins
+RUN mkdir -p /home/jenkins/.jenkins
 VOLUME /home/jenkins/.jenkins
 WORKDIR /home/jenkins
-USER jenkins
 
 ENTRYPOINT ["jenkins-slave"]
