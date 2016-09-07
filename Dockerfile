@@ -34,8 +34,9 @@ RUN curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-c
 
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
+USER jenkins
+RUN mkdir -p /home/jenkins/.jenkins
 VOLUME /home/jenkins/.jenkins
 WORKDIR /home/jenkins
-USER jenkins
 
 ENTRYPOINT ["jenkins-slave"]
