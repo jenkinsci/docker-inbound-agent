@@ -50,5 +50,26 @@ else
 		JNLP_PROTOCOL_OPTS="-Dorg.jenkinsci.remoting.engine.JnlpProtocol3.disabled=true"
 	fi
 
-	exec java $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/slave.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL "$@"
+	SLAVE_OPTS=("$TUNNEL" "$URL" "$@")
+
+	MASTER_URL=
+	NEXT_IS_URL=false
+	for x in ${SLAVE_OPTS[*]}; do
+		if [[ $x = '-url' ]]; then
+			NEXT_IS_URL=true
+		elif [[ $NEXT_IS_URL = 'true' ]]; then
+			NEXT_IS_URL=false
+			MASTER_URL=$x
+		fi
+	done
+
+	SLAVE_JAR=/usr/share/jenkins/slave.jar
+	if wget "${MASTER_URL%/}/jnlpJars/slave.jar" -O ./slave.jar; then
+		SLAVE_JAR="./slave.jar"
+	else
+		echo "Warning: cannot download ${MASTER_URL%/}/jnlpJars/slave.jar, use built-in slave.jar"
+	fi
+
+	exec java $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp $SLAVE_JAR hudson.remoting.jnlp.Main -headless ${SLAVE_OPTS[*]}
+
 fi
