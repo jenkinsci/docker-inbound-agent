@@ -20,7 +20,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-FROM jenkinsci/slave
+FROM jenkinsci/slave:alpine
 MAINTAINER Nicolas De Loof <nicolas.deloof@gmail.com>
 
 COPY jenkins-slave /usr/local/bin/jenkins-slave
