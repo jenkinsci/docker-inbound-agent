@@ -48,7 +48,7 @@ else
 	fi
 
 	if [ -n "$JENKINS_NAME" ]; then
-		JENKINS_AGENT_NAME="-url $JENKINS_NAME"
+		JENKINS_AGENT_NAME="$JENKINS_NAME"
 	fi	
 
 	if [ -z "$JNLP_PROTOCOL_OPTS" ]; then
