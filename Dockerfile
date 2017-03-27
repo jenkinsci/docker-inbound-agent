@@ -20,25 +20,9 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-FROM openjdk:8-jdk-alpine
+FROM jenkinsci/slave:alpine
 MAINTAINER Nicolas De Loof <nicolas.deloof@gmail.com>
 
-ENV HOME /home/jenkins
-RUN adduser -S -h $HOME jenkins jenkins
-
-ARG VERSION=2.62
-
-RUN apk add --update --no-cache curl bash git \
-  && curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${VERSION}/remoting-${VERSION}.jar \
-  && chmod 755 /usr/share/jenkins \
-  && chmod 644 /usr/share/jenkins/slave.jar \
-  && apk del curl
-
 COPY jenkins-slave /usr/local/bin/jenkins-slave
-
-USER jenkins
-RUN mkdir -p /home/jenkins/.jenkins
-VOLUME /home/jenkins/.jenkins
-WORKDIR /home/jenkins
 
 ENTRYPOINT ["jenkins-slave"]
