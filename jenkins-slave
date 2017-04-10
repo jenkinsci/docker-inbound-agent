@@ -56,5 +56,27 @@ else
 		JNLP_PROTOCOL_OPTS="-Dorg.jenkinsci.remoting.engine.JnlpProtocol3.disabled=true"
 	fi
 
-	exec java $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/slave.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $JENKINS_SECRET $JENKINS_AGENT_NAME "$@"
+	# If both required options are defined, do not pass the parameters
+	OPT_JENKINS_SECRET=""
+	if [ -n "$JENKINS_SECRET" ]; then
+		if [[ "$@" != *"${JENKINS_SECRET}"* ]]; then
+			OPT_JENKINS_SECRET="${JENKINS_SECRET}"
+		else
+			echo "Warning: SECRET is defined twice in command-line arguments and the environment variable"
+		fi
+	fi
+	
+	OPT_JENKINS_AGENT_NAME=""
+	if [ -n "$JENKINS_AGENT_NAME" ]; then
+		if [[ "$@" != *"${JENKINS_AGENT_NAME}"* ]]; then
+			OPT_JENKINS_AGENT_NAME="${JENKINS_AGENT_NAME}"
+		else
+			echo "Warning: AGENT_NAME is defined twice in command-line arguments and the environment variable"
+		fi
+	fi
+
+	#TODO: Handle the case when the command-line and Environment variable contain different values.
+	#It is fine it blows up for now since it should lead to an error anyway.
+
+	exec java $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/slave.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
 fi
