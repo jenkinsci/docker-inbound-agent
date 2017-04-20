@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+set -x
+set -o errexit
+set -o nounset
+set -o pipefail
+
 # The MIT License
 #
 #  Copyright (c) 2015, CloudBees, Inc.
@@ -75,8 +80,19 @@ else
 		fi
 	fi
 
+	if [ -n "$JENKINS_CA_CERT" ]; then
+		jre_keystore=/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security/cacerts
+		keystore_dir=$HOME/.keystore
+		mkdir -p $keystore_dir
+		cp $jre_keystore $keystore_dir
+		echo $JENKINS_CA_CERT > /tmp/cacert
+		keytool -import -keystore $keystore_dir/cacerts -alias master -file /tmp/cacert -storepass changeit -noprompt
+		rm /tmp/cacert
+		TRUSTSTORE="-Djavax.net.ssl.trustStore=$HOME/.keystore/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
+	fi
+
 	#TODO: Handle the case when the command-line and Environment variable contain different values.
 	#It is fine it blows up for now since it should lead to an error anyway.
 
-	exec java $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/slave.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
+	exec java $JAVA_OPTS $TRUSTSTORE $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/slave.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
 fi
