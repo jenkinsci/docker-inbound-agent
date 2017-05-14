@@ -21,6 +21,7 @@ Optional environment variables:
 * `JENKINS_TUNNEL`: (`HOST:PORT`) connect to this agent host and port instead of Jenkins server, assuming this one do route TCP traffic to Jenkins master. Useful when when Jenkins runs behind a load balancer, reverse proxy, etc.
 * `JENKINS_SECRET`: agent secret, if not set as an argument
 * `JENKINS_AGENT_NAME`: agent name, if not set as an argument
+* `JENKINS_CA_CERT`: path to Jenkins master CA certificate, required to establish JNLP-4 connections.
 
 ## Configuration specifics
 
