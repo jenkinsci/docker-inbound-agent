@@ -27,7 +27,7 @@ USER root
 
 RUN apt-get update && apt-get install -y git curl build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev  xz-utils tk-dev \
-apt-transport-https ca-certificates gnupg2 software-properties-common && rm -rf /var/lib/apt/lists/*
+apt-transport-https ca-certificates gnupg2 software-properties-common python-pip && rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
 
@@ -41,9 +41,10 @@ RUN apt-get update && apt-get -y install docker-ce
 RUN curl -sL https://deb.nodesource.com/setup_4.x | bash -
 RUN apt-get install -y nodejs
 
-
 RUN systemctl enable docker
 #VOLUME /var/run/docker.sock
+
+RUN pip install docker-compose
 
 RUN usermod -aG docker jenkins
 
