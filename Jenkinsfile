@@ -11,7 +11,7 @@ pipeline {
     }
     stage('Docker Build') {
       steps {
-        sh 'env=dev make docker_build'
+        sh 'echo $BRANCH_NAME; make docker_build'
       }
     }
     stage('Docker Publish') {
