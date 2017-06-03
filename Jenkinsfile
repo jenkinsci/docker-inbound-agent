@@ -15,6 +15,11 @@ pipeline {
       }
     }
     stage('Docker Publish') {
+      when {
+        expression {
+           BRANCH_NAME == "master"
+        }
+      }
       steps{
         sh '''export AWS_DEFAULT_REGION=us-east-1
 ACCOUNT_NUMBER=423681189101
