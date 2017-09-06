@@ -28,6 +28,7 @@
 # * JENKINS_URL : alternate jenkins URL
 # * JENKINS_SECRET : agent secret, if not set as an argument
 # * JENKINS_AGENT_NAME : agent name, if not set as an argument
+# * JENKINS_AGENT_WORKDIR : agent work directory, if not set as an argument
 
 if [ $# -eq 1 ]; then
 
@@ -40,6 +41,13 @@ else
 	if [[ "$@" != *"-tunnel "* ]]; then
 		if [ ! -z "$JENKINS_TUNNEL" ]; then
 			TUNNEL="-tunnel $JENKINS_TUNNEL"
+		fi
+	fi
+
+	# if -workDir is not provided try env vars
+	if [[ "$@" != *"-workDir "* ]]; then
+		if [ ! -z "$JENKINS_AGENT_WORKDIR" ]; then
+			WORKDIR="-workDir $JENKINS_AGENT_WORKDIR"
 		fi
 	fi
 
@@ -78,5 +86,5 @@ else
 	#TODO: Handle the case when the command-line and Environment variable contain different values.
 	#It is fine it blows up for now since it should lead to an error anyway.
 
-	exec java $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/slave.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
+	exec java $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/slave.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
 fi
