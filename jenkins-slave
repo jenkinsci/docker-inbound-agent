@@ -28,7 +28,7 @@
 # * JENKINS_URL : alternate jenkins URL
 # * JENKINS_SECRET : agent secret, if not set as an argument
 # * JENKINS_AGENT_NAME : agent name, if not set as an argument
-# * JENKINS_AGENT_WORKDIR : agent work directory, if not set as an argument
+# * JENKINS_AGENT_WORKDIR : agent work directory, if not set by optional parameter -workDir
 
 if [ $# -eq 1 ]; then
 
