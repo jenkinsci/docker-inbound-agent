@@ -21,8 +21,13 @@
 #  THE SOFTWARE.
 
 FROM jenkinsci/slave
-MAINTAINER Nicolas De Loof <nicolas.deloof@gmail.com>
+LABEL maintainer=devops@prominentedge.com
+
+USER root
 
 COPY jenkins-slave /usr/local/bin/jenkins-slave
+
+RUN apt-get update && \
+    apt-get install -y awscli
 
 ENTRYPOINT ["jenkins-slave"]
