@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 # The MIT License
 #
@@ -37,11 +37,13 @@ if [ $# -eq 1 ]; then
 else
 
 	# if -tunnel is not provided try env vars
-	if [[ "$@" != *"-tunnel "* ]]; then
+	case "$@" in
+		*"-tunnel "*) ;;
+		*)
 		if [ ! -z "$JENKINS_TUNNEL" ]; then
 			TUNNEL="-tunnel $JENKINS_TUNNEL"
-		fi
-	fi
+		fi ;;
+	esac
 
 	if [ -n "$JENKINS_URL" ]; then
 		URL="-url $JENKINS_URL"
@@ -49,7 +51,7 @@ else
 
 	if [ -n "$JENKINS_NAME" ]; then
 		JENKINS_AGENT_NAME="$JENKINS_NAME"
-	fi	
+	fi  
 
 	if [ -z "$JNLP_PROTOCOL_OPTS" ]; then
 		echo "Warning: JnlpProtocol3 is disabled by default, use JNLP_PROTOCOL_OPTS to alter the behavior"
@@ -59,20 +61,20 @@ else
 	# If both required options are defined, do not pass the parameters
 	OPT_JENKINS_SECRET=""
 	if [ -n "$JENKINS_SECRET" ]; then
-		if [[ "$@" != *"${JENKINS_SECRET}"* ]]; then
-			OPT_JENKINS_SECRET="${JENKINS_SECRET}"
-		else
-			echo "Warning: SECRET is defined twice in command-line arguments and the environment variable"
-		fi
+		case "$@" in
+			*"${JENKINS_SECRET}"*) echo "Warning: SECRET is defined twice in command-line arguments and the environment variable" ;;
+			*)
+			OPT_JENKINS_SECRET="${JENKINS_SECRET}" ;;
+		esac
 	fi
 	
 	OPT_JENKINS_AGENT_NAME=""
 	if [ -n "$JENKINS_AGENT_NAME" ]; then
-		if [[ "$@" != *"${JENKINS_AGENT_NAME}"* ]]; then
-			OPT_JENKINS_AGENT_NAME="${JENKINS_AGENT_NAME}"
-		else
-			echo "Warning: AGENT_NAME is defined twice in command-line arguments and the environment variable"
-		fi
+		case "$@" in
+			*"${JENKINS_AGENT_NAME}"*) echo "Warning: AGENT_NAME is defined twice in command-line arguments and the environment variable" ;;
+			*)
+			OPT_JENKINS_AGENT_NAME="${JENKINS_AGENT_NAME}" ;;
+		esac
 	fi
 
 	#TODO: Handle the case when the command-line and Environment variable contain different values.
