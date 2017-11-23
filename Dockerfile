@@ -27,33 +27,39 @@ USER root
 
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
-RUN apt-get update && \
-    apt-get install -y software-properties-common \
-            lsb-release \
-            apt-transport-https \
+ENV BUILD_PACKAGES apt-transport-https \
+            build-essential \
             ca-certificates \
-            curl && \
+            curl \
+            lsb-release \
+            software-properties-common
+
+ENV RUNTIME_PACKAGES apt-transport-https \
+            awscli \
+            docker-ce=17.03.1~ce-0~ubuntu-xenial
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends $BUILD_PACKAGES && \
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" && \
     apt-get update && \
-    apt-get install -y docker-ce=17.03.1~ce-0~ubuntu-xenial
+    apt-get install -y $RUNTIME_PACKAGES
 
-RUN apt-get update && \
-    apt-get install -y awscli && \
-    wget https://github.com/kelseyhightower/confd/releases/download/v0.14.0/confd-0.14.0-linux-amd64 && \
+RUN wget https://github.com/kelseyhightower/confd/releases/download/v0.14.0/confd-0.14.0-linux-amd64 && \
     mv confd-0.14.0-linux-amd64 /usr/local/bin/confd && \
-    chmod 755 /usr/local/bin/confd
-
-RUN curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash && \
+    chmod 755 /usr/local/bin/confd && \
+    curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash && \
     curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && \
     chmod +x ./kubectl && \
-    mv ./kubectl /usr/local/bin/kubectl    
+    mv ./kubectl /usr/local/bin/kubectl
 
-# Install heketi
-RUN wget https://github.com/heketi/heketi/releases/download/v5.0.0/heketi-client-v5.0.0.linux.amd64.tar.gz && \
-    tar -xvzf heketi-client-v5.0.0.linux.amd64.tar.gz && \
-    mv heketi-client/bin/heketi-cli /usr/local/bin/heketi-cli && \
-    chmod 755 /usr/local/bin/heketi-cli
-  
+RUN wget https://bootstrap.pypa.io/get-pip.py && \
+    python get-pip.py && \
+    pip install \
+        elasticsearch-curator==5.4.0
+
+# Clean up
+RUN apt-get remove -y $BUILD_PACKAGES $RUNTIME_PACKAGES && \
+    rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["jenkins-slave"]
