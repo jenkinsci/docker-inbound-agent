@@ -59,7 +59,7 @@ RUN wget https://bootstrap.pypa.io/get-pip.py && \
         elasticsearch-curator==5.4.0
 
 # Clean up
-RUN apt-get remove -y $BUILD_PACKAGES $RUNTIME_PACKAGES && \
-    rm -rf /var/lib/apt/lists/*
+#RUN apt-get remove -y --purge $BUILD_PACKAGES $RUNTIME_PACKAGES && \
+#    rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["jenkins-slave"]
