@@ -20,7 +20,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-FROM jenkinsci/slave:3.7-1
+FROM jenkinsci/slave:3.14-1
 LABEL maintainer=devops@prominentedge.com
 
 USER root
