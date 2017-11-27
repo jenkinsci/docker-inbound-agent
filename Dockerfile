@@ -36,12 +36,16 @@ ENV BUILD_PACKAGES apt-transport-https \
 
 ENV RUNTIME_PACKAGES apt-transport-https \
             awscli \
-            docker-ce=17.03.1~ce-0~ubuntu-xenial
+            docker-ce=17.03.1~ce-0~ubuntu-xenial \
+            elixer \
+            esl-erlang
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends $BUILD_PACKAGES && \
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" && \
+    wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb && \
+    dpkg -i erlang-solutions_1.0_all.deb && \
     apt-get update && \
     apt-get install -y $RUNTIME_PACKAGES
 
@@ -57,12 +61,6 @@ RUN wget https://bootstrap.pypa.io/get-pip.py && \
     python get-pip.py && \
     pip install \
         elasticsearch-curator==5.4.0
-
-# Setup elixer / erlang for rabbitmq plugin building
-RUN wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb && sudo dpkg -i erlang-solutions_1.0_all.deb && \
-    apt-get update && \
-    apt-get install esl-erlang && \
-    apt-get install elixir
 
 # Clean up
 #RUN apt-get remove -y --purge $BUILD_PACKAGES $RUNTIME_PACKAGES && \
