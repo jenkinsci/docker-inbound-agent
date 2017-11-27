@@ -58,6 +58,12 @@ RUN wget https://bootstrap.pypa.io/get-pip.py && \
     pip install \
         elasticsearch-curator==5.4.0
 
+# Setup elixer / erlang for rabbitmq plugin building
+RUN wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb && sudo dpkg -i erlang-solutions_1.0_all.deb && \
+    apt-get update && \
+    apt-get install esl-erlang && \
+    apt-get install elixir
+
 # Clean up
 #RUN apt-get remove -y --purge $BUILD_PACKAGES $RUNTIME_PACKAGES && \
 #    rm -rf /var/lib/apt/lists/*
