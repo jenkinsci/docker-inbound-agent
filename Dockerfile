@@ -37,7 +37,7 @@ ENV BUILD_PACKAGES apt-transport-https \
 ENV RUNTIME_PACKAGES apt-transport-https \
             awscli \
             docker-ce=17.03.1~ce-0~ubuntu-xenial \
-            elixer \
+            elixir \
             esl-erlang
 
 RUN apt-get update && \
