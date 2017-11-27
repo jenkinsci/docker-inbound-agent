@@ -38,7 +38,8 @@ ENV RUNTIME_PACKAGES apt-transport-https \
             awscli \
             docker-ce=17.03.1~ce-0~ubuntu-xenial \
             elixir \
-            esl-erlang
+            esl-erlang \
+            rsync
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends $BUILD_PACKAGES && \
