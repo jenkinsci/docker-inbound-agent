@@ -63,7 +63,7 @@ RUN wget https://bootstrap.pypa.io/get-pip.py && \
     python get-pip.py && \
     pip install \
         elasticsearch-curator==5.4.0 \
-        boto=2.48.0
+        boto==2.48.0
 
 # Clean up
 #RUN apt-get remove -y --purge $BUILD_PACKAGES $RUNTIME_PACKAGES && \
