@@ -62,7 +62,7 @@ RUN wget https://github.com/kelseyhightower/confd/releases/download/v0.14.0/conf
 RUN wget https://bootstrap.pypa.io/get-pip.py && \
     python get-pip.py && \
     pip install \
-        elasticsearch-curator==5.4.0
+        elasticsearch-curator==5.4.0 \
         boto=2.48.0
 
 # Clean up
