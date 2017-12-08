@@ -13,11 +13,11 @@ See [Jenkins Distributed builds](https://wiki.jenkins-ci.org/display/JENKINS/Dis
 
 To run a Docker container
 
-    docker run jenkinsci/jnlp-slave -url http://jenkins-server:port <secret> <agent name>
+    docker run jenkins/jnlp-slave -url http://jenkins-server:port <secret> <agent name>
 
 To run a Docker container with [Work Directory](https://github.com/jenkinsci/remoting/blob/master/docs/workDir.md):
 
-    docker run jenkinsci/jnlp-slave -url http://jenkins-server:port -workDir=/home/jenkins/agent <secret> <agent name>
+    docker run jenkins/jnlp-slave -url http://jenkins-server:port -workDir=/home/jenkins/agent <secret> <agent name>
 
 Optional environment variables:
 
