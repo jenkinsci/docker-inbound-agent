@@ -39,6 +39,7 @@ ENV RUNTIME_PACKAGES apt-transport-https \
             docker-ce=17.03.1~ce-0~ubuntu-xenial \
             elixir \
             esl-erlang \
+            gdal-bin \
             rsync \
             zip
 
