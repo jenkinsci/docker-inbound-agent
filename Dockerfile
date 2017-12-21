@@ -28,7 +28,6 @@ USER root
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
 ENV BUILD_PACKAGES apt-transport-https \
-            build-essential \
             ca-certificates \
             curl \
             lsb-release \
@@ -36,6 +35,7 @@ ENV BUILD_PACKAGES apt-transport-https \
 
 ENV RUNTIME_PACKAGES apt-transport-https \
             awscli \
+            build-essential \
             docker-ce=17.03.1~ce-0~ubuntu-xenial \
             elixir \
             esl-erlang \
