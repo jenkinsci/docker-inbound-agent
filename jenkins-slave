@@ -47,10 +47,12 @@ else
 	esac
 
 	# if -workDir is not provided try env vars
-	if [[ "$@" != *"-workDir "* ]]; then
-		if [ ! -z "$JENKINS_AGENT_WORKDIR" ]; then
-			WORKDIR="-workDir $JENKINS_AGENT_WORKDIR"
-		fi
+	if [ ! -z "$JENKINS_AGENT_WORKDIR" ]; then
+		case "$@" in
+			*"-workDir"*) echo "Warning: Work directory is defined twice in command-line arguments and the environment variable" ;;
+			*)
+			WORKDIR="-workDir $JENKINS_AGENT_WORKDIR" ;;
+		esac
 	fi
 
 	if [ -n "$JENKINS_URL" ]; then
