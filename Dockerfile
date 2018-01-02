@@ -40,6 +40,8 @@ ENV RUNTIME_PACKAGES apt-transport-https \
             elixir \
             esl-erlang \
             gdal-bin \
+            postgresql \
+            postgresql-contrib \
             rsync \
             zip
 
