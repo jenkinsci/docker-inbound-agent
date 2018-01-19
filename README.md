@@ -46,3 +46,8 @@ Make sure your ECS container agent is [updated](http://docs.aws.amazon.com/Amazo
 ## Notes
 
 * The stacks installed in the Dockerfile are of the [ops-tools repository](https://github.com/ProminentEdge/ops-tools).
+
+---
+
+## GDAL Deps:
+* This slave uses GDAL for Geo Spatial thingamajigs(?).  The dependencies can be found [here](https://trac.osgeo.org/gdal/wiki/DownloadSource).

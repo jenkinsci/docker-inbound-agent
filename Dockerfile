@@ -28,6 +28,7 @@ USER root
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
 ENV BUILD_PACKAGES apt-transport-https \
+            build-essential \
             ca-certificates \
             curl \
             lsb-release \
@@ -39,7 +40,6 @@ ENV RUNTIME_PACKAGES apt-transport-https \
             docker-ce=17.03.1~ce-0~ubuntu-xenial \
             elixir \
             esl-erlang \
-            gdal-bin \
             postgresql \
             postgresql-contrib \
             rsync \
@@ -51,6 +51,12 @@ RUN apt-get update && \
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable" && \
     wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb && \
     dpkg -i erlang-solutions_1.0_all.deb && \
+    wget http://download.osgeo.org/gdal/2.2.2/gdal-2.2.2.tar.gz && \
+    tar -xvf gdal-2.2.2.tar.gz && \
+    cd gdal-2.2.2 && \
+    ./configure && \
+    make && \
+    make install && \
     apt-get update && \
     apt-get install -y $RUNTIME_PACKAGES
 
