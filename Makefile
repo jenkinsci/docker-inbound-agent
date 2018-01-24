@@ -4,7 +4,7 @@
 
 build:
 	docker build --no-cache \
-	-t prominentedgestatengine/jenkins:jnlp-slave .
+	-t prominentedgestatengine/jenkins:gdal-latest .
 
 push:
-	docker push prominentedgestatengine/jenkins:jnlp-slave
+	docker push prominentedgestatengine/jenkins:gdal-latest
