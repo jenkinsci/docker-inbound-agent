@@ -28,6 +28,7 @@ USER root
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
 ENV BUILD_PACKAGES apt-transport-https \
+            build-essential \
             ca-certificates \
             curl \
             libcurl4-gnutls-dev \
@@ -37,7 +38,6 @@ ENV BUILD_PACKAGES apt-transport-https \
 
 ENV RUNTIME_PACKAGES apt-transport-https \
             awscli \
-            build-essential \
             docker-ce=17.03.1~ce-0~ubuntu-xenial \
             elixir \
             esl-erlang \
@@ -82,9 +82,5 @@ RUN wget https://bootstrap.pypa.io/get-pip.py && \
     pip install \
         elasticsearch-curator==5.4.0 \
         boto==2.48.0
-
-# Clean up
-#RUN apt-get remove -y --purge $BUILD_PACKAGES $RUNTIME_PACKAGES && \
-#    rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["jenkins-slave"]

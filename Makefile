@@ -3,7 +3,7 @@
 
 
 build:
-	docker build --no-cache \
+	docker build \
 	-t prominentedgestatengine/jenkins:gdal-latest .
 
 push:
