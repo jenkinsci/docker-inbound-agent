@@ -31,6 +31,8 @@ ENV BUILD_PACKAGES apt-transport-https \
             build-essential \
             ca-certificates \
             curl \
+            libcurl4-gnutls-dev \
+            libproj-dev \
             lsb-release \
             software-properties-common
 
@@ -55,7 +57,7 @@ RUN apt-get update && \
     wget http://download.osgeo.org/gdal/2.2.2/gdal-2.2.2.tar.gz && \
     tar -xvf gdal-2.2.2.tar.gz && \
     cd gdal-2.2.2 && \
-    ./configure && \
+    ./configure --with-curl=/usr/bin/curl-config && \
     make && \
     make install && \
     apt-get update && \
