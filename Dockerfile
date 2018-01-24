@@ -43,6 +43,7 @@ ENV RUNTIME_PACKAGES apt-transport-https \
             elixir \
             esl-erlang \
             libproj-dev \
+            libc6 \
             postgresql \
             postgresql-contrib \
             rsync \
