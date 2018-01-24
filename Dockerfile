@@ -28,7 +28,6 @@ USER root
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
 ENV BUILD_PACKAGES apt-transport-https \
-            build-essential \
             ca-certificates \
             curl \
             libcurl4-gnutls-dev \
