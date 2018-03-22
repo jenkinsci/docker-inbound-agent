@@ -4,8 +4,8 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
 [![Docker Automated build](https://img.shields.io/docker/automated/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
 
-:exclamation: **Warning!** This image used to be published as [jenkinsci/jnlp-slave/](https://hub.docker.com/r/jenkinsci/jnlp-slave/). 
-This release destination is deprecated.
+:exclamation: **Warning!** This image used to be published as [jenkinsci/jnlp-slave](https://hub.docker.com/r/jenkinsci/jnlp-slave/). 
+That image name is deprecated, use [jenkins/jnlp-slave](https://hub.docker.com/r/jenkins/jnlp-slave/).
 
 This is an image for [Jenkins](https://jenkins.io) agent (FKA "slave") using JNLP to establish connection.
 This agent is powered by the [Jenkins Remoting library](https://github.com/jenkinsci/remoting), which version is being taken from the base [Docker Agent](https://github.com/jenkinsci/docker-slave/) image.
