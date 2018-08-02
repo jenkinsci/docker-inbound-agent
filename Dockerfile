@@ -20,7 +20,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-FROM jenkins/slave:3.19-1
+FROM jenkins/slave:3.20-1
 MAINTAINER Oleg Nenashev <o.v.nenashev@gmail.com>
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="3.19"
 
