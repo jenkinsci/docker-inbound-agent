@@ -8,15 +8,14 @@ pipeline {
         stage('Build image') {
             steps {
                 script {
-                echo 'Starting to build docker image'
-                checkout scm
-                shortCommit = readFile('GIT_COMMIT').take(8)
                 tag = sh('git tag --contains ${longCommit}')
+                echo 'Starting to build docker image ${env.IMAGE_NAME}:${tag}'
+                shortCommit = readFile('GIT_COMMIT').take(8)
                 def imageTag = "build-${shortCommit}"
                 def image= "${env.IMAGE_NAME}:${imageTag}"
                 script {
-                    newImage = docker.build('${image}')
                     docker.withRegistry("https://hub.docker.com/v2", '${env.DOCKERHUB_CREDENTIALS_ID}'){
+                        newImage = docker.build('${image}')
                         newImage.tag("latest", false)
                         newImage.push()
                     }
@@ -31,8 +30,8 @@ pipeline {
                 def imageTag = "release-${TAG_NAME}"
                 def image= "${env.IMAGE_NAME}:${imageTag}"
                 script {
-                    newImage = docker.build('${imageName}':'${imageTag}')
                     docker.withRegistry("https://hub.docker.com/v2", '${env.DOCKERHUB_CREDENTIALS_ID}'){
+                        newImage = docker.build('${imageName}':'${imageTag}')
                         newImage.tag("latest", false)
                         newImage.push()
                        }
