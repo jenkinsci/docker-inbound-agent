@@ -8,8 +8,7 @@ pipeline {
         stage('Build image') {
             steps {
                 script {
-                tag = sh('git tag --contains ${longCommit}')
-                shortCommit = readFile('GIT_COMMIT').take(8)
+                shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim().take(8)
                 def imageTag = "build-${shortCommit}"
                 def image= "${env.IMAGE_NAME}:${imageTag}"
                 echo 'Starting to build docker image ${env.IMAGE_NAME}:${imageTag}'
