@@ -1,7 +1,9 @@
 pipeline {
     agent any
-    def imageName = "capturemedia/jenkins-slave-jnlp-docker"
-    def credentialsId = "dockerhub-capturemediamachine"
+        environment {
+            IMAGE_NAME='capturemedia/jenkins-slave-jnlp-docker'
+            DOCKERHUB_CREDENTIALS_ID='dockerhub-capturemediamachine'
+        }
     stages {
         stage('Build image') {
             steps {
@@ -10,10 +12,10 @@ pipeline {
                 shortCommit = readFile('GIT_COMMIT').take(8)
                 tag = sh('git tag --contains ${longCommit}')
                 def imageTag = "build-${shortCommit}"
-                def image= "${imageName}:${imageTag}"
+                def image= "${env.IMAGE_NAME}:${imageTag}"
                 script {
                     newImage = docker.build('${image}')
-                    docker.withRegistry("https://hub.docker.com/v2", '${credentialsId}'){
+                    docker.withRegistry("https://hub.docker.com/v2", '${env.DOCKERHUB_CREDENTIALS_ID}'){
                         newImage.tag("latest", false)
                         newImage.push()
 
@@ -25,10 +27,10 @@ pipeline {
             when { buildingTag() }
             steps {
                 def imageTag = "release-${TAG_NAME}"
-                def image= "${imageName}:${imageTag}"
+                def image= "${env.IMAGE_NAME}:${imageTag}"
                 script {
                     newImage = docker.build('${imageName}':'${imageTag}')
-                    docker.withRegistry("https://hub.docker.com/v2", '${credentialsId}'){
+                    docker.withRegistry("https://hub.docker.com/v2", '${env.DOCKERHUB_CREDENTIALS_ID}'){
                         newImage.tag("latest", false)
                         newImage.push()
 
