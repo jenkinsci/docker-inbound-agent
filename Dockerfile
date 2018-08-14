@@ -27,15 +27,7 @@ ARG DOCKER_VERSION="18.06.0-ce"
 ARG AGENT_VERSION=3.23
 ARG AGENT_WORKDIR=/home/${user}/agent
 
-ARG user=jenkins
-ARG group=jenkins
-ARG uid=10000
-ARG gid=10000
-
-
 ENV HOME /home/${user}
-RUN groupadd -g ${gid} ${group}
-RUN useradd -c "Jenkins user" -d $HOME -u ${uid} -g ${gid} -m ${user}
 
 RUN curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
   && chmod 755 /usr/share/jenkins \
@@ -50,11 +42,8 @@ RUN mkdir /home/${user}/.jenkins && mkdir -p ${AGENT_WORKDIR} \
     && chmod +x /usr/bin/docker /usr/local/bin/jenkins-slave \
     && rm -rf /tmp/docker /tmp/docker.tar.gz
 
-USER ${user}
-VOLUME /home/${user}/.jenkins
-VOLUME ${AGENT_WORKDIR}
 WORKDIR /home/${user}
-
+VOLUME /var/run/docker.sock
 
 
 ENTRYPOINT ["jenkins-slave"]
