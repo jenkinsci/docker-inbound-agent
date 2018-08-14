@@ -20,7 +20,7 @@ pipeline {
             }
         }
         stage('Push tagged release') {
-            when { buildingTag() }
+            when { tag "*" }
             steps {
                 script {
                     def imageTag = "release-${TAG_NAME}"
