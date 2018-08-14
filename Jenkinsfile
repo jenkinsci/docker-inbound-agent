@@ -32,7 +32,8 @@ pipeline {
                         newImage.tag("latest", false)
                         newImage.push()
 
-                    }
+                       }
+                }
             }
         }
     }
