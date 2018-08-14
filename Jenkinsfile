@@ -12,10 +12,9 @@ pipeline {
                 def imageTag = "build-${shortCommit}"
                 def image= "${env.IMAGE_NAME}:${imageTag}"
                 echo 'Starting to build docker image ${env.IMAGE_NAME}:${imageTag}'
-                
-                    docker.withRegistry("https://hub.docker.com/v2", '${env.DOCKERHUB_CREDENTIALS_ID}'){
-                        newImage = docker.build('${image}')
-                        newImage.tag("latest", false)
+                newImage = docker.build('${image}')
+                newImage.tag("latest", false)
+                    docker.withRegistry("https://hub.docker.com/v2", ${env.DOCKERHUB_CREDENTIALS_ID}){
                         newImage.push()
                     }
                    
@@ -28,9 +27,9 @@ pipeline {
                 script {
                     def imageTag = "release-${TAG_NAME}"
                     def image= "${env.IMAGE_NAME}:${imageTag}"
-                    docker.withRegistry("https://hub.docker.com/v2", '${env.DOCKERHUB_CREDENTIALS_ID}'){
-                        newImage = docker.build('${imageName}':'${imageTag}')
-                        newImage.tag("latest", false)
+                    newImage = docker.build('${imageName}':'${imageTag}')
+                    newImage.tag("latest", false)
+                    docker.withRegistry("https://hub.docker.com/v2", ${env.DOCKERHUB_CREDENTIALS_ID}){
                         newImage.push()
                        }
                     }
