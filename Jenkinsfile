@@ -13,7 +13,7 @@ pipeline {
                 def image= "${env.IMAGE_NAME}:${imageTag}"
                 echo 'Starting to build docker image ${env.IMAGE_NAME}:${imageTag}'
                 newImage = docker.build("${image}")
-                    docker.withRegistry("${env.DOCKERHUB_CREDENTIALS_ID}"){
+                    docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS_ID}"){
                         newImage.push()
                     }       
                 }
@@ -26,7 +26,7 @@ pipeline {
                     def imageTag = "release-${TAG_NAME}"
                     def image= "${env.IMAGE_NAME}:${imageTag}"
                     newImage = docker.build("${image}")
-                    docker.withRegistry("${env.DOCKERHUB_CREDENTIALS_ID}"){
+                    docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS_ID}"){
                         newImage.push()
                     }
                 }
