@@ -13,20 +13,20 @@ pipeline {
                 shortCommit = readFile('GIT_COMMIT').take(8)
                 def imageTag = "build-${shortCommit}"
                 def image= "${env.IMAGE_NAME}:${imageTag}"
-                script {
+                
                     docker.withRegistry("https://hub.docker.com/v2", '${env.DOCKERHUB_CREDENTIALS_ID}'){
                         newImage = docker.build('${image}')
                         newImage.tag("latest", false)
                         newImage.push()
                     }
-                }   
+                   
             }
         }
     }
         stage('Push tagged release') {
             when { buildingTag() }
             steps {
-                script {
+                
                 def imageTag = "release-${TAG_NAME}"
                 def image= "${env.IMAGE_NAME}:${imageTag}"
                 script {
@@ -36,7 +36,7 @@ pipeline {
                         newImage.push()
                        }
                     }
-                }
+                
             }
         }
     }
