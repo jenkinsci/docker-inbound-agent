@@ -20,21 +20,41 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-FROM jenkins/slave:3.23-1
-MAINTAINER Oleg Nenashev <o.v.nenashev@gmail.com>
-LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="3.23"
+FROM openjdk:8-jdk
+LABEL maintainer="lukas@capturemedia.ch"
 
 ARG DOCKER_VERSION="18.06.0-ce"
+ARG AGENT_VERSION=3.23
+ARG AGENT_WORKDIR=/home/${user}/agent
+
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=10000
+ARG gid=10000
+
+
+ENV HOME /home/${user}
+RUN groupadd -g ${gid} ${group}
+RUN useradd -c "Jenkins user" -d $HOME -u ${uid} -g ${gid} -m ${user}
+
+RUN curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-ci.org/public/org/jenkins-ci/main/remoting/${AGENT_VERSION}/remoting-${AGENT_VERSION}.jar \
+  && chmod 755 /usr/share/jenkins \
+  && chmod 644 /usr/share/jenkins/slave.jar
 
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
-RUN apk add --no-cache git xz wget bash \
-    && mkdir /tmp/docker \
+RUN mkdir /home/${user}/.jenkins && mkdir -p ${AGENT_WORKDIR} \
     && wget https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz -O /tmp/docker.tar.gz \
     && tar xfv /tmp/docker.tar.gz -C /tmp \
     && mv /tmp/docker/docker /usr/bin/docker \
-    && chmod +x /usr/bin/docker \
-    && rm -rf /tmp/docker /tmp/docker.tar.gz \
-    && apk del wget
+    && chmod +x /usr/bin/docker /usr/local/bin/jenkins-slave \
+    && rm -rf /tmp/docker /tmp/docker.tar.gz
+
+USER ${user}
+VOLUME /home/${user}/.jenkins
+VOLUME ${AGENT_WORKDIR}
+WORKDIR /home/${user}
+
+
 
 ENTRYPOINT ["jenkins-slave"]
