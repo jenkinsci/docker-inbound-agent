@@ -24,6 +24,17 @@ FROM jenkins/slave:3.23-1
 MAINTAINER Oleg Nenashev <o.v.nenashev@gmail.com>
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="3.23"
 
+ARG DOCKER_VERSION="18.06.0-ce"
+
 COPY jenkins-slave /usr/local/bin/jenkins-slave
+
+RUN apk add --no-cache git xz wget bash \
+    && mkdir /tmp/docker \
+    && wget https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz -O /tmp/docker.tar.gz \
+    && tar xfv /tmp/docker.tar.gz -C /tmp \
+    && mv /tmp/docker/docker /usr/bin/docker \
+    && chmod +x /usr/bin/docker \
+    && rm -rf /tmp/docker /tmp/docker.tar.gz \
+    && apk del wget
 
 ENTRYPOINT ["jenkins-slave"]
