@@ -1,7 +1,7 @@
 FROM openjdk:8-jdk
 LABEL maintainer="lukas@capturemedia.ch"
 
-ARG DOCKER_VERSION="18.06.0-ce"
+ARG DOCKER_VERSION="17.03.2-ce"
 ARG AGENT_VERSION=3.23
 ARG AGENT_WORKDIR=/home/${user}/agent
 
@@ -28,4 +28,3 @@ VOLUME /var/run/docker.sock
 
 
 ENTRYPOINT ["jenkins-slave"]
-
