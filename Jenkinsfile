@@ -8,26 +8,25 @@ pipeline {
         stage('Build image') {
             steps {
                 script {
-                shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim().take(8)
-                def imageTag = "build-${shortCommit}"
-                def image= "${env.IMAGE_NAME}:${imageTag}"
-                echo 'Starting to build docker image ${env.IMAGE_NAME}:${imageTag}'
-                newImage = docker.build("${image}")
-                    docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS_ID}"){
-                        newImage.push()
-                    }       
+                sh 'make build'
                 }
             }
         }
-        stage('Push tagged release') {
-            when { buildingTag() }
+        stage('Push image') {
             steps {
                 script {
-                    def imageTag = "release-${TAG_NAME}"
-                    def image= "${env.IMAGE_NAME}:${imageTag}"
-                    newImage = docker.build("${image}")
                     docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS_ID}"){
-                        newImage.push()
+                        sh 'make snapshot'
+                    }
+                }
+            }
+        }
+        stage('Release new version') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS_ID}"){
+                        sh 'make release'
+                    }
                     }
                 }
             }
