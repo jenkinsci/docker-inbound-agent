@@ -28,7 +28,6 @@ pipeline {
                     docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS_ID}"){
                         sh 'make release'
                     }
-                    }
                 }
             }
         }
