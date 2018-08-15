@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { node { label 'jenkins-slave' } }
         environment {
             IMAGE_NAME='capturemedia/jenkins-slave-jnlp-docker'
             DOCKERHUB_CREDENTIALS_ID='dockerhub-capturemediamachine'
