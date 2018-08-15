@@ -1,10 +1,8 @@
-REGISTRY_HOST=docker.io
-USERNAME=$(DOCKERHUB_CREDENTIALS_USR)
-PASSWORD=$(DOCKERHUB_CREDENTIALS_PSW)
+ORGANISATION=capturemedia
 NAME=$(shell basename $(CURDIR))
 
 RELEASE_SUPPORT := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))/.make-release-support
-IMAGE=$(REGISTRY_HOST)/$(USERNAME)/$(NAME)
+IMAGE=$(ORGANISATION)/$(NAME)
 
 VERSION=$(shell . $(RELEASE_SUPPORT) ; getVersion)
 TAG=$(shell . $(RELEASE_SUPPORT); getTag)
@@ -26,7 +24,14 @@ post-build:
 
 
 pre-push:
-	docker login -u $(USERNAME) -p $(PASSWORD)
+ifdef DOCKERHUB_CREDENTIALS_PSW
+	docker login -u $(DOCKERHUB_CREDENTIALS_USR) -p $(DOCKERHUB_CREDENTIALS_PSW)
+endif
+ifndef DOCKERHUB_CREDENTIALS_PSW
+	@echo "No credentials for Dockerhub found in environment, please enter manually"
+	docker login
+endif
+	
 
 post-push:
 
