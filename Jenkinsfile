@@ -22,6 +22,7 @@ pipeline {
             }
         }
         stage('Release new version') {
+            when { buildingTag() }
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS_ID}"){
