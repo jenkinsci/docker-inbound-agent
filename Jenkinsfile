@@ -1,23 +1,20 @@
 pipeline {
     agent { node { label 'jenkins-slave' } }
         environment {
-            IMAGE_NAME='capturemedia/jenkins-slave-jnlp-docker'
-            DOCKERHUB_CREDENTIALS_ID='dockerhub-capturemediamachine'
+            DOCKERHUB_CREDENTIALS='dockerhub-capturemediamachine'
         }
     stages {
         stage('Build image') {
             steps {
                 script {
-                sh 'make build'
+                    sh 'make build'
                 }
             }
         }
         stage('Push image') {
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS_ID}"){
-                        sh 'make snapshot'
-                    }
+                    sh 'make snapshot'
                 }
             }
         }
@@ -25,9 +22,7 @@ pipeline {
             when { buildingTag() }
             steps {
                 script {
-                    docker.withRegistry('https://registry.hub.docker.com', "${env.DOCKERHUB_CREDENTIALS_ID}"){
-                        sh 'make release'
-                    }
+                    sh 'make release'
                 }
             }
         }

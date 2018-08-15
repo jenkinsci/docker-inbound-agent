@@ -1,5 +1,6 @@
 REGISTRY_HOST=docker.io
-USERNAME=capturemedia
+USERNAME=$(DOCKERHUB_CREDENTIALS_USR)
+PASSWORD=$(DOCKERHUB_CREDENTIALS_PSW)
 NAME=$(shell basename $(CURDIR))
 
 RELEASE_SUPPORT := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))/.make-release-support
@@ -25,7 +26,7 @@ post-build:
 
 
 pre-push:
-
+	docker login -u $(USERNAME) -p $(PASSWORD)
 
 post-push:
 
