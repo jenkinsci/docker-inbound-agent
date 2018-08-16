@@ -21,7 +21,9 @@ RUN mkdir -p ${HOME}/.jenkins && mkdir -p ${AGENT_WORKDIR} \
   && chmod +x /usr/bin/docker /usr/local/bin/jenkins-slave \
   && rm -rf /tmp/docker /tmp/docker.tar.gz \
   && apt-get update \
-  && apt-get install -y jq make git
+  && apt-get install -y jq make git python3-pip \
+  && pip3 install --upgrade pip \
+  && pip3 install awscli boto3
 
 WORKDIR /var/jenkins_home
 VOLUME /var/run/docker.sock
