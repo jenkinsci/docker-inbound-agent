@@ -26,7 +26,7 @@ LABEL maintainer="lukas@capturemedia.ch"
 ARG USER=jenkins
 ARG DOCKER_VERSION="18.06.0-ce"
 ARG AGENT_VERSION=3.23
-ARG AGENT_WORKDIR=/home/${USER}/agent
+ARG AGENT_WORKDIR=/var/jenkins_home
 
 ENV HOME /home/${USER}
 
@@ -37,13 +37,13 @@ RUN curl --create-dirs -sSLo /usr/share/jenkins/slave.jar https://repo.jenkins-c
 COPY jenkins-slave /usr/local/bin/jenkins-slave
 
 RUN mkdir /home/${USER}/.jenkins && mkdir -p ${AGENT_WORKDIR} \
-    && wget https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz -O /tmp/docker.tar.gz \
-    && tar xfv /tmp/docker.tar.gz -C /tmp \
-    && mv /tmp/docker/docker /usr/bin/docker \
-    && chmod +x /usr/bin/docker /usr/local/bin/jenkins-slave \
-    && rm -rf /tmp/docker /tmp/docker.tar.gz
+  && wget https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz -O /tmp/docker.tar.gz \
+  && tar xfv /tmp/docker.tar.gz -C /tmp \
+  && mv /tmp/docker/docker /usr/bin/docker \
+  && chmod +x /usr/bin/docker /usr/local/bin/jenkins-slave \
+  && rm -rf /tmp/docker /tmp/docker.tar.gz
 
-WORKDIR /home/${USER}
+WORKDIR /var/jenkins_home
 VOLUME /var/run/docker.sock
 
 
