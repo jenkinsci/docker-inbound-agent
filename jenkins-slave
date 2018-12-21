@@ -29,6 +29,22 @@
 # * JENKINS_SECRET : agent secret, if not set as an argument
 # * JENKINS_AGENT_NAME : agent name, if not set as an argument
 # * JENKINS_AGENT_WORKDIR : agent work directory, if not set by optional parameter -workDir
+# * JENKINS_USERNAME : username to use when authenticating to master -credentials
+# * JENKINS_PASSWORD : password to use when authenticating to master -credentials
+
+
+# Get the secret from Jenkins master
+get_secret() {
+	local jenkins_url="$1"
+	local jenkins_agent_name="$2"
+	local username="$3"
+	local password="$4"
+	local crumb=".crumb:dac7ce5614f8cb32a6ce75153aaf2398"
+
+	secret="$(curl -L -s -u $username:$password -H "$crumb" -X GET $jenkins_url/computer/$jenkins_agent_name/slave-agent.jnlp \
+	    | sed "s/.*<application-desc main-class=\"hudson.remoting.jnlp.Main\"><argument>\([a-z0-9]*\).*/\1/")"
+	echo "$secret"
+}
 
 if [ $# -eq 1 ]; then
 
@@ -82,8 +98,11 @@ else
 			*)
 			OPT_JENKINS_SECRET="${JENKINS_SECRET}" ;;
 		esac
+	# use jenkins credentials if secret not defined
+	elif [ -n "$JENKINS_USERNAME" ] && [ -n "$JENKINS_PASSWORD" ]; then
+		OPT_JENKINS_SECRET="$(get_secret "$JENKINS_URL" "$JENKINS_AGENT_NAME" "$JENKINS_USERNAME" "$JENKINS_PASSWORD")"
 	fi
-	
+
 	OPT_JENKINS_AGENT_NAME=""
 	if [ -n "$JENKINS_AGENT_NAME" ]; then
 		case "$@" in
