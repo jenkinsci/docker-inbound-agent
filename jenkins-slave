@@ -30,7 +30,7 @@
 # * JENKINS_AGENT_NAME : agent name, if not set as an argument
 # * JENKINS_AGENT_WORKDIR : agent work directory, if not set by optional parameter -workDir
 # * JENKINS_USERNAME : username to use when authenticating to master -credentials
-# * JENKINS_PASSWORD : password to use when authenticating to master -credentials
+# * JENKINS_PASSWORD : password or API token to use when authenticating to master -credentials
 
 
 # Get the secret from Jenkins master
@@ -39,9 +39,10 @@ get_secret() {
 	local jenkins_agent_name="$2"
 	local username="$3"
 	local password="$4"
-	local crumb=".crumb:dac7ce5614f8cb32a6ce75153aaf2398"
 
-	secret="$(curl -L -s -u $username:$password -H "$crumb" -X GET $jenkins_url/computer/$jenkins_agent_name/slave-agent.jnlp \
+	crumb="$(curl -s -u "$username:$password" "$jenkins_url/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\":\",//crumb)")"
+
+	secret="$(curl -L -s -u "$username:$password" -H "$crumb" -X GET $jenkins_url/computer/$jenkins_agent_name/slave-agent.jnlp \
 	    | sed "s/.*<application-desc main-class=\"hudson.remoting.jnlp.Main\"><argument>\([a-z0-9]*\).*/\1/")"
 	echo "$secret"
 }
