@@ -30,7 +30,7 @@
 # * JENKINS_AGENT_NAME : agent name, if not set as an argument
 # * JENKINS_AGENT_WORKDIR : agent work directory, if not set by optional parameter -workDir
 # * JENKINS_USERNAME : username to use when authenticating to master -credentials
-# * JENKINS_PASSWORD : password or API token to use when authenticating to master -credentials
+# * JENKINS_API_TOKEN : password or API token to use when authenticating to master -credentials
 
 
 # Get the secret from Jenkins master
@@ -100,8 +100,8 @@ else
 			OPT_JENKINS_SECRET="${JENKINS_SECRET}" ;;
 		esac
 	# use jenkins credentials if secret not defined
-	elif [ -n "$JENKINS_USERNAME" ] && [ -n "$JENKINS_PASSWORD" ]; then
-		OPT_JENKINS_SECRET="$(get_secret "$JENKINS_URL" "$JENKINS_AGENT_NAME" "$JENKINS_USERNAME" "$JENKINS_PASSWORD")"
+	elif [ -n "$JENKINS_USERNAME" ] && [ -n "$JENKINS_API_TOKEN" ]; then
+		OPT_JENKINS_SECRET="$(get_secret "$JENKINS_URL" "$JENKINS_AGENT_NAME" "$JENKINS_USERNAME" "$JENKINS_API_TOKEN")"
 	fi
 
 	OPT_JENKINS_AGENT_NAME=""
