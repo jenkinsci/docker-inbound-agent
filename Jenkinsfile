@@ -16,11 +16,22 @@ pipeline {
     }
 
     stages {
-        stage('Build Docker Image') {
-            steps {
-                deleteDir()
-                checkout scm
-                sh 'make build'
+        parallel {
+            stage('Build Linux Docker Image') {
+                steps {
+                    deleteDir()
+                    checkout scm
+                    sh 'make build'
+                }
+            }
+
+            state('Build Windows Docker Image') {
+                agent { label 'windows' }
+                steps {
+                    deleteDir()
+                    checkout scm
+                    powershell './make.ps1'
+                }
             }
         }
     }
