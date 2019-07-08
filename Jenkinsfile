@@ -24,15 +24,6 @@ pipeline {
                     sh 'make build'
                 }
             }
-
-            state('Build Windows Docker Image') {
-                agent { label 'windows' }
-                steps {
-                    deleteDir()
-                    checkout scm
-                    powershell './make.ps1'
-                }
-            }
         }
     }
 }
