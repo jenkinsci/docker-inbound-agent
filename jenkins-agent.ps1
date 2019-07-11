@@ -27,7 +27,7 @@ Param(
 	$Secret = '',
 	$Name = '',
 	$Tunnel = '',
-	$WorkDir = 'C:/jenkins/agent',
+	$WorkDir = 'C:/Users/jenkins/Agent',
 	$JavaHome = $env:JAVA_HOME
 )
 
@@ -41,7 +41,7 @@ Param(
 
 if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 	# if `docker run` only has one arguments, we assume user is running alternate command like `bash` to inspect the image
-	& "$Cmd"
+	Invoke-Expression "$Cmd"
 } else {
 	# if -Tunnel is not provided, try env vars
 	if(![System.String]::IsNullOrWhiteSpace($env:JENKINS_TUNNEL)) {
@@ -52,7 +52,7 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 	}
 	$Tunnel = $Tunnel.Trim()
 	if(![System.String]::IsNullOrWhiteSpace($Tunnel)) {
-		$Tunnel = " -tunnel $Tunnel)"
+		$Tunnel = " -tunnel `"$Tunnel`""
 	}
 
 	# if -WorkDir is not provided, try env vars
