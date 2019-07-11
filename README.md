@@ -14,25 +14,25 @@ See [Jenkins Distributed builds](https://wiki.jenkins-ci.org/display/JENKINS/Dis
 
 ## Running
 
-To run a Docker container
+To run a Docker container 
 
-  Linux
+  Linux agent:
 
     docker run jenkins/jnlp-slave -url http://jenkins-server:port <secret> <agent name>
-
-  Windows
+    
+  Windows agent:
 
     docker run jenkins/jnlp-agent:latest-windows -Url http://jenkins-server:port -Secret <secret> -Name <agent name>
 
-To run a Docker container with [Work Directory](https://github.com/jenkinsci/remoting/blob/master/docs/workDir.md):
+To run a Docker container with [Work Directory](https://github.com/jenkinsci/remoting/blob/master/docs/workDir.md) 
 
-  Linux
+  Linux agent:
 
     docker run jenkins/jnlp-slave -url http://jenkins-server:port -workDir=/home/jenkins/agent <secret> <agent name>
-
-  Windows 
-
-    docker run jenkins/jnlp-agent:latest-windows -Url http://jenkins-server:port -WorkDir=C:/Users/jenkins/Agent -Secret <secret> -Name <agent name>
+    
+  Windows agent:
+  
+    docker run jenkins/jnlp-agent-windows -Url http://jenkins-server:port -WorkDir=C:/Jenkins/agent -Secret <secret> -Name <agent name>
 
 Optional environment variables:
 

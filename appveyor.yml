@@ -1,0 +1,9 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+
+install:
+  - docker version
+  - docker info
+
+build_script:
+  - ps: ./make.ps1
