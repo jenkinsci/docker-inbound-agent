@@ -20,7 +20,7 @@ pipeline {
             parallel {
                 stage('Windows') {
                     agent {
-                        label "windock"
+                        label "windock&&windows"
                     }
                     steps {
                         deleteDir()
@@ -30,7 +30,7 @@ pipeline {
                 }
                 stage('Linux') {
                     agent {
-                        label "docker"
+                        label "docker&&linux"
                     }
                     steps {
                         deleteDir()
