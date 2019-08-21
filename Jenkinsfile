@@ -23,6 +23,8 @@ pipeline {
                         label "windock"
                     }
                     steps {
+                        deleteDir()
+                        checkout scm
                         bat "powershell -File ./make.ps1"
                     }
                 }
@@ -31,6 +33,8 @@ pipeline {
                         label "docker"
                     }
                     steps {
+                        deleteDir()
+                        checkout scm
                         sh "make build"
                     }
                 }
