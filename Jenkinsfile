@@ -17,11 +17,23 @@ pipeline {
 
     stages {
         stage('Build Docker Image') {
-            steps {
-                deleteDir()
-                checkout scm
-                sh 'make build'
-            }
+            parallel {
+                stage('Windows') {
+                    agent {
+                        label "windock"
+                    }
+                    steps {
+                        bat "powershell -File ./make.ps1"
+                    }
+                }
+                stage('Linux') {
+                    agent {
+                        label "docker"
+                    }
+                    steps {
+                        sh "make build"
+                    }
+                }
         }
     }
 }
