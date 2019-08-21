@@ -38,6 +38,7 @@ pipeline {
                         sh "make build"
                     }
                 }
+            }
         }
     }
 }
