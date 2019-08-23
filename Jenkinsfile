@@ -20,7 +20,7 @@ pipeline {
             parallel {
                 stage('Windows') {
                     agent {
-                        label "windock&&windows"
+                        label 'windock'
                     }
                     steps {
                         deleteDir()
