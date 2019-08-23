@@ -25,7 +25,7 @@ pipeline {
                     steps {
                         deleteDir()
                         checkout scm
-                        powershell "& ./make.ps1"
+                        powershell '& ./make.ps1'
                     }
                 }
                 stage('Linux') {
