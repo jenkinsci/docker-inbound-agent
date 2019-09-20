@@ -1,8 +1,10 @@
 # Jenkins JNLP Agent Docker image
 
+[![Join the chat at https://gitter.im/jenkinsci/docker-slave](https://badges.gitter.im/jenkinsci/docker-slave.svg)](https://gitter.im/jenkinsci/docker-slave?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Docker Stars](https://img.shields.io/docker/stars/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
 [![Docker Automated build](https://img.shields.io/docker/automated/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/docker-jnlp-slave.svg?label=chanelog)](https://github.com/jenkinsci/docker-jnlp-slave/releases/latest)
 
 :exclamation: **Warning!** This image used to be published as [jenkinsci/jnlp-slave](https://hub.docker.com/r/jenkinsci/jnlp-slave/). 
 That image name is deprecated, use [jenkins/jnlp-slave](https://hub.docker.com/r/jenkins/jnlp-slave/).
