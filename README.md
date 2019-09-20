@@ -1,8 +1,10 @@
 # Jenkins JNLP Agent Docker image
 
+[![Join the chat at https://gitter.im/jenkinsci/docker-slave](https://badges.gitter.im/jenkinsci/docker-slave.svg)](https://gitter.im/jenkinsci/docker-slave?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Docker Stars](https://img.shields.io/docker/stars/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
 [![Docker Automated build](https://img.shields.io/docker/automated/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/docker-jnlp-slave.svg?label=chanelog)](https://github.com/jenkinsci/docker-jnlp-slave/releases/latest)
 
 :exclamation: **Warning!** This image used to be published as [jenkinsci/jnlp-slave](https://hub.docker.com/r/jenkinsci/jnlp-slave/). 
 That image name is deprecated, use [jenkins/jnlp-slave](https://hub.docker.com/r/jenkins/jnlp-slave/).
@@ -47,7 +49,7 @@ Optional environment variables:
 ### Enabled JNLP protocols
 
 By default, the [JNLP3-connect](https://github.com/jenkinsci/remoting/blob/master/docs/protocols.md#jnlp3-connect) is disabled due to the known stability and scalability issues.
-You can enable this protocol on your own risk using the 
+You can enable this protocol at your own risk using the 
 `JNLP_PROTOCOL_OPTS=-Dorg.jenkinsci.remoting.engine.JnlpProtocol3.disabled=false` property (the protocol should be enabled on the master side as well).
 
 In Jenkins versions starting from `2.27` there is a [JNLP4-connect](https://github.com/jenkinsci/remoting/blob/master/docs/protocols.md#jnlp4-connect) protocol. 
