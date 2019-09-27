@@ -52,7 +52,7 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 	}
 	$Tunnel = $Tunnel.Trim()
 	if(![System.String]::IsNullOrWhiteSpace($Tunnel)) {
-		$Tunnel = " -tunnel `"$Tunnel`""
+		$Tunnel = "-tunnel `"$Tunnel`""
 	}
 
 	# if -WorkDir is not provided, try env vars
@@ -64,7 +64,7 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 	}
 	$WorkDir = $WorkDir.Trim()
 	if(![System.String]::IsNullOrWhiteSpace($WorkDir)) {
-		$WorkDir = " -workDir `"$WorkDir`""
+		$WorkDir = "-workDir `"$WorkDir`""
 	}
 
 	# if -Url is not provided, try env vars
@@ -76,7 +76,7 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 	}
 	$Url = $Url.Trim()
 	if(![System.String]::IsNullOrWhiteSpace($Url)) {
-		$Url = " -url `"$Url`""
+		$Url = "-url `"$Url`""
 	}
 
 	# if -Name is not provided, try env vars
@@ -108,11 +108,33 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 		$Secret = $env:JENKINS_SECRET
 	}
 	$Secret = $Secret.Trim()
-	if(![System.String]::IsNullOrWhiteSpace($Secret)) {
-		$Secret = " $Secret"
-	}
+
+	$ArgumentList = @(
+		$jnlpProtocolOpts,
+		"-cp",
+		"C:/ProgramData/Jenkins/agent.jar",
+		"hudson.remoting.jnlp.Main",
+		"-headless",
+		$Tunnel,
+		$Url,
+		$WorkDir,
+		$Secret,
+		$Name
+	)
 
 	#TODO: Handle the case when the command-line and Environment variable contain different values.
-	#It is fine it blows up for now since it should lead to an error anyway.
-	Start-Process -FilePath $JAVA_BIN -Wait -NoNewWindow -ArgumentList $("$jnlpProtocolOpts -cp C:/ProgramData/Jenkins/agent.jar hudson.remoting.jnlp.Main -headless$Tunnel$Url$WorkDir$Secret $Name")
+
+	Write-Verbose "Starting to execute Jenkins Agent"
+	$process = Start-Process -FilePath $JAVA_BIN -Wait -NoNewWindow -ArgumentList $ArgumentList
+	$exitCode = $process.ExitCode
+	if ($exitCode -eq 0)
+	{
+		Write-Verbose "Installation successful"
+		return $exitCode
+	}
+	else
+	{
+		Write-Error -Message "Non zero exit code returned by the installation process: $exitCode."
+		return $exitCode
+	}
 }
