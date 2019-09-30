@@ -23,8 +23,12 @@ pipeline {
                         label 'windock'
                     }
                     steps {
-                        deleteDir()
-                        checkout scm
+                        checkout([
+                            $class: 'GitSCM',
+                            branches: scm.branches,
+                            extensions: scm.extensions + [[$class: 'CleanBeforeCheckout']],
+                            userRemoteConfigs: scm.userRemoteConfigs
+                        ])
                         powershell '& ./make.ps1'
                     }
                 }
