@@ -22,24 +22,37 @@ pipeline {
                     agent {
                         label 'windock'
                     }
+                    environment {
+                        DOCKERHUB_ORGANISATION = 'jenkins4eval'
+                    }
                     steps {
-                        checkout([
-                            $class: 'GitSCM',
-                            branches: scm.branches,
-                            extensions: scm.extensions + [[$class: 'CleanBeforeCheckout']],
-                            userRemoteConfigs: scm.userRemoteConfigs
-                        ])
-                        powershell '& ./make.ps1'
+                        script {
+                            // we can't use dockerhub builds for windows
+                            // so we publish here
+                            if (infra.isTrusted()) {
+                                env.DOCKERHUB_ORGANISATION = 'jenkins'
+                            }
+                            infra.withDockerCredentials {
+                                powershell '& ./make.ps1 publish'
+                            }
+                            
+                            powershell '& docker system prune --force --all'
+                        }
+                        
                     }
                 }
                 stage('Linux') {
                     agent {
                         label "docker&&linux"
                     }
-                    steps {
-                        deleteDir()
-                        checkout scm
-                        sh "make build"
+                    steps {                        
+                        script {
+                            if(!infra.isTrusted()) {                                
+                                deleteDir()
+                                checkout scm
+                                sh "make build"
+                            }
+                        }
                     }
                 }
             }
