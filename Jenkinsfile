@@ -50,7 +50,7 @@ pipeline {
                             if(!infra.isTrusted()) {                                
                                 deleteDir()
                                 checkout scm
-                                sh "make build"
+                                sh "make build ; docker system prune --force --all"
                             }
                         }
                     }
