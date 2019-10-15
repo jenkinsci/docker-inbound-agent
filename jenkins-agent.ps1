@@ -31,7 +31,7 @@ Param(
 	$JavaHome = $env:JAVA_HOME
 )
 
-# Usage jenkins-slave.ps1 [options] -Url http://jenkins -Secret [SECRET] -Name [AGENT_NAME]
+# Usage jenkins-agent.ps1 [options] -Url http://jenkins -Secret [SECRET] -Name [AGENT_NAME]
 # Optional environment variables :
 # * JENKINS_TUNNEL : HOST:PORT for a tunnel to route TCP traffic to jenkins host, when jenkins can't be directly accessed over network
 # * JENKINS_URL : alternate jenkins URL
