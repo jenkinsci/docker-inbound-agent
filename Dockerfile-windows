@@ -20,7 +20,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-FROM jenkins4eval/remoting:latest-windows
+FROM jenkins/agent:latest-windows
 MAINTAINER Alex Earl <slide.o.mix@gmail.com>
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="3.29"
 
