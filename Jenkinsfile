@@ -6,7 +6,6 @@ pipeline {
     agent none
 
     options {
-        timeout(time: 30, unit: 'MINUTES')
         buildDiscarder(logRotator(daysToKeepStr: '10'))
         timestamps()
     }
@@ -21,6 +20,9 @@ pipeline {
                 stage('Windows') {
                     agent {
                         label 'windock'
+                    }
+                    options {
+                        timeout(time: 60, unit: 'MINUTES')
                     }
                     environment {
                         DOCKERHUB_ORGANISATION = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}"
@@ -41,6 +43,9 @@ pipeline {
                 stage('Linux') {
                     agent {
                         label "docker&&linux"
+                    }
+                    options {
+                        timeout(time: 30, unit: 'MINUTES')
                     }
                     steps {                        
                         script {
