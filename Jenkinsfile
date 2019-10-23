@@ -29,10 +29,15 @@ pipeline {
                     }
                     steps {
                         script {
-                            // we can't use dockerhub builds for windows
-                            // so we publish here
-                            infra.withDockerCredentials {
-                                powershell '& ./make.ps1 publish'
+                            powershell '& ./make.ps1 build'
+                            
+                            def branchName = "${env.BRANCH_NAME}"
+                            if (branchName ==~ 'master') {
+                                // we can't use dockerhub builds for windows
+                                // so we publish here
+                                infra.withDockerCredentials {
+                                    powershell '& ./make.ps1 publish'
+                                }
                             }
                             
                             powershell '& docker system prune --force --all'
