@@ -22,18 +22,20 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-# Usage jenkins-agent.sh [options] -url http://jenkins [SECRET] [AGENT_NAME]
-# Optional environment variables :
-# * JENKINS_TUNNEL : HOST:PORT for a tunnel to route TCP traffic to jenkins host, when jenkins can't be directly accessed over network
-# * JENKINS_URL : alternate jenkins URL
+# Usage: jenkins-agent [options] [-url http://jenkins/] [SECRET] [AGENT_NAME]
+# or:    JENKINS_URL=http://jenkins/ JENKINS_AGENT_NAME=myagent JENKINS_SECRET=s3cr3t [LAUNCHER_OPTS=-noKeepAlive] jenkins-agent
+# Environment variables:
+# * JENKINS_URL : Jenkins URL, if not set via -url
 # * JENKINS_SECRET : agent secret, if not set as an argument
 # * JENKINS_AGENT_NAME : agent name, if not set as an argument
+# * JENKINS_TUNNEL : HOST:PORT for a tunnel to route TCP traffic to Jenkins host, when Jenkins can't be directly accessed over network
 # * JENKINS_AGENT_WORKDIR : agent work directory, if not set by optional parameter -workDir
 # * JENKINS_DIRECT_CONNECTION: Connect directly to this TCP agent port, skipping the HTTP(S) connection parameter download.
 #                              Value: "<HOST>:<PORT>"
 # * JENKINS_INSTANCE_IDENTITY: The base64 encoded InstanceIdentity byte array of the Jenkins master. When this is set,
 #                              the agent skips connecting to an HTTP(S) port for connection info.
 # * JENKINS_PROTOCOLS:         Specify the remoting protocols to attempt when instanceIdentity is provided.
+# * LAUNCHER_OPTS: additional options to pass to the preferred launcher
 
 if [ $# -eq 1 ]; then
 
@@ -113,5 +115,13 @@ else
 	#TODO: Handle the case when the command-line and Environment variable contain different values.
 	#It is fine it blows up for now since it should lead to an error anyway.
 
-	exec $JAVA_BIN $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
+	if [ -z "$JENKINS_DIRECT_CONNECTION" -a -z "$JENKINS_TUNNEL" -a $# -eq 0 ]
+	then
+		# Assuming we are not using direct connection, and all parameters are specified via environment variable, prefer hudson.remoting.Launcher.
+		# Ignoring $JENKINS_AGENT_WORKDIR, which is canonically available from slave-agent.jnlp anyway.
+		exec $JAVA_BIN $JAVA_OPTS $JNLP_PROTOCOL_OPTS -jar /usr/share/jenkins/agent.jar -jnlpUrl ${JENKINS_URL}computer/$OPT_JENKINS_AGENT_NAME/slave-agent.jnlp -secret $OPT_JENKINS_SECRET "$LAUNCHER_OPTS"
+	else
+		# Compatibility mode, or using direct connection (no HTTP), or using tunnel (not supported by Launcher).
+		exec $JAVA_BIN $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
+	fi
 fi
