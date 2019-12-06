@@ -115,13 +115,13 @@ else
 	#TODO: Handle the case when the command-line and Environment variable contain different values.
 	#It is fine it blows up for now since it should lead to an error anyway.
 
-	if [ -z "$JENKINS_DIRECT_CONNECTION" -a -z "$JENKINS_TUNNEL" -a $# -eq 0 ]
+	if [ -z "$JENKINS_DIRECT_CONNECTION" -a $# -eq 0 ]
 	then
 		# Assuming we are not using direct connection, and all parameters are specified via environment variable, prefer hudson.remoting.Launcher.
-		# Ignoring $JENKINS_AGENT_WORKDIR, which is canonically available from slave-agent.jnlp anyway.
+		# Ignoring $JENKINS_AGENT_WORKDIR and $JENKINS_TUNNEL, which are canonically available from slave-agent.jnlp anyway.
 		exec $JAVA_BIN $JAVA_OPTS $JNLP_PROTOCOL_OPTS -jar /usr/share/jenkins/agent.jar -jnlpUrl ${JENKINS_URL}computer/$OPT_JENKINS_AGENT_NAME/slave-agent.jnlp -secret $OPT_JENKINS_SECRET "$LAUNCHER_OPTS"
 	else
-		# Compatibility mode, or using direct connection (no HTTP), or using tunnel (not supported by Launcher).
+		# Compatibility mode, or using direct connection (no HTTP).
 		exec $JAVA_BIN $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
 	fi
 fi
