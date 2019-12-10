@@ -29,6 +29,7 @@
 # * JENKINS_SECRET : agent secret, if not set as an argument
 # * JENKINS_AGENT_NAME : agent name, if not set as an argument
 # * JENKINS_AGENT_WORKDIR : agent work directory, if not set by optional parameter -workDir
+# * JENKINS_WEB_SOCKET: true if the connection should be made via WebSocket rather than TCP
 # * JENKINS_DIRECT_CONNECTION: Connect directly to this TCP agent port, skipping the HTTP(S) connection parameter download.
 #                              Value: "<HOST>:<PORT>"
 # * JENKINS_INSTANCE_IDENTITY: The base64 encoded InstanceIdentity byte array of the Jenkins master. When this is set,
@@ -73,6 +74,10 @@ else
 		JNLP_PROTOCOL_OPTS="-Dorg.jenkinsci.remoting.engine.JnlpProtocol3.disabled=true"
 	fi
 
+        if [ "$JENKINS_WEB_SOCKET" = true ]; then
+            WEB_SOCKET=-webSocket
+        fi
+
 	if [ -n "$JENKINS_PROTOCOLS" ]; then
 		PROTOCOLS="-protocols $JENKINS_PROTOCOLS"
 	fi
@@ -113,5 +118,5 @@ else
 	#TODO: Handle the case when the command-line and Environment variable contain different values.
 	#It is fine it blows up for now since it should lead to an error anyway.
 
-	exec $JAVA_BIN $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
+	exec $JAVA_BIN $JAVA_OPTS $JNLP_PROTOCOL_OPTS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $WEB_SOCKET $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
 fi
