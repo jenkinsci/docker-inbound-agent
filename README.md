@@ -1,6 +1,6 @@
 # Jenkins JNLP Agent Docker image
 
-[![Join the chat at https://gitter.im/jenkinsci/docker-slave](https://badges.gitter.im/jenkinsci/docker-slave.svg)](https://gitter.im/jenkinsci/docker-slave?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/jenkinsci/docker](https://badges.gitter.im/jenkinsci/docker.svg)](https://gitter.im/jenkinsci/docker-slave?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Docker Stars](https://img.shields.io/docker/stars/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
 [![Docker Automated build](https://img.shields.io/docker/automated/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
