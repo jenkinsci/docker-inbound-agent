@@ -3,10 +3,9 @@
  * This is currently handled through Automated Builds using standard Docker Hub feature
 */
 pipeline {
-    agent { label 'linux' }
+    agent none
 
     options {
-        timeout(time: 2, unit: 'MINUTES')
         buildDiscarder(logRotator(daysToKeepStr: '10'))
         timestamps()
     }
@@ -17,10 +16,52 @@ pipeline {
 
     stages {
         stage('Build Docker Image') {
-            steps {
-                deleteDir()
-                checkout scm
-                sh 'make build'
+            parallel {
+                stage('Windows') {
+                    agent {
+                        label 'windock'
+                    }
+                    options {
+                        timeout(time: 60, unit: 'MINUTES')
+                    }
+                    environment {
+                        DOCKERHUB_ORGANISATION = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}"
+                    }
+                    steps {
+                        script {
+                            powershell '& ./make.ps1 build'
+                            
+                            def branchName = "${env.BRANCH_NAME}"
+                            if (branchName ==~ 'master') {
+                                // we can't use dockerhub builds for windows
+                                // so we publish here
+                                infra.withDockerCredentials {
+                                    powershell '& ./make.ps1 publish'
+                                }
+                            }
+                            
+                            powershell '& docker system prune --force --all'
+                        }
+                        
+                    }
+                }
+                stage('Linux') {
+                    agent {
+                        label "docker&&linux"
+                    }
+                    options {
+                        timeout(time: 30, unit: 'MINUTES')
+                    }
+                    steps {                        
+                        script {
+                            if(!infra.isTrusted()) {                                
+                                deleteDir()
+                                checkout scm
+                                sh "make build ; docker system prune --force --all"
+                            }
+                        }
+                    }
+                }
             }
         }
     }

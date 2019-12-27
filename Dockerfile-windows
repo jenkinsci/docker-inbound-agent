@@ -21,11 +21,14 @@
 #  THE SOFTWARE.
 
 ARG version=latest-windows
-FROM jenkins4eval/remoting:$version
+FROM jenkins/agent:$version
 
 ARG version
 MAINTAINER Alex Earl <slide.o.mix@gmail.com>
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$version"
 
+ARG user=jenkins
+
 COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
+USER ${user}
 ENTRYPOINT ["powershell.exe", "-f", "C:/ProgramData/Jenkins/jenkins-agent.ps1"]
