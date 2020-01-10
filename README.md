@@ -48,8 +48,9 @@ Optional environment variables:
 
 ### Enabled JNLP protocols
 
-In Jenkins versions starting from `2.27` there is a [JNLP4-connect](https://github.com/jenkinsci/remoting/blob/master/docs/protocols.md#jnlp4-connect) protocol. 
-If you use Jenkins `2.32.x LTS`, it is recommended to enable the protocol on your instance.
+As of version 3.40-1 this image only supports the [JNLP4-connect](https://github.com/jenkinsci/remoting/blob/master/docs/protocols.md#jnlp4-connect) protocol.
+Earlier, long-unsupported protocols have been removed.
+As a result, Jenkins versions prior to 2.32 are no longer supported.
 
 ### Amazon ECS
 
