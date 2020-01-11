@@ -1,6 +1,6 @@
 # The MIT License
 #
-#  Copyright (c) 2019, Alex Earl
+#  Copyright (c) 2019-2020, Alex Earl
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -88,12 +88,6 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 	}
 	$Name = $Name.Trim()
 
-	$jnlpProtocolOpts = ''
-	if([System.String]::IsNullOrWhiteSpace($env:JNLP_PROTOCOL_OPTS)) {
-		Write-Warning "JnlpProtocol3 is disabled by default, use JNLP_PROTOCOL_OPTS to alter the behavior"
-		$jnlpProtocolOpts="-D`"org.jenkinsci.remoting.engine.JnlpProtocol3.disabled=true`""
-	}
-
 	# if java home is defined, use it
 	$JAVA_BIN="java.exe"
 	if(![System.String]::IsNullOrWhiteSpace($JavaHome)) {
@@ -114,5 +108,5 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 
 	#TODO: Handle the case when the command-line and Environment variable contain different values.
 	#It is fine it blows up for now since it should lead to an error anyway.
-	Start-Process -FilePath $JAVA_BIN -Wait -NoNewWindow -ArgumentList $("$jnlpProtocolOpts -cp C:/ProgramData/Jenkins/agent.jar hudson.remoting.jnlp.Main -headless$Tunnel$Url$WorkDir$Secret $Name")
+	Start-Process -FilePath $JAVA_BIN -Wait -NoNewWindow -ArgumentList $("-cp C:/ProgramData/Jenkins/agent.jar hudson.remoting.jnlp.Main -headless$Tunnel$Url$WorkDir$Secret $Name")
 }
