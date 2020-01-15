@@ -24,7 +24,7 @@ To run a Docker container
 
   Windows agent:
 
-    docker run --init jenkins/jnlp-agent:latest-windows -Url http://jenkins-server:port -Secret <secret> -Name <agent name>
+    docker run jenkins/jnlp-agent:latest-windows -Url http://jenkins-server:port -Secret <secret> -Name <agent name>
 
 To run a Docker container with [Work Directory](https://github.com/jenkinsci/remoting/blob/master/docs/workDir.md) 
 
@@ -34,7 +34,7 @@ To run a Docker container with [Work Directory](https://github.com/jenkinsci/rem
     
   Windows agent:
   
-    docker run --init jenkins/jnlp-agent-windows -Url http://jenkins-server:port -WorkDir=C:/Jenkins/agent -Secret <secret> -Name <agent name>
+    docker run jenkins/jnlp-agent-windows -Url http://jenkins-server:port -WorkDir=C:/Jenkins/agent -Secret <secret> -Name <agent name>
 
 Optional environment variables:
 
