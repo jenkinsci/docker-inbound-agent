@@ -57,7 +57,8 @@ pipeline {
                             if(!infra.isTrusted()) {                                
                                 deleteDir()
                                 checkout scm
-                                sh "make build ; docker system prune --force --all"
+                                sh 'make tests && make build'
+                                sh 'docker system prune --force --all'
                             }
                         }
                     }
