@@ -21,6 +21,7 @@ To run a Docker container
   Linux agent:
 
     docker run --init jenkins/jnlp-slave -url http://jenkins-server:port <secret> <agent name>
+  Note: `--init` is necessary for correct subprocesses handling (zombie reaping)
 
   Windows agent:
 
