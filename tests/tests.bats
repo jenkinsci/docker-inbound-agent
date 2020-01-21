@@ -62,9 +62,9 @@ function teardown () {
 @test "[${FLAVOR}] use build args correctly" {
   cd "${BATS_TEST_DIRNAME}"/.. || false
 
-	local ARG_TEST_VERSION
+  local ARG_TEST_VERSION
   local TEST_VERSION="3.36"
-	local TEST_USER="root"
+  local TEST_USER="root"
 
 	if [[ "${FLAVOR}" = "debian" ]]
   then
