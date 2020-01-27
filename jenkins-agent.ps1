@@ -69,7 +69,7 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 		$WorkDir = " -workDir `"$WorkDir`""
 	}
 
-	if("true".Equals($Env:JENKINS_WEB_SOCKET)) {
+	if($Env:JENKINS_WEB_SOCKET -eq "true") {
 		$WebSocket = " -webSocket"
 	}
 
