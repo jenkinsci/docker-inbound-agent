@@ -69,9 +69,9 @@ else
 		JENKINS_AGENT_NAME="$JENKINS_NAME"
 	fi
 
-        if [ "$JENKINS_WEB_SOCKET" = true ]; then
-            WEB_SOCKET=-webSocket
-        fi
+	if [ "$JENKINS_WEB_SOCKET" = true ]; then
+		WEB_SOCKET=-webSocket
+	fi
 
 	if [ -n "$JENKINS_PROTOCOLS" ]; then
 		PROTOCOLS="-protocols $JENKINS_PROTOCOLS"
