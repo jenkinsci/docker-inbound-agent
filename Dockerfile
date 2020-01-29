@@ -20,7 +20,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-ARG version=3.40-1
+ARG version=4.0.1-1
 FROM jenkins/slave:$version
 
 ARG version
