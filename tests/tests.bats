@@ -53,7 +53,7 @@ function teardown () {
   docker run -d -it --name netcat-helper netcat-helper:latest /bin/sh
 
   # Run jenkins agent which tries to connect to the netcat-helper container at port 5000
-  docker run -d --link netcat-helper --name "${AGENT_CONTAINER}" "${AGENT_IMAGE}" -url http://netcat-helper:5000 aaa bbb
+  docker run -d --link netcat-helper --name "${SLAVE_CONTAINER}" "${SLAVE_IMAGE}" -url http://netcat-helper:5000 aaa bbb
 
   # Launch the netcat utility, listening at port 5000 for 30 sec
   # bats will capture the output from netcat and compare the first line
