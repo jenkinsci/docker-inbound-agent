@@ -28,6 +28,7 @@ Param(
 	$Name = '',
 	$Tunnel = '',
 	$WorkDir = 'C:/Users/jenkins/Agent',
+	$WebSocket = '',
 	$JavaHome = $env:JAVA_HOME
 )
 
@@ -38,6 +39,7 @@ Param(
 # * JENKINS_SECRET : agent secret, if not set as an argument
 # * JENKINS_AGENT_NAME : agent name, if not set as an argument
 # * JENKINS_AGENT_WORKDIR : agent work directory, if not set by optional parameter -workDir
+# * JENKINS_WEB_SOCKET : true if the connection should be made via WebSocket rather than TCP
 
 if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 	# if `docker run` only has one arguments, we assume user is running alternate command like `bash` to inspect the image
@@ -65,6 +67,10 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 	$WorkDir = $WorkDir.Trim()
 	if(![System.String]::IsNullOrWhiteSpace($WorkDir)) {
 		$WorkDir = " -workDir `"$WorkDir`""
+	}
+
+	if($Env:JENKINS_WEB_SOCKET -eq "true") {
+		$WebSocket = " -webSocket"
 	}
 
 	# if -Url is not provided, try env vars
@@ -108,5 +114,5 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 
 	#TODO: Handle the case when the command-line and Environment variable contain different values.
 	#It is fine it blows up for now since it should lead to an error anyway.
-	Start-Process -FilePath $JAVA_BIN -Wait -NoNewWindow -ArgumentList $("-cp C:/ProgramData/Jenkins/agent.jar hudson.remoting.jnlp.Main -headless$Tunnel$Url$WorkDir$Secret $Name")
+	Start-Process -FilePath $JAVA_BIN -Wait -NoNewWindow -ArgumentList $("-cp C:/ProgramData/Jenkins/agent.jar hudson.remoting.jnlp.Main -headless$Tunnel$Url$WorkDir$WebSocket$Secret $Name")
 }
