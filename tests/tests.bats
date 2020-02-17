@@ -15,6 +15,12 @@ then
   JDK=11
   SLAVE_IMAGE+=":jdk11"
   SLAVE_CONTAINER+="-jdk11"
+elif [[ "${FLAVOR}" = "jdk11-buster" ]]
+then
+  DOCKERFILE+="-jdk11-buster"
+  JDK=11
+  SLAVE_IMAGE+=":jdk11-buster"
+  SLAVE_CONTAINER+="-jdk11-buster"
 else
   DOCKERFILE+="-alpine"
   SLAVE_IMAGE+=":alpine"
