@@ -1,2 +1,4 @@
 .idea
 bats-core/
+8/*/jenkins-agent*
+11/*/jenkins-agent*

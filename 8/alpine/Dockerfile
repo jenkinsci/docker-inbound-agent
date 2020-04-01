@@ -1,6 +1,6 @@
 # The MIT License
 #
-#  Copyright (c) 2019, Alex Earl
+#  Copyright (c) 2015-2017, CloudBees, Inc.
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -20,12 +20,19 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-FROM jenkins/agent:latest-windows-jdk11
-MAINTAINER Alex Earl <slide.o.mix@gmail.com>
-LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="3.29"
+ARG version=4.3-1-alpine
+FROM jenkins/slave:$version
+
+ARG version
+MAINTAINER Oleg Nenashev <o.v.nenashev@gmail.com>
+LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="$version"
 
 ARG user=jenkins
 
-COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
+USER root
+COPY jenkins-agent /usr/local/bin/jenkins-agent
+RUN chmod +x /usr/local/bin/jenkins-agent &&\
+    ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
 USER ${user}
-ENTRYPOINT ["powershell.exe", "-f", "C:/ProgramData/Jenkins/jenkins-agent.ps1"]
+
+ENTRYPOINT ["jenkins-agent"]
