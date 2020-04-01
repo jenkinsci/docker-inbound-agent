@@ -21,7 +21,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-ARG VERSION=4.0.1-1
+ARG VERSION=4.3-1
 FROM jenkins/agent:${VERSION}-windowsservercore-1809-jdk11
 
 ARG VERSION
@@ -39,4 +39,3 @@ RUN $output = net users ; `
 COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
 USER ${user}
 ENTRYPOINT ["powershell.exe", "-f", "C:/ProgramData/Jenkins/jenkins-agent.ps1"]
-
