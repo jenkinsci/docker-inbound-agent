@@ -81,7 +81,7 @@ if($lastExitCode -ne 0) {
     exit $lastExitCode
 }
 
-if($target -eq "test") {
+if($Target -eq "test") {
     $mod = Get-InstalledModule -Name Pester -MinimumVersion 4.9.0 -ErrorAction SilentlyContinue
     if($null -eq $mod) {
         $module = "c:\Program Files\WindowsPowerShell\Modules\Pester"
@@ -109,12 +109,12 @@ if($target -eq "test") {
     }
 }
 
-if($target -eq "publish") {
+if($Target -eq "publish") {
     if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
         foreach($tag in $Builds[$Build]['Tags']) {
             Write-Host "Publishing $Build => tag=$tag"
             $cmd = "docker push {0}/{1}:{2}" -f $Organization, $Repository, $tag
-        Invoke-Expression $cmd
+            Invoke-Expression $cmd
 
             if($PushVersions) {
                 $buildTag = "$RemotingVersion-$BuildNumber-$tag"
@@ -140,9 +140,9 @@ if($target -eq "publish") {
                     }
                     Write-Host "Publishing $Build => tag=$buildTag"
                     $cmd = "docker push {0}/{1}:{2}" -f $Organization, $Repository, $buildTag
-            Invoke-Expression $cmd
-        }
-    }
+                    Invoke-Expression $cmd
+                }
+            }
         }
     }
 }

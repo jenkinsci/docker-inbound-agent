@@ -33,6 +33,7 @@ pipeline {
                             powershell '& ./make.ps1 test'
 
                             def branchName = "${env.BRANCH_NAME}"
+                            echo "branchName = $branchName"
                             if (branchName ==~ 'master') {
                                 // we can't use dockerhub builds for windows
                                 // so we publish here
@@ -42,13 +43,16 @@ pipeline {
                             }
 
                             def tagName = "${env.TAG_NAME}"
+                            echo "tagName = $tagName"
                             if (tagName != "") {
                                 def tagItems = tagName.split('-')
-                                def remotingVersion = tagItems[0]
-                                def buildNumber = tagItems[1]
-                                // we need to build and publish the tag version
-                                infra.withDockerCredentials {
-                                    powershell "& ./make.ps1 -PushVersions -RemotingVersion $remotingVersion -BuildNumber $buildNumber publish"
+                                if(tagItems.length == 2) {
+                                    def remotingVersion = tagItems[0]
+                                    def buildNumber = tagItems[1]
+                                    // we need to build and publish the tag version
+                                    infra.withDockerCredentials {
+                                        powershell "& ./make.ps1 -PushVersions -RemotingVersion $remotingVersion -BuildNumber $buildNumber publish"
+                                    }
                                 }
                             }
 
