@@ -41,9 +41,8 @@ pipeline {
                                 }
                             }
 
-                            def tagName = "${env.TAG_NAME}"
-                            if (tagName != "") {
-                                def tagItems = tagName.split('-')
+                            if (env.TAG_NAME != null) {
+                                def tagItems = env.TAG_NAME.split('-')
                                 if(tagItems.length == 2) {
                                     def remotingVersion = tagItems[0]
                                     def buildNumber = tagItems[1]
