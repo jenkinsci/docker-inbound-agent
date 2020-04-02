@@ -33,7 +33,6 @@ pipeline {
                             powershell '& ./make.ps1 test'
 
                             def branchName = "${env.BRANCH_NAME}"
-                            echo "branchName = $branchName"
                             if (branchName ==~ 'master') {
                                 // we can't use dockerhub builds for windows
                                 // so we publish here
@@ -43,7 +42,6 @@ pipeline {
                             }
 
                             def tagName = "${env.TAG_NAME}"
-                            echo "tagName = $tagName"
                             if (tagName != "") {
                                 def tagItems = tagName.split('-')
                                 if(tagItems.length == 2) {
