@@ -20,7 +20,8 @@ To run a Docker container
 
   Linux agent:
 
-    docker run jenkins/jnlp-slave -url http://jenkins-server:port <secret> <agent name>
+    docker run --init jenkins/jnlp-slave -url http://jenkins-server:port <secret> <agent name>
+  Note: `--init` is necessary for correct subprocesses handling (zombie reaping)
 
   Windows agent:
 
@@ -30,7 +31,7 @@ To run a Docker container with [Work Directory](https://github.com/jenkinsci/rem
 
   Linux agent:
 
-    docker run jenkins/jnlp-slave -url http://jenkins-server:port -workDir=/home/jenkins/agent <secret> <agent name>
+    docker run --init jenkins/jnlp-slave -url http://jenkins-server:port -workDir=/home/jenkins/agent <secret> <agent name>
     
   Windows agent:
   
