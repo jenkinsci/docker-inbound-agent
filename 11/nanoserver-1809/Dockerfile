@@ -1,6 +1,7 @@
+# escape=`
 # The MIT License
 #
-#  Copyright (c) 2015-2017, CloudBees, Inc.
+#  Copyright (c) 2019, Alex Earl
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -20,19 +21,21 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-ARG version=4.3-1-alpine
-FROM jenkins/slave:$version
+ARG VERSION=4.3-1
+FROM jenkins/agent:${VERSION}-nanoserver-1809-jdk11
 
-ARG version
-MAINTAINER Oleg Nenashev <o.v.nenashev@gmail.com>
-LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="$version"
+ARG VERSION
+LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$VERSION"
 
 ARG user=jenkins
 
-USER root
-COPY jenkins-agent /usr/local/bin/jenkins-agent
-RUN chmod +x /usr/local/bin/jenkins-agent &&\
-    ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
-USER ${user}
+RUN $output = net users ; `
+    if(-not ($output -match $env:user)) { `
+        Write-Host 'user does not exist?' ; `
+        net user $env:user /add /expire:never /passwordreq:no ; `
+        net localgroup Administrators /add $env:user `
+    }
 
-ENTRYPOINT ["jenkins-slave"]
+COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
+USER ${user}
+ENTRYPOINT ["pwsh.exe", "-f", "C:/ProgramData/Jenkins/jenkins-agent.ps1"]

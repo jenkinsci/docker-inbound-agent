@@ -8,30 +8,30 @@ IMAGE_JDK11:=${IMAGE_NAME}:jdk11
 build: build-alpine build-debian build-jdk11
 
 build-alpine:
-	docker build -t ${IMAGE_ALPINE} --file Dockerfile-alpine .
+	cp -f jenkins-agent 8/alpine/
+	docker build -t ${IMAGE_ALPINE} 8/alpine
 
 build-debian:
-	docker build -t ${IMAGE_DEBIAN} --file Dockerfile .
+	cp -f jenkins-agent 8/debian/
+	docker build -t ${IMAGE_DEBIAN} 8/debian
 
 build-jdk11:
-	docker build -t ${IMAGE_JDK11} --file Dockerfile-jdk11 .
+	cp -f jenkins-agent 11/debian/
+	docker build -t ${IMAGE_JDK11} 11/debian
 
 bats:
 # The lastest version is v1.1.0
 	@if [ ! -d bats-core ]; then git clone https://github.com/bats-core/bats-core.git; fi
 	@git -C bats-core reset --hard c706d1470dd1376687776bbe985ac22d09780327
 
-.PHONY: test
+.PHONY: test test-alpine test-debian test-jdk11
 test: test-alpine test-debian test-jdk11
 
-.PHONY: test-alpine
 test-alpine: bats
-	@FLAVOR=alpine bats-core/bin/bats tests/tests.bats
+	@FOLDER="8/alpine" bats-core/bin/bats tests/tests.bats
 
-.PHONY: test-debian
 test-debian: bats
-	@bats-core/bin/bats tests/tests.bats
+	@FOLDER="8/debian" bats-core/bin/bats tests/tests.bats
 
-.PHONY: test-jdk11
 test-jdk11: bats
-	@FLAVOR=jdk11 bats-core/bin/bats tests/tests.bats
+	@FOLDER="11/debian" bats-core/bin/bats tests/tests.bats

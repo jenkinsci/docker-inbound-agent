@@ -1,24 +1,34 @@
 #!/usr/bin/env bats
 
-DOCKERFILE=Dockerfile
-JDK=8
-SLAVE_IMAGE=jenkins-jnlp-slave
-SLAVE_CONTAINER=bats-jenkins-jnlp-slave
+AGENT_IMAGE=jenkins-jnlp-agent
+AGENT_CONTAINER=bats-jenkins-jnlp-agent
 NETCAT_HELPER_CONTAINER=netcat-helper
 
-if [[ -z "${FLAVOR}" ]]
+REGEX='^([0-9]+)/(.+)$'
+
+REAL_FOLDER=$(realpath "${BATS_TEST_DIRNAME}/../${FOLDER}")
+
+if [[ ${FOLDER} =~ ${REGEX} ]] && [[ -d "${REAL_FOLDER}" ]]
 then
-  FLAVOR="debian"
-elif [[ "${FLAVOR}" = "jdk11" ]]
-then
-  DOCKERFILE+="-jdk11"
-  JDK=11
-  SLAVE_IMAGE+=":jdk11"
-  SLAVE_CONTAINER+="-jdk11"
+  JDK="${BASH_REMATCH[1]}"
+  FLAVOR="${BASH_REMATCH[2]}"
 else
-  DOCKERFILE+="-alpine"
-  SLAVE_IMAGE+=":alpine"
-  SLAVE_CONTAINER+="-alpine"
+  echo "Wrong folder format or folder does not exist: ${FOLDER}"
+  exit 1
+fi
+
+if [[ "${JDK}" = "11" ]]
+then
+  AGENT_IMAGE+=":jdk11"
+  AGENT_CONTAINER+="-jdk11"
+else
+  if [[ "${FLAVOR}" = "alpine*" ]]
+  then
+    AGENT_IMAGE+=":alpine"
+    AGENT_CONTAINER+="-alpine"
+  else
+    AGENT_IMAGE+=":latest"
+  fi
 fi
 
 load test_helpers
@@ -31,29 +41,29 @@ function teardown () {
   clean_test_container
 }
 
-@test "[${FLAVOR}] build image" {
+@test "[${JDK} ${FLAVOR}] build image" {
   cd "${BATS_TEST_DIRNAME}"/.. || false
-  docker build -t "${SLAVE_IMAGE}" -f "${DOCKERFILE}" .
+  docker build -t "${AGENT_IMAGE}" ${FOLDER}
 }
 
-@test "[${FLAVOR}] image has installed jenkins-agent in PATH" {
-  docker run -d -it --name "${SLAVE_CONTAINER}" -P "${SLAVE_IMAGE}" /bin/bash
+@test "[${JDK} ${FLAVOR}] image has installed jenkins-agent in PATH" {
+  docker run -d -it --name "${AGENT_CONTAINER}" -P "${AGENT_IMAGE}" /bin/bash
 
   is_slave_container_running
 
-  run docker exec "${SLAVE_CONTAINER}" which jenkins-slave
-  [ "/usr/local/bin/jenkins-slave" = "${lines[0]}" ]
+  run docker exec "${AGENT_CONTAINER}" which jenkins-agent
+  [ "/usr/local/bin/jenkins-agent" = "${lines[0]}" ]
 
-  run docker exec "${SLAVE_CONTAINER}" which jenkins-agent
+  run docker exec "${AGENT_CONTAINER}" which jenkins-agent
   [ "/usr/local/bin/jenkins-agent" = "${lines[0]}" ]
 }
 
-@test "[${FLAVOR}] image starts jenkins-agent correctly (slow test)" {
+@test "[${JDK} ${FLAVOR}] image starts jenkins-agent correctly (slow test)" {
   #  Spin off a helper image which contains netcat
   docker run -d -it --name netcat-helper netcat-helper:latest /bin/sh
 
   # Run jenkins agent which tries to connect to the netcat-helper container at port 5000
-  docker run -d --link netcat-helper --name "${SLAVE_CONTAINER}" "${SLAVE_IMAGE}" -url http://netcat-helper:5000 aaa bbb
+  docker run -d --link netcat-helper --name "${AGENT_CONTAINER}" "${AGENT_IMAGE}" -url http://netcat-helper:5000 aaa bbb
 
   # Launch the netcat utility, listening at port 5000 for 30 sec
   # bats will capture the output from netcat and compare the first line
@@ -64,7 +74,7 @@ function teardown () {
   [ $'GET /tcpSlaveAgentListener/ HTTP/1.1\r' = "${lines[0]}" ]
 }
 
-@test "[${FLAVOR}] use build args correctly" {
+@test "[${JDK} ${FLAVOR}] use build args correctly" {
   cd "${BATS_TEST_DIRNAME}"/.. || false
 
   local ARG_TEST_VERSION
@@ -84,16 +94,16 @@ function teardown () {
   docker build \
     --build-arg "version=${ARG_TEST_VERSION}" \
     --build-arg "user=${TEST_USER}" \
-    -t "${SLAVE_IMAGE}" \
-    -f "${DOCKERFILE}" .
+    -t "${AGENT_IMAGE}" \
+    ${FOLDER}
 
-  docker run -d -it --name "${SLAVE_CONTAINER}" -P "${SLAVE_IMAGE}" /bin/sh
+  docker run -d -it --name "${AGENT_CONTAINER}" -P "${AGENT_IMAGE}" /bin/sh
 
   is_slave_container_running
 
-  run docker exec "${SLAVE_CONTAINER}" sh -c "java -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -version"
+  run docker exec "${AGENT_CONTAINER}" sh -c "java -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -version"
   [ "${TEST_VERSION}" = "${lines[0]}" ]
 
-  run docker exec "${SLAVE_CONTAINER}" sh -c "id -u -n ${TEST_USER}"
+  run docker exec "${AGENT_CONTAINER}" sh -c "id -u -n ${TEST_USER}"
   [ "${TEST_USER}" = "${lines[0]}" ]
 }
