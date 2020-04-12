@@ -1,16 +1,16 @@
-# Jenkins JNLP Agent Docker image
+# Docker image for inbound Jenkins agents
 
-[![Join the chat at https://gitter.im/jenkinsci/docker](https://badges.gitter.im/jenkinsci/docker.svg)](https://gitter.im/jenkinsci/docker-slave?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Docker Stars](https://img.shields.io/docker/stars/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
-[![Docker Pulls](https://img.shields.io/docker/pulls/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
-[![Docker Automated build](https://img.shields.io/docker/automated/jenkins/jnlp-slave.svg)](https://hub.docker.com/r/jenkins/jnlp-slave/)
-[![GitHub release](https://img.shields.io/github/release/jenkinsci/docker-jnlp-slave.svg?label=changelog)](https://github.com/jenkinsci/docker-jnlp-slave/releases/latest)
+[![Join the chat at https://gitter.im/jenkinsci/docker](https://badges.gitter.im/jenkinsci/docker.svg)](https://gitter.im/jenkinsci/docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Docker Stars](https://img.shields.io/docker/stars/jenkins/inbound-agent.svg)](https://hub.docker.com/r/jenkins/inbound-agent/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/jenkins/inbound-agent.svg)](https://hub.docker.com/r/jenkins/inbound-agent/)
+[![Docker Automated build](https://img.shields.io/docker/automated/jenkins/inbound-agent.svg)](https://hub.docker.com/r/jenkins/inbound-agent/)
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/docker-inbound-agent.svg?label=changelog)](https://github.com/jenkinsci/docker-inbound-agent/releases/latest)
 
-:exclamation: **Warning!** This image used to be published as [jenkinsci/jnlp-slave](https://hub.docker.com/r/jenkinsci/jnlp-slave/). 
-That image name is deprecated, use [jenkins/jnlp-slave](https://hub.docker.com/r/jenkins/jnlp-slave/).
+:exclamation: **Warning!** This image used to be published as [jenkinsci/jnlp-slave](https://hub.docker.com/r/jenkinsci/jnlp-slave/) and [jenkins/jnlp-slave](https://hub.docker.com/r/jenkins/jnlp-slave/). 
+These images are deprecated, use [jenkins/inbound-agent](https://hub.docker.com/r/jenkins/jnlp-slave/).
 
-This is an image for [Jenkins](https://jenkins.io) agent (FKA "slave") using JNLP to establish connection.
-This agent is powered by the [Jenkins Remoting library](https://github.com/jenkinsci/remoting), which version is being taken from the base [Docker Agent](https://github.com/jenkinsci/docker-slave/) image.
+This is an image for [Jenkins](https://jenkins.io) agents using TCP or WebSockets to establish inbound connection to the Jenkins master.
+This agent is powered by the [Jenkins Remoting library](https://github.com/jenkinsci/remoting), which version is being taken from the base [Docker Agent](https://github.com/jenkinsci/docker-agent/) image.
 
 See [Jenkins Distributed builds](https://wiki.jenkins-ci.org/display/JENKINS/Distributed+builds) for more info.
 
@@ -20,7 +20,7 @@ To run a Docker container
 
   Linux agent:
 
-    docker run --init jenkins/jnlp-slave -url http://jenkins-server:port <secret> <agent name>
+    docker run --init jenkins/inbound-agent -url http://jenkins-server:port <secret> <agent name>
   Note: `--init` is necessary for correct subprocesses handling (zombie reaping)
 
   Windows agent:
@@ -31,7 +31,7 @@ To run a Docker container with [Work Directory](https://github.com/jenkinsci/rem
 
   Linux agent:
 
-    docker run --init jenkins/jnlp-slave -url http://jenkins-server:port -workDir=/home/jenkins/agent <secret> <agent name>
+    docker run --init jenkins/inbound-agent -url http://jenkins-server:port -workDir=/home/jenkins/agent <secret> <agent name>
     
   Windows agent:
 
