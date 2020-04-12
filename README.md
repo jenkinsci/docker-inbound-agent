@@ -35,7 +35,7 @@ To run a Docker container with [Work Directory](https://github.com/jenkinsci/rem
     
   Windows agent:
 
-    docker run jenkins/jnlp-agent-windows -Url http://jenkins-server:port -WorkDir=C:/Jenkins/agent -Secret <secret> -Name <agent name>
+    docker run jenkins/inbound-agent:latest-windows -Url http://jenkins-server:port -WorkDir=C:/Jenkins/agent -Secret <secret> -Name <agent name>
 
 Optional environment variables:
 
