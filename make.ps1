@@ -9,7 +9,7 @@ Param(
     [switch] $PushVersions = $false
 )
 
-$Repository = 'jnlp-agent'
+$Repository = 'inbound-agent'
 $Organization = 'jenkins'
 
 if(![String]::IsNullOrWhiteSpace($env:DOCKERHUB_REPO)) {
