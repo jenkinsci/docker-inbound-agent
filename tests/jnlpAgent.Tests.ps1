@@ -1,11 +1,11 @@
 Import-Module -DisableNameChecking -Force $PSScriptRoot/test_helpers.psm1
 
-$AGENT_IMAGE='jenkins-jnlp-agent'
-$AGENT_CONTAINER='pester-jenkins-jnlp-agent'
+$AGENT_IMAGE='jenkins-inbound-agent'
+$AGENT_CONTAINER='pester-jenkins-inbound-agent'
 $SHELL="powershell.exe"
 
 $FOLDER = Get-EnvOrDefault 'FOLDER' ''
-$VERSION = Get-EnvOrDefault 'VERSION' '4.0.1-1'
+$VERSION = Get-EnvOrDefault 'VERSION' '4.3-4'
 
 $REAL_FOLDER=Resolve-Path -Path "$PSScriptRoot/../${FOLDER}"
 
@@ -106,7 +106,6 @@ Describe "[$JDK $FLAVOR] build args" {
     }
 
     It 'uses build args correctly' {
-        #$TEST_VERSION="3.36"
         $TEST_VERSION="4.3"
         $TEST_USER="foo"
 

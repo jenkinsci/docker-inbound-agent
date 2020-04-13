@@ -78,17 +78,18 @@ function teardown () {
   cd "${BATS_TEST_DIRNAME}"/.. || false
 
   local ARG_TEST_VERSION
-  local TEST_VERSION="3.36"
+  local TEST_VERSION="4.3"
+  local DOCKER_AGENT_VERSION_SUFFIX="4"
   local TEST_USER="root"
 
 	if [[ "${FLAVOR}" = "debian" ]]
   then
-    ARG_TEST_VERSION="${TEST_VERSION}-1"
+    ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
   elif [[ "${FLAVOR}" = "jdk11" ]]
   then
-    ARG_TEST_VERSION="${TEST_VERSION}-1-jdk11"
+    ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}-jdk11"
   else
-    ARG_TEST_VERSION="${TEST_VERSION}-1-alpine"
+    ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}-alpine"
   fi
 
   docker build \
