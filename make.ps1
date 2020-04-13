@@ -4,8 +4,7 @@ Param(
     [String] $Target = "build",
     [String] $AdditionalArgs = '',
     [String] $Build = '',
-    [String] $RemotingVersion = '4.3',
-    [String] $BuildNumber = "1",
+    [String] $VersionTag = '4.3-2',
     [switch] $PushVersions = $false
 )
 
@@ -43,16 +42,16 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
     foreach($tag in $builds[$Build]['Tags']) {
         Copy-Item -Path 'jenkins-agent.ps1' -Destination (Join-Path $builds[$Build]['Folder'] 'jenkins-agent.ps1') -Force
         Write-Host "Building $Build => tag=$tag"
-        $cmd = "docker build --build-arg VERSION='$RemotingVersion-$BuildNumber' -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $tag, $AdditionalArgs, $builds[$Build]['Folder']
+        $cmd = "docker build -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $tag, $AdditionalArgs, $builds[$Build]['Folder']
         Invoke-Expression $cmd
 
         if($PushVersions) {
-            $buildTag = "$RemotingVersion-$BuildNumber-$tag"
+            $buildTag = "$VersionTag-$tag"
             if($tag -eq 'latest') {
-                $buildTag = "$RemotingVersion-$BuildNumber"
+                $buildTag = "$VersionTag"
             }
             Write-Host "Building $Build => tag=$buildTag"
-            $cmd = "docker build --build-arg VERSION='$RemotingVersion-$BuildNumber' -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$Build]['Folder']
+            $cmd = "docker build -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$Build]['Folder']
             Invoke-Expression $cmd
         }
     }
@@ -61,16 +60,16 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
         Copy-Item -Path 'jenkins-agent.ps1' -Destination (Join-Path $builds[$b]['Folder'] 'jenkins-agent.ps1') -Force
         foreach($tag in $builds[$b]['Tags']) {
             Write-Host "Building $b => tag=$tag"
-            $cmd = "docker build --build-arg VERSION='$RemotingVersion-$BuildNumber' -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $tag, $AdditionalArgs, $builds[$b]['Folder']
+            $cmd = "docker build -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $tag, $AdditionalArgs, $builds[$b]['Folder']
             Invoke-Expression $cmd
 
             if($PushVersions) {
-                $buildTag = "$RemotingVersion-$BuildNumber-$tag"
+                $buildTag = "$VersionTag-$tag"
                 if($tag -eq 'latest') {
-                    $buildTag = "$RemotingVersion-$BuildNumber"
+                    $buildTag = "$VersionTag"
                 }
                 Write-Host "Building $Build => tag=$buildTag"
-                $cmd = "docker build --build-arg VERSION='$RemotingVersion-$BuildNumber' -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$b]['Folder']
+                $cmd = "docker build -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$b]['Folder']
                 Invoke-Expression $cmd
             }
         }
@@ -117,9 +116,9 @@ if($Target -eq "publish") {
             Invoke-Expression $cmd
 
             if($PushVersions) {
-                $buildTag = "$RemotingVersion-$BuildNumber-$tag"
+                $buildTag = "$VersionTag-$tag"
                 if($tag -eq 'latest') {
-                    $buildTag = "$RemotingVersion-$BuildNumber"
+                    $buildTag = "$VersionTag"
                 }
                 Write-Host "Publishing $Build => tag=$buildTag"
                 $cmd = "docker push {0}/{1}:{2}" -f $Organization, $Repository, $buildTag
@@ -134,9 +133,9 @@ if($Target -eq "publish") {
                 Invoke-Expression $cmd
 
                 if($PushVersions) {
-                    $buildTag = "$RemotingVersion-$BuildNumber-$tag"
+                    $buildTag = "$VersionTag-$tag"
                     if($tag -eq 'latest') {
-                        $buildTag = "$RemotingVersion-$BuildNumber"
+                        $buildTag = "$VersionTag"
                     }
                     Write-Host "Publishing $Build => tag=$buildTag"
                     $cmd = "docker push {0}/{1}:{2}" -f $Organization, $Repository, $buildTag
