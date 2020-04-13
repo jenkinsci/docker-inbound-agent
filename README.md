@@ -1,6 +1,7 @@
 # Docker image for inbound Jenkins agents
 
 [![Join the chat at https://gitter.im/jenkinsci/docker](https://badges.gitter.im/jenkinsci/docker.svg)](https://gitter.im/jenkinsci/docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![GitHub stars](https://img.shields.io/github/stars/jenkinsci/docker-inbound-agent?label=GitHub%20stars)](https://github.com/jenkinsci/docker-inbound-agent)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jenkins/inbound-agent.svg)](https://hub.docker.com/r/jenkins/inbound-agent/)
 [![GitHub release](https://img.shields.io/github/release/jenkinsci/docker-inbound-agent.svg?label=changelog)](https://github.com/jenkinsci/docker-inbound-agent/releases/latest)
 
