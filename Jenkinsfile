@@ -41,7 +41,7 @@ pipeline {
                             }
 
                             def tagName = "${env.TAG_NAME}"
-                            if(tagName ==~ '\\d\\.\\d') {
+                            if(tagName =~ /\d(\.\d)+(-\d+)?/) {
                                 // we need to build and publish the tagged version
                                 infra.withDockerCredentials {
                                     powershell "& ./make.ps1 -PushVersions -VersionTag $tagName publish"
