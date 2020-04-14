@@ -5,7 +5,6 @@ $AGENT_CONTAINER='pester-jenkins-inbound-agent'
 $SHELL="powershell.exe"
 
 $FOLDER = Get-EnvOrDefault 'FOLDER' ''
-$VERSION = Get-EnvOrDefault 'VERSION' '4.3-4'
 
 $REAL_FOLDER=Resolve-Path -Path "$PSScriptRoot/../${FOLDER}"
 
@@ -42,7 +41,7 @@ Describe "[$JDK $FLAVOR] build image" {
     }
 
     It 'builds image' {
-      $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=$VERSION -t $AGENT_IMAGE $FOLDER"
+      $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build -t $AGENT_IMAGE $FOLDER"
       $exitCode | Should -Be 0
     }
 
@@ -53,7 +52,7 @@ Describe "[$JDK $FLAVOR] build image" {
 
 Describe "[$JDK $FLAVOR] image has jenkins-agent.ps1 in the correct location" {
     BeforeAll {
-        & docker run -d -it --name "$AGENT_CONTAINER" -P "$AGENT_IMAGE" $SHELL
+        & docker run -dit --name "$AGENT_CONTAINER" -P "$AGENT_IMAGE" $SHELL
         Is-ContainerRunning $AGENT_CONTAINER | Should -BeTrue
     }
 
@@ -105,11 +104,11 @@ Describe "[$JDK $FLAVOR] build args" {
         Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
     }
 
-    It 'uses build args correctly' {
+    It -Skip 'uses build args correctly' {
         $TEST_VERSION="4.3"
         $TEST_USER="foo"
 
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=${TEST_VERSION}-1 --build-arg user=$TEST_USER -t $AGENT_IMAGE $FOLDER"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=${TEST_VERSION}-2 --build-arg user=$TEST_USER -t $AGENT_IMAGE $FOLDER"
         $exitCode | Should -Be 0
 
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --name $AGENT_CONTAINER -P $AGENT_IMAGE $SHELL"

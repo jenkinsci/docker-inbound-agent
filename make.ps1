@@ -22,19 +22,19 @@ if(![String]::IsNullOrWhiteSpace($env:DOCKERHUB_ORGANISATION)) {
 $builds = @{
     'jdk8' = @{
         'Folder' = '8\windowsservercore-1809';
-        'Tags' = @( "windowsservercore-1809", "windowsservercore-1809-jdk8" );
+        'Tags' = @( "windowsservercore-1809", "jdk8-windowsservercore-1809-jdk8" );
     };
     'jdk11' = @{
         'Folder' = '11\windowsservercore-1809';
-        'Tags' = @( "windowsservercore-1809-jdk11" );
+        'Tags' = @( "jdk11-windowsservercore-1809" );
     };
     'nanoserver' = @{
         'Folder' = '8\nanoserver-1809';
-        'Tags' = @( "nanoserver-1809", "nanoserver-1809-jdk8" );
+        'Tags' = @( "nanoserver-1809", "jdk8-nanoserver-1809" );
     };
     'nanoserver-jdk11' = @{
         'Folder' = '11\nanoserver-1809';
-        'Tags' = @( "nanoserver-1809-jdk11" );
+        'Tags' = @( "jdk11-nanoserver-1809" );
     };
 }
 
@@ -88,7 +88,7 @@ if($Target -eq "test") {
         icacls $module /reset
         icacls $module /grant Administrators:'F' /inheritance:d /T
         Remove-Item -Path $module -Recurse -Force -Confirm:$false
-        Install-Module -Force -Name Pester -RequiredVersion 4.9.0
+        Install-Module -Force -Name Pester -MinimumVersion 4.9.0
     }
 
     if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
@@ -96,14 +96,12 @@ if($Target -eq "test") {
         $env:VERSION = "$RemotingVersion-$BuildNumber"
         Invoke-Pester -Path tests -EnableExit
         Remove-Item env:\FOLDER
-        Remove-Item env:\VERSION
     } else {
         foreach($b in $builds.Keys) {
             $env:FOLDER = $builds[$b]['Folder']
             $env:VERSION = "$RemotingVersion-$BuildNumber"
             Invoke-Pester -Path tests -EnableExit
             Remove-Item env:\FOLDER
-            Remove-Item env:\VERSION
         }
     }
 }

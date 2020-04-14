@@ -22,7 +22,7 @@
 #  THE SOFTWARE.
 
 ARG VERSION=4.3-4
-FROM jenkins/agent:${VERSION}-windowsservercore-1809-jdk11
+FROM jenkins/agent:${VERSION}-jdk11-windowsservercore-1809
 
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$VERSION"
 
