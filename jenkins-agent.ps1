@@ -25,14 +25,14 @@ Param(
     $Cmd = '', # this is only used when docker run has one arg positional arg
     $Url = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_URL)) { throw ("Url is required") } else { '' } ),
     $Secret = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_SECRET)) { throw ("Secret is required") } else { '' } ),
-	$Name = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_AGENT_NAME)) { throw ("Name is required") } else { '' } ),
-	$Tunnel = '',
-	$WorkDir = '',
+    $Name = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_AGENT_NAME)) { throw ("Name is required") } else { '' } ),
+    $Tunnel = '',
+    $WorkDir = '',
     [switch] $WebSocket = $false,
     $DirectConnection = '',
     $InstanceIdentity = '',
     $Protocols = '',
-	$JavaHome = $env:JAVA_HOME
+    $JavaHome = $env:JAVA_HOME
 )
 
 # Usage jenkins-agent.ps1 [options] -Url http://jenkins -Secret [SECRET] -Name [AGENT_NAME]
@@ -50,7 +50,7 @@ Param(
 # * JENKINS_PROTOCOLS:         Specify the remoting protocols to attempt when instanceIdentity is provided.
 
 if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
-	# if `docker run` only has one arguments, we assume user is running alternate command like `bash` to inspect the image
+	# if `docker run` only has one argument, we assume user is running alternate command like `powershell` or `pwsh` to inspect the image
 	Invoke-Expression "$Cmd"
 } else {
     $AgentArguments = @("-cp", "C:/ProgramData/Jenkins/agent.jar", "hudson.remoting.jnlp.Main", "-headless")
@@ -114,18 +114,22 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
     if(![System.String]::IsNullOrWhiteSpace($InstanceIdentity)) {
         $AgentArguments += @('-instanceIdentity', $InstanceIdentity)
     }
+    
+    if(![System.String]::IsNullOrWhiteSpace($Protocols)) {
+        $AgentArguments += @('-protocols', $Protocols)
+    }
 
     # these need to be the last things added since they are positional
     # parameters to agent.jar
     $AgentArguments += @($Secret, $Name)
 
-	# if java home is defined, use it
-	$JAVA_BIN="java.exe"
-	if(![System.String]::IsNullOrWhiteSpace($JavaHome)) {
-		$JAVA_BIN="$JavaHome/bin/java.exe"
-	}
+    # if java home is defined, use it
+    $JAVA_BIN="java.exe"
+    if(![System.String]::IsNullOrWhiteSpace($JavaHome)) {
+        $JAVA_BIN="$JavaHome/bin/java.exe"
+    }
 
-	#TODO: Handle the case when the command-line and Environment variable contain different values.
-	#It is fine it blows up for now since it should lead to an error anyway.
+    #TODO: Handle the case when the command-line and Environment variable contain different values.
+    #It is fine it blows up for now since it should lead to an error anyway.
     Start-Process -FilePath $JAVA_BIN -Wait -NoNewWindow -ArgumentList $AgentArguments
 }
