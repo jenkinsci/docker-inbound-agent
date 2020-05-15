@@ -1,0 +1,19 @@
+= Windows Command Line and Environment Variable Information
+
+Options can be passed to the docker image via command line parameters after the image name or via link:https://docs.docker.com/engine/reference/run/#env-environment-variables[environment variables].
+
+* `-Url <URL>` or `JENKINS_URL=<URL>` - the Jenkins master URL (this should NOT include the `computer/NAME/slave-agent.jnlp` part which appears in the Jenkins UI after creating a new agent)
+* `-Secret <SECRET>` or `JENKINS_SECRET=<SECRET>` - the secret as shown on the master after creating the agent
+* `-Name <NAME>` or `JENKINS_AGENT_NAME=<NAME>` - the name of the agent, it should match the name you specified when creating the agent on the master
+* `-Tunnel <HOST:PORT>` or `JENKINS_TUNNEL=<HOST:PORT>` - A tunnel host to route the TCP traffic through when connecting to the master
+* `-WorkDir <WORKDIR>` or `JENKINS_AGENT_WORKDIR=<WORKDIR>` - same as the -workDir parameter mentioned above in the jenkins/agent image information.
+* `-WebSocket` or `JENKINS_WEB_SOCKET=true` - when present the connection to the master will be done via WebSocket through the Jenkins URL rather than using a separate network port.
+* `-DirectConnection <HOST:PORT>` or `JENKINS_DIRECT_CONNECTION=<HOST:PORT>` - Connect directly to this TCP agent port, skipping the HTTP(S) connection parameter download.
+* `-InstanceIdentity <BASE64VALUE>` or `JENKINS_INSTANCE_IDENTITY=<BASE64VALUE>` - The base64 encoded InstanceIdentity byte array of the Jenkins master. When this is set, the agent skips connecting to an HTTP(S) port for connection info
+* `-JavaHome <JAVA_HOME>` or `JAVA_HOME=<JAVA_HOME>`  - An override for the default JAVA_HOME baked into the image (different for JDK8 vs. JDK11)
+* `-Protocols <PROTOCOLS>` or `JENKINS_PROTOCOLS=<PROTOCOLS>` - Specify the link:https://github.com/jenkinsci/remoting/blob/de7818885a5bf478760ba29f5ee216291437cb16/docs/protocols.md#active-protocols[remoting protocols] to attempt when instanceIdentity is provided.
+
+[NOTE]
+====
+There is currently an issue where the `-Protocols` parameter is not actually passed to agent.jar. The link:https://github.com/jenkinsci/docker-inbound-agent/pull/170[fix] has been merged, but a release has not been made.
+====
