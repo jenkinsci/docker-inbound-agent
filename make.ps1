@@ -81,14 +81,16 @@ if($lastExitCode -ne 0) {
 }
 
 if($Target -eq "test") {
-    $mod = Get-InstalledModule -Name Pester -MinimumVersion 4.9.0 -ErrorAction SilentlyContinue
+    $mod = Get-InstalledModule -Name Pester -MinimumVersion 4.9.0 -MaximumVersion 4.99.99 -ErrorAction SilentlyContinue
     if($null -eq $mod) {
-        $module = "c:\Program Files\WindowsPowerShell\Modules\Pester"
-        takeown /F $module /A /R
-        icacls $module /reset
-        icacls $module /grant Administrators:'F' /inheritance:d /T
-        Remove-Item -Path $module -Recurse -Force -Confirm:$false
-        Install-Module -Force -Name Pester -MinimumVersion 4.9.0
+        if(Test-Path $module) {
+            $module = "c:\Program Files\WindowsPowerShell\Modules\Pester"
+            takeown /F $module /A /R
+            icacls $module /reset
+            icacls $module /grant Administrators:'F' /inheritance:d /T
+            Remove-Item -Path $module -Recurse -Force -Confirm:$false
+        }
+        Install-Module -Force -Name Pester -MaximumVersion 4.99.99
     }
 
     if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
