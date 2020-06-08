@@ -83,8 +83,8 @@ if($lastExitCode -ne 0) {
 if($Target -eq "test") {
     $mod = Get-InstalledModule -Name Pester -MinimumVersion 4.9.0 -MaximumVersion 4.99.99 -ErrorAction SilentlyContinue
     if($null -eq $mod) {
-        if(Test-Path $module) {
-            $module = "c:\Program Files\WindowsPowerShell\Modules\Pester"
+        $module = "c:\Program Files\WindowsPowerShell\Modules\Pester"
+        if(Test-Path $module) {            
             takeown /F $module /A /R
             icacls $module /reset
             icacls $module /grant Administrators:'F' /inheritance:d /T
