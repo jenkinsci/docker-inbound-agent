@@ -5,6 +5,7 @@ Param(
     [String] $AdditionalArgs = '',
     [String] $Build = '',
     [String] $VersionTag = '4.3-8',
+    [String] $DockerAgentVersion = '4.3-6',
     [switch] $PushVersions = $false
 )
 
@@ -19,30 +20,34 @@ if(![String]::IsNullOrWhiteSpace($env:DOCKERHUB_ORGANISATION)) {
     $Organization = $env:DOCKERHUB_ORGANISATION
 }
 
-$builds = @{
-    'jdk8' = @{
-        'Folder' = '8\windowsservercore-1809';
-        'Tags' = @( "windowsservercore-1809", "jdk8-windowsservercore-1809" );
-    };
-    'jdk11' = @{
-        'Folder' = '11\windowsservercore-1809';
-        'Tags' = @( "jdk11-windowsservercore-1809" );
-    };
-    'nanoserver' = @{
-        'Folder' = '8\nanoserver-1809';
-        'Tags' = @( "nanoserver-1809", "jdk8-nanoserver-1809" );
-    };
-    'nanoserver-jdk11' = @{
-        'Folder' = '11\nanoserver-1809';
-        'Tags' = @( "jdk11-nanoserver-1809" );
-    };
+# this is the jdk version that will be used for the 'bare tag' images, e.g., jdk8-windowsservercore-1809 -> windowsserver-1809
+$defaultBuild = '8'
+$builds = @{}
+
+Get-ChildItem -Recurse -Include windows -Directory | ForEach-Object {
+    Get-ChildItem -Directory -Path $_ | Where-Object { Test-Path (Join-Path $_.FullName "Dockerfile") } | ForEach-Object {
+        $dir = $_.FullName.Replace((Get-Location), "").TrimStart("\")
+        $items = $dir.Split("\")
+        $jdkVersion = $items[0]
+        $baseImage = $items[2]
+        $basicTag = "jdk${jdkVersion}-${baseImage}" 
+        $tags = @( $basicTag )
+        if($jdkVersion -eq $defaultBuild) {
+            $tags += $baseImage
+        }
+
+        $builds[$basicTag] = @{
+            'Folder' = $dir;
+            'Tags' = $tags;
+        }        
+    }
 }
 
 if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
     foreach($tag in $builds[$Build]['Tags']) {
         Copy-Item -Path 'jenkins-agent.ps1' -Destination (Join-Path $builds[$Build]['Folder'] 'jenkins-agent.ps1') -Force
         Write-Host "Building $Build => tag=$tag"
-        $cmd = "docker build -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $tag, $AdditionalArgs, $builds[$Build]['Folder']
+        $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $tag, $AdditionalArgs, $builds[$Build]['Folder']
         Invoke-Expression $cmd
 
         if($PushVersions) {
@@ -51,7 +56,7 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
                 $buildTag = "$VersionTag"
             }
             Write-Host "Building $Build => tag=$buildTag"
-            $cmd = "docker build -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$Build]['Folder']
+            $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$Build]['Folder']
             Invoke-Expression $cmd
         }
     }
@@ -60,7 +65,7 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
         Copy-Item -Path 'jenkins-agent.ps1' -Destination (Join-Path $builds[$b]['Folder'] 'jenkins-agent.ps1') -Force
         foreach($tag in $builds[$b]['Tags']) {
             Write-Host "Building $b => tag=$tag"
-            $cmd = "docker build -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $tag, $AdditionalArgs, $builds[$b]['Folder']
+            $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $tag, $AdditionalArgs, $builds[$b]['Folder']
             Invoke-Expression $cmd
 
             if($PushVersions) {
@@ -69,7 +74,7 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
                     $buildTag = "$VersionTag"
                 }
                 Write-Host "Building $Build => tag=$buildTag"
-                $cmd = "docker build -t {0}/{1}:{2} {3} {4}" -f $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$b]['Folder']
+                $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$b]['Folder']
                 Invoke-Expression $cmd
             }
         }
@@ -95,13 +100,13 @@ if($Target -eq "test") {
 
     if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
         $env:FOLDER = $builds[$Build]['Folder']
-        $env:VERSION = "$RemotingVersion-$BuildNumber"
+        $env:VERSION = $DockerAgentVersion
         Invoke-Pester -Path tests -EnableExit
         Remove-Item env:\FOLDER
     } else {
         foreach($b in $builds.Keys) {
             $env:FOLDER = $builds[$b]['Folder']
-            $env:VERSION = "$RemotingVersion-$BuildNumber"
+            $env:VERSION = $DockerAgentVersion
             Invoke-Pester -Path tests -EnableExit
             Remove-Item env:\FOLDER
         }

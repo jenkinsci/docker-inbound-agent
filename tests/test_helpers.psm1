@@ -81,8 +81,8 @@ function CleanupNetwork($name) {
 }
 
 function Is-ContainerRunning($container) {
-    Start-Sleep -Seconds 5
-    return Retry-Command -RetryCount 10 -Delay 2 -ScriptBlock {
+    Start-Sleep -Seconds 10
+    return Retry-Command -RetryCount 10 -Delay 3 -ScriptBlock {
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect -f `"{{.State.Running}}`" $container"
         if(($exitCode -ne 0) -or (-not $stdout.Contains('true')) ) {
             throw('Exit code incorrect, or invalid value for running state')
@@ -92,7 +92,9 @@ function Is-ContainerRunning($container) {
 }
 
 function Run-Program($cmd, $params, $quiet=$true) {
-    #Write-Host "cmd = $cmd, params = $params"
+    if(-not $quiet) {
+        Write-Host "cmd = $cmd, params = $params"
+    }
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.CreateNoWindow = $true
     $psi.UseShellExecute = $false
@@ -115,6 +117,7 @@ function Run-Program($cmd, $params, $quiet=$true) {
 }
 
 function BuildNcatImage() {
+    Write-Host "Building nmap image for testing"
     $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect --type=image nmap"
     if($exitCode -ne 0) {
         Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
