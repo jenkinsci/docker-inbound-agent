@@ -20,6 +20,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+#TODO(oleg_nenashev): Does it also need an update?
 ARG version=latest-alpine-jdk11
 FROM jenkins/agent:$version
 
