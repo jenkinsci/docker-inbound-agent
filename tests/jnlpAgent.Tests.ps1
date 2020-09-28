@@ -5,6 +5,7 @@ $AGENT_CONTAINER='pester-jenkins-inbound-agent'
 $SHELL="powershell.exe"
 
 $FOLDER = Get-EnvOrDefault 'FOLDER' ''
+$VERSION = Get-EnvOrDefault 'VERSION' '4.3-6'
 
 $REAL_FOLDER=Resolve-Path -Path "$PSScriptRoot/../${FOLDER}"
 
@@ -16,9 +17,9 @@ if(($FOLDER -match '^(?<jdk>[0-9]+)[\\/](?<flavor>.+)$') -and (Test-Path $REAL_F
     exit 1
 }
 
-if($FLAVOR -match "nanoserver") {
+if($FLAVOR -match "nanoserver-(\d+)") {
     $AGENT_IMAGE += "-nanoserver"
-    $AGENT_CONTAINER += "-nanoserver-1809"
+    $AGENT_CONTAINER += "-nanoserver-$($Matches[1])"
     $SHELL = "pwsh.exe"
 }
 
@@ -41,12 +42,33 @@ Describe "[$JDK $FLAVOR] build image" {
     }
 
     It 'builds image' {
-      $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build -t $AGENT_IMAGE $FOLDER"
+      $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg 'VERSION=$VERSION' -t $AGENT_IMAGE $FOLDER"
       $exitCode | Should -Be 0
     }
 
     AfterAll {
       Pop-Location -StackName 'agent'
+    }
+}
+
+Describe "[$JDK $FLAVOR] check user account" {
+    BeforeAll {
+        docker run -d -it --name "$AGENT_CONTAINER" -P "$AGENT_IMAGE" "$SHELL"
+        Is-ContainerRunning $AGENT_CONTAINER
+    }
+
+    It 'Password never expires' {
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $AGENT_CONTAINER $SHELL -C `"if((net user jenkins | Select-String -Pattern 'Password expires') -match 'Never') { exit 0 } else { exit -1 }`""
+        $exitCode | Should -Be 0
+    }
+
+    It 'Password not required' {
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $AGENT_CONTAINER $SHELL -C `"if((net user jenkins | Select-String -Pattern 'Password required') -match 'No') { exit 0 } else { exit -1 }`""
+        $exitCode | Should -Be 0
+    }
+
+    AfterAll {
+        Cleanup($AGENT_CONTAINER)
     }
 }
 
@@ -57,7 +79,7 @@ Describe "[$JDK $FLAVOR] image has jenkins-agent.ps1 in the correct location" {
     }
 
     It 'has jenkins-agent.ps1 in C:/ProgramData/Jenkins' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $AGENT_CONTAINER $SHELL -C `"if(Test-Path C:/ProgramData/Jenkins/jenkins-agent.ps1) { exit 0 } else { exit 1}`""
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $AGENT_CONTAINER $SHELL -C `"if(Test-Path 'C:/ProgramData/Jenkins/jenkins-agent.ps1') { exit 0 } else { exit 1 }`""
         $exitCode | Should -Be 0
     }
 
