@@ -29,7 +29,7 @@ It is a good practice is to create branches instead of pushing to master.
     * If you do not get feedback after 3 days, feel free to ping `@jenkinsci/code-reviewers` to CC.
 
 Once a Pull Request is merged, the continuous delivery process will update the `latest` images
-on [Dockerhub](https://hub.docker.com/r/jenkinsci/jnlp-slave/tags?page=1&name=latest).
+on [Dockerhub](https://hub.docker.com/r/jenkins/inbound-agent/tags?page=1&name=latest).
 
 ## Releasing the Docker Images
 
