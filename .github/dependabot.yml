@@ -1,0 +1,37 @@
+version: 2
+updates:
+- package-ecosystem: docker
+  directory: "/11/windowsservercore-1809"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+- package-ecosystem: docker
+  directory: "/11/nanoserver-1809"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+- package-ecosystem: docker
+  directory: "/11/debian"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+- package-ecosystem: docker
+  directory: "/8/windowsservercore-1809"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+- package-ecosystem: docker
+  directory: "/8/nanoserver-1809"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+- package-ecosystem: docker
+  directory: "/8/debian"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+- package-ecosystem: docker
+  directory: "/8/alpine"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
