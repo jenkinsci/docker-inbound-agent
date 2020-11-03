@@ -5,7 +5,7 @@ $AGENT_CONTAINER='pester-jenkins-inbound-agent'
 $SHELL="powershell.exe"
 
 $FOLDER = Get-EnvOrDefault 'FOLDER' ''
-$VERSION = Get-EnvOrDefault 'VERSION' '4.3-6'
+$VERSION = Get-EnvOrDefault 'VERSION' '4.6-1'
 
 $REAL_FOLDER=Resolve-Path -Path "$PSScriptRoot/../${FOLDER}"
 
@@ -127,7 +127,7 @@ Describe "[$JDK $FLAVOR] build args" {
     }
 
     It -Skip 'uses build args correctly' {
-        $TEST_VERSION="4.3"
+        $TEST_VERSION="4.6"
         $TEST_USER="foo"
 
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=${TEST_VERSION}-2 --build-arg user=$TEST_USER -t $AGENT_IMAGE $FOLDER"

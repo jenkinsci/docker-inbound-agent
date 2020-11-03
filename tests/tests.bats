@@ -78,7 +78,7 @@ function teardown () {
   cd "${BATS_TEST_DIRNAME}"/.. || false
 
   local ARG_TEST_VERSION
-  local TEST_VERSION="4.3"
+  local TEST_VERSION="4.6"
   local DOCKER_AGENT_VERSION_SUFFIX="4"
   local TEST_USER="root"
 
