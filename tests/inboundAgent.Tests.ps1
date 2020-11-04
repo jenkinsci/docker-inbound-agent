@@ -127,7 +127,7 @@ Describe "[$JDK $FLAVOR] build args" {
     }
 
     It -Skip 'uses build args correctly' {
-        $TEST_VERSION="4.6"
+        $TEST_VERSION="4.3"
         $TEST_USER="foo"
 
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=${TEST_VERSION}-2 --build-arg user=$TEST_USER -t $AGENT_IMAGE $FOLDER"
