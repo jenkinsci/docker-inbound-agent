@@ -29,6 +29,7 @@ Param(
     $Tunnel = '',
     $WorkDir = '',
     [switch] $WebSocket = $false,
+    [switch] $DisableCertCheck = $false,
     $DirectConnection = '',
     $InstanceIdentity = '',
     $Protocols = '',
@@ -63,6 +64,7 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
         'Name' = 'JENKINS_AGENT_NAME';
         'WorkDir' = 'JENKINS_AGENT_WORKDIR';
         'WebSocket' = 'JENKINS_WEB_SOCKET';
+        'DisableCertCheck' = 'JENKINS_SKIP_SSL_CERT_CHECK';
         'DirectConnection' = 'JENKINS_DIRECT_CONNECTION';
         'InstanceIdentity' = 'JENKINS_INSTANCE_IDENTITY';
         'Protocols' = 'JENKINS_PROTOCOLS';
@@ -101,6 +103,10 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 
     if($WebSocket) {
         $AgentArguments += @("-webSocket")
+    }
+
+    if($DisableCertCheck) {
+        $AgentArguments += @("-disableHttpsCertValidation")
     }
 
     if(![System.String]::IsNullOrWhiteSpace($Url)) {
