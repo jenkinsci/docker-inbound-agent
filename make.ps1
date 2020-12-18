@@ -4,8 +4,8 @@ Param(
     [String] $Target = "build",
     [String] $AdditionalArgs = '',
     [String] $Build = '',
-    [String] $VersionTag = '4.6-1',
-    [String] $DockerAgentVersion = '4.6-1',
+    [String] $VersionTag = '4.6-2',
+    [String] $DockerAgentVersion = '4.6-2',
     [switch] $PushVersions = $false
 )
 
