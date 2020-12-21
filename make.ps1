@@ -101,13 +101,13 @@ if($Target -eq "test") {
     if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
         $env:FOLDER = $builds[$Build]['Folder']
         $env:VERSION = $DockerAgentVersion
-        Invoke-Pester -Path tests -EnableExit
+        Invoke-Pester -Path tests -EnableExit -OutputFile ".\target\${env:FOLDER}\junit-results.xml" -OutputFormat JUnitXml
         Remove-Item env:\FOLDER
     } else {
         foreach($b in $builds.Keys) {
             $env:FOLDER = $builds[$b]['Folder']
             $env:VERSION = $DockerAgentVersion
-            Invoke-Pester -Path tests -EnableExit
+            Invoke-Pester -Path tests -EnableExit -OutputFile ".\target\${env:FOLDER}\junit-results.xml" -OutputFormat JUnitXml
             Remove-Item env:\FOLDER
         }
     }

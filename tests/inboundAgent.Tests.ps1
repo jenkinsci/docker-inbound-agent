@@ -1,6 +1,6 @@
 Import-Module -DisableNameChecking -Force $PSScriptRoot/test_helpers.psm1
 
-$AGENT_IMAGE='jenkins-inbound-agent'
+$AGENT_IMAGE='jenkins/inbound-agent-test'
 $AGENT_CONTAINER='pester-jenkins-inbound-agent'
 $SHELL="powershell.exe"
 
@@ -17,9 +17,18 @@ if(($FOLDER -match '^(?<jdk>[0-9]+)[\\/](?<flavor>.+)$') -and (Test-Path $REAL_F
     exit 1
 }
 
-if($FLAVOR -match "nanoserver-(\d+)") {
-    $AGENT_IMAGE += "-nanoserver"
-    $AGENT_CONTAINER += "-nanoserver-$($Matches[1])"
+
+if($FLAVOR -match "windows[\\/](.+)") {
+    $AGENT_IMAGE += ":jdk${JDK}-$($Matches[1])"
+    $AGENT_CONTAINER += "-jdk${JDK}-$($Matches[1])"
+}
+else
+{
+    $AGENT_IMAGE += ":jdk${JDK}-${FLAVOR}"
+    $AGENT_CONTAINER += "-jdk${JDK}-${FLAVOR}"
+}
+
+if($FLAVOR -match "nanoserver-(\d*)") {
     $SHELL = "pwsh.exe"
 }
 
@@ -42,7 +51,7 @@ Describe "[$JDK $FLAVOR] build image" {
     }
 
     It 'builds image' {
-      $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg 'VERSION=$VERSION' -t $AGENT_IMAGE $FOLDER"
+      $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=$VERSION -t $AGENT_IMAGE $FOLDER"
       $exitCode | Should -Be 0
     }
 
@@ -127,6 +136,7 @@ Describe "[$JDK $FLAVOR] build args" {
     }
 
     It -Skip 'uses build args correctly' {
+        $AGENT_IMAGE+="-ARGS"
         $TEST_VERSION="4.3"
         $TEST_USER="foo"
 
