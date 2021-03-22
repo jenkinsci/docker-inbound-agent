@@ -4,9 +4,10 @@ IMAGE_NAME:=jenkins4eval/jnlp-slave
 IMAGE_ALPINE:=${IMAGE_NAME}:alpine
 IMAGE_ALPINE_JDK11:=${IMAGE_NAME}:alpine-jdk11
 IMAGE_DEBIAN:=${IMAGE_NAME}:test
+IMAGE_DEBIAN_DIND:=${IMAGE_NAME}:test-dind
 IMAGE_JDK11:=${IMAGE_NAME}:jdk11
 
-build: build-alpine build-debian build-jdk11 build-jdk11-alpine
+build: build-alpine build-debian build-debian-dind build-jdk11 build-jdk11-alpine
 
 build-alpine:
 	cp -f jenkins-agent 8/alpine/
@@ -15,6 +16,10 @@ build-alpine:
 build-debian:
 	cp -f jenkins-agent 8/debian/
 	docker build -t ${IMAGE_DEBIAN} 8/debian
+
+build-debian-dind:
+	cp -f jenkins-agent 8/debian-dind/
+	docker build -t ${IMAGE_DEBIAN_DIND} 8/debian-dind
 
 build-jdk11:
 	cp -f jenkins-agent 11/debian/
