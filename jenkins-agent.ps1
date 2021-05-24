@@ -32,7 +32,8 @@ Param(
     $DirectConnection = '',
     $InstanceIdentity = '',
     $Protocols = '',
-    $JavaHome = $env:JAVA_HOME
+    $JavaHome = $env:JAVA_HOME,
+    $JavaOpts = ''
 )
 
 # Usage jenkins-agent.ps1 [options] -Url http://jenkins -Secret [SECRET] -Name [AGENT_NAME]
@@ -53,9 +54,8 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 	# if `docker run` only has one argument, we assume user is running alternate command like `powershell` or `pwsh` to inspect the image
 	Invoke-Expression "$Cmd"
 } else {
-    $AgentArguments = @("-cp", "C:/ProgramData/Jenkins/agent.jar", "hudson.remoting.jnlp.Main", "-headless")
 
-    # this maps the variable name from th CmdletBinding to environment variables
+    # this maps the variable name from the CmdletBinding to environment variables
     $ParamMap = @{
         'Tunnel' = 'JENKINS_TUNNEL';
         'Url' = 'JENKINS_URL';
@@ -66,6 +66,7 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
         'DirectConnection' = 'JENKINS_DIRECT_CONNECTION';
         'InstanceIdentity' = 'JENKINS_INSTANCE_IDENTITY';
         'Protocols' = 'JENKINS_PROTOCOLS';
+        'JavaOpts' = 'JAVA_OPTS';
     }
 
     # this does some trickery to update the variable from the CmdletBinding
@@ -88,6 +89,14 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
             $var.Value = $var.Value.Trim()
         }
     }
+
+    $AgentArguments = @()
+
+    if(![System.String]::IsNullOrWhiteSpace($JavaOpts)) {
+        $AgentArguments += @($JavaOpts.split(" "))
+    }
+
+    $AgentArguments += @("-cp", "C:/ProgramData/Jenkins/agent.jar", "hudson.remoting.jnlp.Main", "-headless")
 
     if(![System.String]::IsNullOrWhiteSpace($Tunnel)) {
         $AgentArguments += @("-tunnel", "`"$Tunnel`"")
@@ -114,7 +123,7 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
     if(![System.String]::IsNullOrWhiteSpace($InstanceIdentity)) {
         $AgentArguments += @('-instanceIdentity', $InstanceIdentity)
     }
-    
+
     if(![System.String]::IsNullOrWhiteSpace($Protocols)) {
         $AgentArguments += @('-protocols', $Protocols)
     }
