@@ -20,7 +20,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-ARG version=4.7-1-alpine
+ARG version=4.9-1-alpine
 FROM jenkins/agent:$version
 
 ARG version
