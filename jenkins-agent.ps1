@@ -32,11 +32,13 @@ Param(
     $DirectConnection = '',
     $InstanceIdentity = '',
     $Protocols = '',
+    $JenkinsJavaBin = '',
     $JavaHome = $env:JAVA_HOME
 )
 
 # Usage jenkins-agent.ps1 [options] -Url http://jenkins -Secret [SECRET] -Name [AGENT_NAME]
 # Optional environment variables :
+# * JENKINS_JAVA_BIN : Java executable to use instead of the default in PATH or obtained from JAVA_HOME
 # * JENKINS_TUNNEL : HOST:PORT for a tunnel to route TCP traffic to jenkins host, when jenkins can't be directly accessed over network
 # * JENKINS_URL : alternate jenkins URL
 # * JENKINS_SECRET : agent secret, if not set as an argument
@@ -55,8 +57,9 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 } else {
     $AgentArguments = @("-cp", "C:/ProgramData/Jenkins/agent.jar", "hudson.remoting.jnlp.Main", "-headless")
 
-    # this maps the variable name from th CmdletBinding to environment variables
+    # this maps the variable name from the CmdletBinding to environment variables
     $ParamMap = @{
+        'JenkinsJavaBin' = 'JENKINS_JAVA_BIN';
         'Tunnel' = 'JENKINS_TUNNEL';
         'Url' = 'JENKINS_URL';
         'Secret' = 'JENKINS_SECRET';
@@ -123,10 +126,14 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
     # parameters to agent.jar
     $AgentArguments += @($Secret, $Name)
 
-    # if java home is defined, use it
-    $JAVA_BIN="java.exe"
-    if(![System.String]::IsNullOrWhiteSpace($JavaHome)) {
-        $JAVA_BIN="$JavaHome/bin/java.exe"
+    if(![System.String]::IsNullOrWhiteSpace($JenkinsJavaBin)) {
+        $JAVA_BIN = $JenkinsJavaBin
+    } else {
+        # if java home is defined, use it
+        $JAVA_BIN = "java.exe"
+        if (![System.String]::IsNullOrWhiteSpace($JavaHome)) {
+            $JAVA_BIN = "$JavaHome/bin/java.exe"
+        }
     }
 
     #TODO: Handle the case when the command-line and Environment variable contain different values.
