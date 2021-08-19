@@ -32,7 +32,6 @@ ARG user=jenkins
 USER root
 COPY ../../jenkins-agent /usr/local/bin/jenkins-agent
 RUN chmod +x /usr/local/bin/jenkins-agent &&\
-    rm -f /usr/local/bin/jenkins-slave &&\
     ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
 USER ${user}
 
