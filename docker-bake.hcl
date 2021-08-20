@@ -109,5 +109,5 @@ target "debian_jdk11" {
     "${REGISTRY}/${JENKINS_REPO}:latest",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk11",
   ]
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64", "linux/arm64", "linux/ppc64le", "linux/s390x"]
 }
