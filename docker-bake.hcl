@@ -25,14 +25,9 @@ group "linux-ppc64le" {
   ]
 }
 
-group "windows" {
-  targets = [
-    "windows_2019_jdk11",
-  ]
-}
-
-variable "REMOTING_VERSION" {
-  default = "4.10"
+# update this to use a newer build number for jenkins/docker image
+variable "AGENT_IMAGE_BUILD_NUMBER" {
+  default = "1"
 }
 
 variable "REGISTRY" {
@@ -43,8 +38,12 @@ variable "JENKINS_REPO" {
   default = "jenkins/inbound-agent"
 }
 
+variable "REMOTING_VERSION" {
+  default = "4.10"
+}
+
 variable "BUILD_NUMBER" {
-  default = "1"
+  default = "6"
 }
 
 variable "ON_TAG" {
@@ -55,7 +54,7 @@ target "alpine_jdk8" {
   dockerfile = "8/alpine/Dockerfile"
   context = "."
   args = {
-    REMOTING_VERSION = REMOTING_VERSION
+    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-alpine-jdk8"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-alpine-jdk8": "",
@@ -69,7 +68,7 @@ target "alpine_jdk11" {
   dockerfile = "11/alpine/Dockerfile"
   context = "."
   args = {
-    REMOTING_VERSION = REMOTING_VERSION
+    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-alpine-jdk11"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-alpine": "",
@@ -86,7 +85,7 @@ target "debian_jdk8" {
   dockerfile = "8/debian/Dockerfile"
   context = "."
   args = {
-    REMOTING_VERSION = REMOTING_VERSION
+    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-jdk8"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-jdk8": "",
@@ -100,7 +99,7 @@ target "debian_jdk11" {
   dockerfile = "11/debian/Dockerfile"
   context = "."
   args = {
-    REMOTING_VERSION = REMOTING_VERSION
+    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-jdk11"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}": "",
