@@ -1,6 +1,6 @@
 ROOT:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-IMAGE_NAME:=jenkins4eval/jnlp-slave
+IMAGE_NAME:=jenkins4eval/inbound-agent
 IMAGE_ALPINE:=${IMAGE_NAME}:alpine
 IMAGE_ALPINE_JDK11:=${IMAGE_NAME}:alpine-jdk11
 IMAGE_DEBIAN:=${IMAGE_NAME}:test

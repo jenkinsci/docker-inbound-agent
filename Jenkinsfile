@@ -1,7 +1,3 @@
-/* NOTE: this Pipeline mainly aims at catching mistakes (wrongly formed Dockerfile, etc.)
- * This Pipeline is *not* used for actual image publishing.
- * This is currently handled through Automated Builds using standard Docker Hub feature
-*/
 pipeline {
     agent none
 
@@ -15,7 +11,7 @@ pipeline {
     }
 
     stages {
-        stage('Build Docker Image') {
+        stage('Build') {
             parallel {
                 stage('Windows') {
                     agent {
@@ -28,9 +24,8 @@ pipeline {
                         DOCKERHUB_ORGANISATION = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}"
                     }
                     steps {
+                        powershell '& ./make.ps1 test'
                         script {
-                            powershell '& ./make.ps1 test'
-
                             def branchName = "${env.BRANCH_NAME}"
                             if (branchName ==~ 'master') {
                                 // we can't use dockerhub builds for windows
@@ -47,8 +42,11 @@ pipeline {
                                     powershell "& ./make.ps1 -PushVersions -VersionTag $tagName publish"
                                 }
                             }
-
-                            powershell '& docker system prune --force --all'
+                        }
+                    }
+                    post {
+                        always {
+                            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/**/junit-results.xml')
                         }
                     }
                 }
@@ -59,23 +57,55 @@ pipeline {
                     options {
                         timeout(time: 30, unit: 'MINUTES')
                     }
+                    environment {
+                        JENKINS_REPO = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}/inbound-agent"
+                    }
                     steps {
                         script {
-                            if(!infra.isTrusted()) {
-                                deleteDir()
-                                checkout scm
-                                sh '''
-                                make build
-                                make test
-                                docker system prune --force --all
-                                '''
+                            def branchName = "${env.BRANCH_NAME}"
+                            if (branchName ==~ 'master') {
+                                // publish the images to Dockerhub
+                                infra.withDockerCredentials {
+                                    sh '''
+                                      docker buildx create --use
+                                      docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+                                      docker buildx bake --push --file docker-bake.hcl linux
+                                    '''
+                                }
+                            } else if (env.TAG_NAME == null) {
+                                sh 'make build'
+                                sh 'make test'
                             }
+
+                            if(env.TAG_NAME != null) {
+                                def tagItems = env.TAG_NAME.split('-')
+                                if(tagItems.length == 2) {
+                                    def remotingVersion = tagItems[0]
+                                    def buildNumber = tagItems[1]
+                                    // we need to build and publish the tag version
+                                    infra.withDockerCredentials {
+                                        sh """
+                                        docker buildx create --use
+                                        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+                                        export REMOTING_VERSION=$remotingVersion
+                                        export BUILD_NUMBER=$buildNumber
+                                        docker buildx bake --push --file docker-bake.hcl linux
+                                        """
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/*.xml')
                         }
                     }
                 }
             }
         }
     }
+
 }
 
 // vim: ft=groovy
