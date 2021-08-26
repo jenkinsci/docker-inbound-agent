@@ -47,18 +47,40 @@ function retry {
     false
 }
 
+function get_sut_image {
+    test -n "${IMAGE:?"[sut_image] Please set the variable 'IMAGE' to the name of the image to test in 'docker-bake.hcl'."}"
+    ## Retrieve the SUT image name from buildx
+    # Option --print for 'docker buildx bake' prints the JSON configuration on the stdout
+    # Option --silent for 'make' suppresses the echoing of command so the output is valid JSON
+    # The image name is the 1st of the "tags" array, on the first "image" found
+    make --silent show | jq -r ".target.${IMAGE}.tags[0]"
+}
+
+function get_dockerfile_directory() {
+    test -n "${IMAGE:?"[sut_image] Please set the variable 'IMAGE' to the name of the image to test in 'docker-bake.hcl'."}"
+
+    DOCKERFILE=$(make --silent show | jq -r ".target.${IMAGE}.dockerfile")
+    echo "${DOCKERFILE%"/Dockerfile"}"
+}
+
 function clean_test_container {
 	docker kill "${AGENT_CONTAINER}" "${NETCAT_HELPER_CONTAINER}" &>/dev/null || :
 	docker rm -fv "${AGENT_CONTAINER}" "${NETCAT_HELPER_CONTAINER}" &>/dev/null || :
 }
 
-function is_slave_container_running {
+function is_agent_container_running {
+  local cid="${1}"
 	sleep 1
-	retry 3 1 assert "true" docker inspect -f '{{.State.Running}}' "${AGENT_CONTAINER}"
+	retry 3 1 assert "true" docker inspect -f '{{.State.Running}}' "${cid}"
 }
 
 function buildNetcatImage() {
   if ! docker inspect --type=image netcat-helper:latest &>/dev/null; then
     docker build -t netcat-helper:latest tests/netcat-helper/ &>/dev/null
   fi
+}
+
+function cleanup {
+    docker kill "$1" &>/dev/null ||:
+    docker rm -fv "$1" &>/dev/null ||:
 }

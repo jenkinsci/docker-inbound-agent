@@ -24,6 +24,7 @@
 
 # Usage jenkins-agent.sh [options] -url http://jenkins [SECRET] [AGENT_NAME]
 # Optional environment variables :
+# * JENKINS_JAVA_BIN : Java executable to use instead of the default in PATH or obtained from JAVA_HOME
 # * JENKINS_TUNNEL : HOST:PORT for a tunnel to route TCP traffic to jenkins host, when jenkins can't be directly accessed over network
 # * JENKINS_URL : alternate jenkins URL
 # * JENKINS_SECRET : agent secret, if not set as an argument
@@ -85,10 +86,14 @@ else
 		INSTANCE_IDENTITY="-instanceIdentity $JENKINS_INSTANCE_IDENTITY"
 	fi
 
-	# if java home is defined, use it
-	JAVA_BIN="java"
-	if [ "$JAVA_HOME" ]; then
-		JAVA_BIN="$JAVA_HOME/bin/java"
+	if [ "$JENKINS_JAVA_BIN" ]; then
+		JAVA_BIN="$JENKINS_JAVA_BIN"
+	else
+		# if java home is defined, use it
+		JAVA_BIN="java"
+		if [ "$JAVA_HOME" ]; then
+			JAVA_BIN="$JAVA_HOME/bin/java"
+		fi
 	fi
 
 	# if both required options are defined, do not pass the parameters

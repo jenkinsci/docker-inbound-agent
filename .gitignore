@@ -5,3 +5,6 @@ bats-core/
 
 /**/windows/**/jenkins-agent.ps1
 /.vscode/
+
+bats/
+target/
