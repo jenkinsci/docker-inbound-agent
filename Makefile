@@ -1,6 +1,6 @@
 ROOT:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-IMAGE_NAME:=jenkins4eval/jnlp-slave
+IMAGE_NAME:=jenkins4eval/inbound-agent
 IMAGE_ALPINE:=${IMAGE_NAME}:alpine
 IMAGE_ALPINE_JDK11:=${IMAGE_NAME}:alpine-jdk11
 IMAGE_DEBIAN:=${IMAGE_NAME}:test
@@ -55,29 +55,38 @@ list: check-reqs
 
 
 bats:
-# The lastest version is v1.1.0
-	@if [ ! -d bats-core ]; then git clone https://github.com/bats-core/bats-core.git; fi
-	@git -C bats-core reset --hard c706d1470dd1376687776bbe985ac22d09780327
+	git clone https://github.com/bats-core/bats-core bats ;\
+	cd bats ;\
+	git checkout v1.4.1
 
-.PHONY: test test-alpine test-debian test-jdk11 test-jdk11-alpine
-test: test-alpine test-debian test-jdk11 test-jdk11-alpine
+prepare-test: bats check-reqs
+	git submodule update --init --recursive
+	mkdir -p target
 
-test-alpine: bats
-	cp -f jenkins-agent 8/alpine/
-	@FOLDER="8/alpine" bats-core/bin/bats tests/tests.bats
-	rm -f 8/alpine/jenkins-agent
+## Define bats options based on environment
+# common flags for all tests
+bats_flags := $(TEST_SUITES)
+# if DISABLE_PARALLEL_TESTS true, then disable parallel execution
+ifneq (true,$(DISABLE_PARALLEL_TESTS))
+# If the GNU 'parallel' command line is absent, then disable parallel execution
+parallel_cli := $(shell command -v parallel 2>/dev/null)
+ifneq (,$(parallel_cli))
+# If parallel execution is enabled, then set 2 tests per core available for the Docker Engine
+test-%: PARALLEL_JOBS ?= $(shell echo $$(( $(shell docker run --rm alpine grep -c processor /proc/cpuinfo) * 2)))
+test-%: bats_flags += --jobs $(PARALLEL_JOBS)
+endif
+endif
+test-%: prepare-test
+# Check that the image exists in the manifest
+	@$(call check_image,$*)
+# Ensure that the image is built
+	# @make --silent build-$*
+# Execute the test harness and write result to a TAP file
+	set -x
+	IMAGE=$* bats/bin/bats $(bats_flags) | tee target/results-$*.tap
+# convert TAP to JUNIT
+	docker run --rm -v "$(CURDIR)":/usr/src/app -w /usr/src/app node:16-alpine \
+		sh -c "npm install tap-xunit -g && cat target/results-$*.tap | tap-xunit --package='jenkinsci.docker.$*' > target/junit-results-$*.xml"
 
-test-debian: bats
-	cp -f jenkins-agent 8/debian/
-	@FOLDER="8/debian" bats-core/bin/bats tests/tests.bats
-	rm -f 8/debian/jenkins-agent
-
-test-jdk11: bats
-	cp -f jenkins-agent 11/debian/
-	@FOLDER="11/debian" bats-core/bin/bats tests/tests.bats
-	rm -f 11/debian/jenkins-agent
-
-test-jdk11-alpine: bats
-	cp -f jenkins-agent 11/alpine/
-	@FOLDER="11/alpine" bats-core/bin/bats tests/tests.bats
-	rm -f 11/alpine/jenkins-agent
+test: prepare-test
+	@make --silent list | while read image; do make --silent "test-$${image}"; done
