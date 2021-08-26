@@ -37,9 +37,9 @@
 #                              the agent skips connecting to an HTTP(S) port for connection info.
 # * JENKINS_PROTOCOLS:         Specify the remoting protocols to attempt when instanceIdentity is provided.
 
-if [ $# -eq 1 ]; then
+if [ $# -eq 1 ] && [ "${1#-}" == "$1" ] ; then
 
-	# if `docker run` only has one arguments, we assume user is running alternate command like `bash` to inspect the image
+	# if `docker run` only has one arguments and it is not an option as `-help`, we assume user is running alternate command like `bash` to inspect the image
 	exec "$@"
 
 else
