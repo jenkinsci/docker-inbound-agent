@@ -63,18 +63,23 @@ pipeline {
                     steps {
                         script {
                             def branchName = "${env.BRANCH_NAME}"
-                            if (branchName ==~ 'master') {
-                                // publish the images to Dockerhub
-                                infra.withDockerCredentials {
+                            infra.withDockerCredentials {
+                                if (branchName ==~ 'master') {
+                                    // publish the images to Dockerhub
+                                        sh '''
+                                          docker buildx create --use
+                                          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+                                          docker buildx bake --push --file docker-bake.hcl linux
+                                        '''
+                                } else if (env.TAG_NAME == null) {
+                                    sh 'make build'
+                                    sh 'make test'
                                     sh '''
-                                      docker buildx create --use
-                                      docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-                                      docker buildx bake --push --file docker-bake.hcl linux
+                                          docker buildx create --use
+                                          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+                                          docker buildx bake --file docker-bake.hcl linux
                                     '''
                                 }
-                            } else if (env.TAG_NAME == null) {
-                                sh 'make build'
-                                sh 'make test'
                             }
 
                             if(env.TAG_NAME != null) {
