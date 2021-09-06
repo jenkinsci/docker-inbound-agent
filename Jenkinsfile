@@ -94,6 +94,7 @@ pipeline {
                                         docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
                                         export REMOTING_VERSION=$remotingVersion
                                         export BUILD_NUMBER=$buildNumber
+                                        export ON_TAG=true
                                         docker buildx bake --push --file docker-bake.hcl linux
                                         """
                                     }
