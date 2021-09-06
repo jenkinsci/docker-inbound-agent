@@ -23,7 +23,7 @@ group "linux-ppc64le" {
 
 # update this to use a newer build number for jenkins/docker image
 variable "AGENT_IMAGE_BUILD_NUMBER" {
-  default = "1"
+  default = "4"
 }
 
 variable "REGISTRY" {
@@ -104,5 +104,5 @@ target "debian_jdk11" {
     "${REGISTRY}/${JENKINS_REPO}:latest",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk11",
   ]
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64", "linux/arm64", "linux/s390x"]
 }
