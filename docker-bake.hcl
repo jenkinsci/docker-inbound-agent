@@ -4,12 +4,14 @@ group "linux" {
     "alpine_jdk11",
     "debian_jdk8",
     "debian_jdk11",
+    "debian_jdk17",
   ]
 }
 
 group "linux-arm64" {
   targets = [
     "debian_jdk11",
+    "debian_jdk17",
   ]
 }
 
@@ -105,4 +107,18 @@ target "debian_jdk11" {
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk11",
   ]
   platforms = ["linux/amd64", "linux/arm64", "linux/s390x"]
+}
+
+target "debian_jdk17" {
+  dockerfile = "17/debian/Dockerfile"
+  context = "."
+  args = {
+    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-jdk17-preview"
+  }
+  tags = [
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-jdk17-preview": "",
+    "${REGISTRY}/${JENKINS_REPO}:jdk17-preview",
+    "${REGISTRY}/${JENKINS_REPO}:latest-jdk17-preview",
+  ]
+  platforms = ["linux/amd64", "linux/arm64"]
 }
