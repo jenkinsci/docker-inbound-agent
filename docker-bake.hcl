@@ -25,7 +25,7 @@ group "linux-ppc64le" {
 
 # update this to use a newer build number for jenkins/docker image
 variable "AGENT_IMAGE_BUILD_NUMBER" {
-  default = "4"
+  default = "6"
 }
 
 variable "REGISTRY" {
