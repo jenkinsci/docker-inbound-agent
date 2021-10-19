@@ -15,7 +15,7 @@ pipeline {
             parallel {
                 stage('Windows') {
                     agent {
-                        label 'windock'
+                        label 'docker-windows'
                     }
                     options {
                         timeout(time: 60, unit: 'MINUTES')
