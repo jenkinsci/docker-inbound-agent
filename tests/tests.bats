@@ -1,69 +1,34 @@
 #!/usr/bin/env bats
 
-AGENT_IMAGE=jenkins-jnlp-agent
 AGENT_CONTAINER=bats-jenkins-jnlp-agent
 NETCAT_HELPER_CONTAINER=netcat-helper
 
-REGEX='^([0-9]+)/(.+)$'
-
-REAL_FOLDER=$(realpath "${BATS_TEST_DIRNAME}/../${FOLDER}")
-
-if [[ ${FOLDER} =~ ${REGEX} ]] && [[ -d "${REAL_FOLDER}" ]]
-then
-  JDK="${BASH_REMATCH[1]}"
-  FLAVOR="${BASH_REMATCH[2]}"
-else
-  echo "Wrong folder format or folder does not exist: ${FOLDER}"
-  exit 1
-fi
-
-if [[ "${JDK}" = "11" ]]
-then
-  AGENT_IMAGE+=":jdk11"
-  AGENT_CONTAINER+="-jdk11"
-else
-  if [[ "${FLAVOR}" = "alpine*" ]]
-  then
-    AGENT_IMAGE+=":alpine"
-    AGENT_CONTAINER+="-alpine"
-  else
-    AGENT_IMAGE+=":latest"
-  fi
-fi
-
 load test_helpers
-
-clean_test_container
 
 buildNetcatImage
 
-function teardown () {
-  clean_test_container
-}
+SUT_IMAGE=$(get_sut_image)
 
-@test "[${JDK} ${FLAVOR}] build image" {
-  cd "${BATS_TEST_DIRNAME}"/.. || false
-  docker build -t "${AGENT_IMAGE}" ${FOLDER}
-}
+@test "[${SUT_IMAGE}] image has installed jenkins-agent in PATH" {
+  cid=$(docker run -d -it -P "${SUT_IMAGE}" /bin/bash)
 
-@test "[${JDK} ${FLAVOR}] image has installed jenkins-agent in PATH" {
-  docker run -d -it --name "${AGENT_CONTAINER}" -P "${AGENT_IMAGE}" /bin/bash
+  is_agent_container_running $cid
 
-  is_slave_container_running
-
-  run docker exec "${AGENT_CONTAINER}" which jenkins-agent
+  run docker exec "${cid}" which jenkins-agent
   [ "/usr/local/bin/jenkins-agent" = "${lines[0]}" ]
 
-  run docker exec "${AGENT_CONTAINER}" which jenkins-agent
+  run docker exec "${cid}" which jenkins-agent
   [ "/usr/local/bin/jenkins-agent" = "${lines[0]}" ]
+
+  cleanup $cid
 }
 
-@test "[${JDK} ${FLAVOR}] image starts jenkins-agent correctly (slow test)" {
+@test "[${SUT_IMAGE}] image starts jenkins-agent correctly (slow test)" {
   #  Spin off a helper image which contains netcat
-  docker run -d -it --name netcat-helper netcat-helper:latest /bin/sh
+  netcat_cid=$(docker run -d -it --name netcat-helper netcat-helper:latest /bin/sh)
 
   # Run jenkins agent which tries to connect to the netcat-helper container at port 5000
-  docker run -d --link netcat-helper --name "${AGENT_CONTAINER}" "${AGENT_IMAGE}" -url http://netcat-helper:5000 aaa bbb
+  cid=$(docker run -d --link netcat-helper "${SUT_IMAGE}" -url http://netcat-helper:5000 aaa bbb)
 
   # Launch the netcat utility, listening at port 5000 for 30 sec
   # bats will capture the output from netcat and compare the first line
@@ -72,39 +37,41 @@ function teardown () {
 
   # The GET request ends with a '\r'
   [ $'GET /tcpSlaveAgentListener/ HTTP/1.1\r' = "${lines[0]}" ]
+
+  cleanup $netcat_cid
+  cleanup $cid
 }
 
-@test "[${JDK} ${FLAVOR}] use build args correctly" {
+@test "[${SUT_IMAGE}] use build args correctly" {
   cd "${BATS_TEST_DIRNAME}"/.. || false
 
   local ARG_TEST_VERSION
   local TEST_VERSION="4.3"
   local DOCKER_AGENT_VERSION_SUFFIX="4"
   local TEST_USER="root"
+  local ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
 
-	if [[ "${FLAVOR}" = "debian" ]]
-  then
-    ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
-  elif [[ "${FLAVOR}" = "jdk11" ]]
-  then
-    ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}-jdk11"
-  else
-    ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}-alpine"
-  fi
+  local FOLDER=$(get_dockerfile_directory)
 
-  docker build \
-    --build-arg "version=${ARG_TEST_VERSION}" \
-    --build-arg "user=${TEST_USER}" \
-    -t "${AGENT_IMAGE}" \
-    ${FOLDER}
+  local sut_image="${SUT_IMAGE}-tests-${BATS_TEST_NUMBER}"
 
-  docker run -d -it --name "${AGENT_CONTAINER}" -P "${AGENT_IMAGE}" /bin/sh
+  docker buildx bake \
+    --set "${IMAGE}".args.version="${ARG_TEST_VERSION}" \
+    --set "${IMAGE}".args.user="${TEST_USER}" \
+    --set "${IMAGE}".platform="linux/${ARCH}" \
+    --set "${IMAGE}".tags="${sut_image}" \
+    --load \
+      "${IMAGE}"
 
-  is_slave_container_running
+  cid=$(docker run -d -it --name "${AGENT_CONTAINER}" -P "${sut_image}" /bin/sh)
 
-  run docker exec "${AGENT_CONTAINER}" sh -c "java -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -version"
+  is_agent_container_running $cid
+
+  run docker exec "${cid}" sh -c "java -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -version"
   [ "${TEST_VERSION}" = "${lines[0]}" ]
 
   run docker exec "${AGENT_CONTAINER}" sh -c "id -u -n ${TEST_USER}"
   [ "${TEST_USER}" = "${lines[0]}" ]
+
+  cleanup $cid
 }

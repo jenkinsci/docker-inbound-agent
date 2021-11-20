@@ -24,20 +24,22 @@
 Param(
     $Cmd = '', # this is only used when docker run has one arg positional arg
     $Url = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_URL)) { throw ("Url is required") } else { '' } ),
-    $Secret = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_SECRET)) { throw ("Secret is required") } else { '' } ),
-    $Name = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_AGENT_NAME)) { throw ("Name is required") } else { '' } ),
+    [Parameter(Position=0)]$Secret = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_SECRET)) { throw ("Secret is required") } else { '' } ),
+    [Parameter(Position=1)]$Name = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_AGENT_NAME)) { throw ("Name is required") } else { '' } ),
     $Tunnel = '',
     $WorkDir = '',
     [switch] $WebSocket = $false,
     $DirectConnection = '',
     $InstanceIdentity = '',
     $Protocols = '',
+    $JenkinsJavaBin = '',
     $JavaHome = $env:JAVA_HOME,
     $JavaOpts = ''
 )
 
 # Usage jenkins-agent.ps1 [options] -Url http://jenkins -Secret [SECRET] -Name [AGENT_NAME]
 # Optional environment variables :
+# * JENKINS_JAVA_BIN : Java executable to use instead of the default in PATH or obtained from JAVA_HOME
 # * JENKINS_TUNNEL : HOST:PORT for a tunnel to route TCP traffic to jenkins host, when jenkins can't be directly accessed over network
 # * JENKINS_URL : alternate jenkins URL
 # * JENKINS_SECRET : agent secret, if not set as an argument
@@ -57,6 +59,7 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 
     # this maps the variable name from the CmdletBinding to environment variables
     $ParamMap = @{
+        'JenkinsJavaBin' = 'JENKINS_JAVA_BIN';
         'Tunnel' = 'JENKINS_TUNNEL';
         'Url' = 'JENKINS_URL';
         'Secret' = 'JENKINS_SECRET';
@@ -132,10 +135,14 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
     # parameters to agent.jar
     $AgentArguments += @($Secret, $Name)
 
-    # if java home is defined, use it
-    $JAVA_BIN="java.exe"
-    if(![System.String]::IsNullOrWhiteSpace($JavaHome)) {
-        $JAVA_BIN="$JavaHome/bin/java.exe"
+    if(![System.String]::IsNullOrWhiteSpace($JenkinsJavaBin)) {
+        $JAVA_BIN = $JenkinsJavaBin
+    } else {
+        # if java home is defined, use it
+        $JAVA_BIN = "java.exe"
+        if (![System.String]::IsNullOrWhiteSpace($JavaHome)) {
+            $JAVA_BIN = "$JavaHome/bin/java.exe"
+        }
     }
 
     #TODO: Handle the case when the command-line and Environment variable contain different values.
