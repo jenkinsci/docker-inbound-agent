@@ -37,11 +37,11 @@ variable "JENKINS_REPO" {
 }
 
 variable "REMOTING_VERSION" {
-  default = "4.11"
+  default = "4.11.2"
 }
 
 variable "BUILD_NUMBER" {
-  default = "6"
+  default = "1"
 }
 
 variable "ON_TAG" {
