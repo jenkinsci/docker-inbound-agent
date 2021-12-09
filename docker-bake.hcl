@@ -87,9 +87,9 @@ target "alpine_jdk17" {
     version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-alpine-jdk17"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-alpine-jdk17": "",
-    "${REGISTRY}/${JENKINS_REPO}:alpine-jdk17",
-    "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk17",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-alpine-jdk17-preview": "",
+    "${REGISTRY}/${JENKINS_REPO}:alpine-jdk17-preview",
+    "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk17-preview",
   ]
   platforms = ["linux/amd64"]
 }
