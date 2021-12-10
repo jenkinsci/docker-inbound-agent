@@ -35,4 +35,6 @@ RUN chmod +x /usr/local/bin/jenkins-agent &&\
     ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
 USER ${user}
 
+ENV JENKINS_ENABLE_FUTURE_JAVA=true
+
 ENTRYPOINT ["/usr/local/bin/jenkins-agent"]
