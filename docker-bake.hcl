@@ -2,6 +2,7 @@ group "linux" {
   targets = [
     "alpine_jdk8",
     "alpine_jdk11",
+    "alpine_jdk17",
     "debian_jdk8",
     "debian_jdk11",
     "debian_jdk17",
@@ -75,6 +76,20 @@ target "alpine_jdk11" {
     "${REGISTRY}/${JENKINS_REPO}:alpine-jdk11",
     "${REGISTRY}/${JENKINS_REPO}:latest-alpine",
     "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk11",
+  ]
+  platforms = ["linux/amd64"]
+}
+
+target "alpine_jdk17" {
+  dockerfile = "17/alpine/Dockerfile"
+  context = "."
+  args = {
+    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-alpine-jdk17"
+  }
+  tags = [
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-alpine-jdk17-preview": "",
+    "${REGISTRY}/${JENKINS_REPO}:alpine-jdk17-preview",
+    "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk17-preview",
   ]
   platforms = ["linux/amd64"]
 }
