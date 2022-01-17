@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 # The MIT License
 #
@@ -37,9 +37,9 @@
 #                              the agent skips connecting to an HTTP(S) port for connection info.
 # * JENKINS_PROTOCOLS:         Specify the remoting protocols to attempt when instanceIdentity is provided.
 
-if [ "${1:0:1}" != '-' ]; then
+if [ $# -eq 1 ] && [ "${1#-}" = "$1" ] ; then
 
-	# if `docker run`'s first argument does not look like a flag, we assume the user is running an alternate command like `bash` to inspect the image
+	# if `docker run` only has one arguments and it is not an option as `-help`, we assume user is running alternate command like `bash` to inspect the image
 	exec "$@"
 
 else
