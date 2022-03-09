@@ -25,6 +25,7 @@
 # Usage jenkins-agent.sh [options] -url http://jenkins [SECRET] [AGENT_NAME]
 # Optional environment variables :
 # * JENKINS_JAVA_BIN : Java executable to use instead of the default in PATH or obtained from JAVA_HOME
+# * JENKINS_JAVA_OPTS : Java Options to use for the remoting process, otherwise obtained from JAVA_OPTS
 # * JENKINS_TUNNEL : HOST:PORT for a tunnel to route TCP traffic to jenkins host, when jenkins can't be directly accessed over network
 # * JENKINS_URL : alternate jenkins URL
 # * JENKINS_SECRET : agent secret, if not set as an argument
@@ -96,6 +97,15 @@ else
 		fi
 	fi
 
+	if [ "$JENKINS_JAVA_OPTS" ]; then
+		JAVA_OPTIONS="$JENKINS_JAVA_OPTS"
+	else
+		# if JAVA_OPTS is defined, use it
+		if [ "$JAVA_OPTS" ]; then
+			JAVA_OPTIONS="$JAVA_OPTS"
+		fi
+	fi
+
 	# if both required options are defined, do not pass the parameters
 	OPT_JENKINS_SECRET=""
 	if [ -n "$JENKINS_SECRET" ]; then
@@ -130,6 +140,6 @@ else
                 "
         fi
 
-        exec $JAVA_BIN ${FUTURE_OPTS} $JAVA_OPTS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $WEB_SOCKET $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
+        exec $JAVA_BIN ${FUTURE_OPTS} $JAVA_OPTIONS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -headless $TUNNEL $URL $WORKDIR $WEB_SOCKET $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
 
 fi
