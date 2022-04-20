@@ -24,9 +24,9 @@ group "linux-ppc64le" {
   targets = []
 }
 
-# update this to use a newer build number for jenkins/docker-agent image
+# update this to use a newer build number of the jenkins/agent image
 variable "AGENT_IMAGE_BUILD_NUMBER" {
-  default = "1"
+  default = "2"
 }
 
 variable "REGISTRY" {
@@ -41,6 +41,7 @@ variable "REMOTING_VERSION" {
   default = "4.13"
 }
 
+# Used in the tag pushed to the jenkins/inbound-agent image, no need to update this the pipeline will change it
 variable "BUILD_NUMBER" {
   default = "1"
 }
