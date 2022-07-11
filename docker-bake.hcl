@@ -26,7 +26,7 @@ group "linux-ppc64le" {
 
 # update this to use a newer build number of the jenkins/agent image
 variable "AGENT_IMAGE_BUILD_NUMBER" {
-  default = "2"
+  default = "2-1"
 }
 
 variable "REGISTRY" {
@@ -113,7 +113,7 @@ target "debian_jdk11" {
   dockerfile = "11/debian/Dockerfile"
   context = "."
   args = {
-    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-jdk11"
+    version = "${REMOTING_VERSION}.${AGENT_IMAGE_BUILD_NUMBER}-jdk11"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}": "",
@@ -122,19 +122,19 @@ target "debian_jdk11" {
     "${REGISTRY}/${JENKINS_REPO}:latest",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk11",
   ]
-  platforms = ["linux/amd64", "linux/arm64", "linux/s390x"]
+  platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7", "linux/s390x"]
 }
 
 target "debian_jdk17" {
   dockerfile = "17/debian/Dockerfile"
   context = "."
   args = {
-    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-jdk17-preview"
+    version = "${REMOTING_VERSION}.${AGENT_IMAGE_BUILD_NUMBER}-jdk17-preview"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-jdk17-preview": "",
     "${REGISTRY}/${JENKINS_REPO}:jdk17-preview",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk17-preview",
   ]
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7"]
 }
