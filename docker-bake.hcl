@@ -38,7 +38,7 @@ variable "JENKINS_REPO" {
 }
 
 variable "REMOTING_VERSION" {
-  default = "4.13"
+  default = "4.13.2"
 }
 
 # Used in the tag pushed to the jenkins/inbound-agent image, no need to update this the pipeline will change it
