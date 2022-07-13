@@ -129,7 +129,7 @@ target "debian_jdk17" {
   dockerfile = "17/debian/Dockerfile"
   context = "."
   args = {
-    version = "${REMOTING_VERSION}.${AGENT_IMAGE_BUILD_NUMBER}-jdk17-preview"
+    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-jdk17-preview"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-jdk17-preview": "",
