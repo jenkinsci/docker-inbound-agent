@@ -26,7 +26,7 @@ group "linux-ppc64le" {
 
 # update this to use a newer build number of the jenkins/agent image
 variable "AGENT_IMAGE_BUILD_NUMBER" {
-  default = "2"
+  default = "1"
 }
 
 variable "REGISTRY" {
@@ -38,7 +38,7 @@ variable "JENKINS_REPO" {
 }
 
 variable "REMOTING_VERSION" {
-  default = "4.13"
+  default = "4.13.2"
 }
 
 # Used in the tag pushed to the jenkins/inbound-agent image, no need to update this the pipeline will change it
@@ -122,7 +122,7 @@ target "debian_jdk11" {
     "${REGISTRY}/${JENKINS_REPO}:latest",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk11",
   ]
-  platforms = ["linux/amd64", "linux/arm64", "linux/s390x"]
+  platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7", "linux/s390x"]
 }
 
 target "debian_jdk17" {
@@ -136,5 +136,5 @@ target "debian_jdk17" {
     "${REGISTRY}/${JENKINS_REPO}:jdk17-preview",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk17-preview",
   ]
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7"]
 }
