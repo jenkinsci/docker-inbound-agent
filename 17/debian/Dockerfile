@@ -1,4 +1,4 @@
-ARG version=4.10-6-jdk17-preview
+ARG version=4.13.3-2-jdk17
 FROM jenkins/agent:$version
 
 ARG version
