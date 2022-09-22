@@ -47,6 +47,7 @@ pipeline {
                     post {
                         always {
                             junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/**/junit-results.xml')
+                            bat 'docker system prune --force --all || echo "Failed to cleanup docker images"'
                         }
                     }
                 }
@@ -105,6 +106,7 @@ pipeline {
                     post {
                         always {
                             junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/*.xml')
+                            sh 'docker system prune --force --all || echo "Failed to cleanup docker images"'
                         }
                     }
                 }
