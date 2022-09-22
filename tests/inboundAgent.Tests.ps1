@@ -44,7 +44,7 @@ Describe "[$global:JDK $global:FLAVOR] build image" {
     It 'builds image' {
       $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=$global:VERSION -t $global:AGENT_IMAGE $global:FOLDER"
       # This failure was added on purpose to verify that the build will fail if a test fails
-      $exitCode | Should -Be -1
+      $exitCode | Should -Be 0
     }
 
     AfterAll {
