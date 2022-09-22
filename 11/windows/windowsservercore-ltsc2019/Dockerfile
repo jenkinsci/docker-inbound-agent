@@ -30,10 +30,10 @@ ARG user=jenkins
 
 RUN $output = net users ; `
     if(-not ($output -match $env:user)) { `
-        Write-Host 'user does not exist?' ; `
-        net user $env:user /add /expire:never /passwordreq:no ; `
+        net accounts /maxpwage:unlimited ; `
+        net user "$env:user" /add /expire:never /passwordreq:no ; `
         net localgroup Administrators /add $env:user ; `
-        wmic useraccount WHERE Name=$env:user set PasswordExpires=false; `
+        Set-LocalUser -Name $env:user -PasswordNeverExpires 1 `
     }
 
 COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
