@@ -31,7 +31,7 @@ Get-ChildItem -Recurse -Include windows -Directory | ForEach-Object {
         $jdkVersion = $items[0]
         $baseImage = $items[2]
         $basicTag = "jdk${jdkVersion}-${baseImage}" 
-        $tags = @( $basicTag, "${VersionTag}-${basicTag}" )
+        $tags = @( $basicTag )
         if($jdkVersion -eq $defaultBuild) {
             $tags += $baseImage
         }
@@ -43,12 +43,14 @@ Get-ChildItem -Recurse -Include windows -Directory | ForEach-Object {
     }
 }
 
+$exitCodes = 0
 if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
     foreach($tag in $builds[$Build]['Tags']) {
         Copy-Item -Path 'jenkins-agent.ps1' -Destination (Join-Path $builds[$Build]['Folder'] 'jenkins-agent.ps1') -Force
         Write-Host "Building $Build => tag=$tag"
         $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $tag, $AdditionalArgs, $builds[$Build]['Folder']
         Invoke-Expression $cmd
+        $exitCodes += $lastExitCode
 
         if($PushVersions) {
             $buildTag = "$VersionTag-$tag"
@@ -58,6 +60,7 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
             Write-Host "Building $Build => tag=$buildTag"
             $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$Build]['Folder']
             Invoke-Expression $cmd
+            $exitCodes += $lastExitCode
         }
     }
 } else {
@@ -67,6 +70,7 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
             Write-Host "Building $b => tag=$tag"
             $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $tag, $AdditionalArgs, $builds[$b]['Folder']
             Invoke-Expression $cmd
+            $exitCodes += $lastExitCode
 
             if($PushVersions) {
                 $buildTag = "$VersionTag-$tag"
@@ -76,13 +80,17 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
                 Write-Host "Building $Build => tag=$buildTag"
                 $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$b]['Folder']
                 Invoke-Expression $cmd
+                $exitCodes += $lastExitCode
             }
         }
     }
 }
 
-if($lastExitCode -ne 0) {
-    exit $lastExitCode
+if($exitCodes -ne 0) {
+    Write-Host "Image build stage failed!"
+    exit 1
+} else {
+    Write-Host "Image build stage passed!"
 }
 
 if($Target -eq "test") {
@@ -160,12 +168,14 @@ if($Target -eq "test") {
     }
 }
 
+$exitCodes = 0
 if($Target -eq "publish") {
     if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
         foreach($tag in $Builds[$Build]['Tags']) {
             Write-Host "Publishing $Build => tag=$tag"
             $cmd = "docker push {0}/{1}:{2}" -f $Organization, $Repository, $tag
             Invoke-Expression $cmd
+            $exitCodes += $lastExitCode
 
             if($PushVersions) {
                 $buildTag = "$VersionTag-$tag"
@@ -175,6 +185,7 @@ if($Target -eq "publish") {
                 Write-Host "Publishing $Build => tag=$buildTag"
                 $cmd = "docker push {0}/{1}:{2}" -f $Organization, $Repository, $buildTag
                 Invoke-Expression $cmd
+                $exitCodes += $lastExitCode
             }
         }
     } else {
@@ -183,6 +194,7 @@ if($Target -eq "publish") {
                 Write-Host "Publishing $b => tag=$tag"
                 $cmd = "docker push {0}/{1}:{2}" -f $Organization, $Repository, $tag
                 Invoke-Expression $cmd
+                $exitCodes += $lastExitCode
 
                 if($PushVersions) {
                     $buildTag = "$VersionTag-$tag"
@@ -192,6 +204,7 @@ if($Target -eq "publish") {
                     Write-Host "Publishing $Build => tag=$buildTag"
                     $cmd = "docker push {0}/{1}:{2}" -f $Organization, $Repository, $buildTag
                     Invoke-Expression $cmd
+                    $exitCodes += $lastExitCode
                 }
             }
         }
@@ -199,9 +212,9 @@ if($Target -eq "publish") {
 }
 
 
-if($lastExitCode -ne 0) {
-    Write-Error "Build failed!"
+if($exitCodes -ne 0) {
+    Write-Error "Publish stage failed!"
 } else {
-    Write-Host "Build finished successfully"
+    Write-Host "Publish stage passed!"
 }
-exit $lastExitCode
+exit $exitCodes
