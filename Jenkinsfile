@@ -6,114 +6,113 @@ pipeline {
         timestamps()
     }
 
-    triggers {
-        pollSCM('H/24 * * * *') // once a day in case some hooks are missed
-    }
-
     stages {
-        stage('Linux') {
-            agent {
-                label "docker&&linux"
-            }
-            options {
-                timeout(time: 30, unit: 'MINUTES')
-            }
-            environment {
-                JENKINS_REPO = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}/inbound-agent"
-            }
-            steps {
-                script {
-                    def branchName = "${env.BRANCH_NAME}"
-                    infra.withDockerCredentials {
-                        if (branchName ==~ 'master') {
-                            // publish the images to Dockerhub
-                            sh '''
-                            docker buildx create --use
-                            docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-                            docker buildx bake --push --file docker-bake.hcl linux
-                            '''
-                        } else if (env.TAG_NAME == null) {
-                            sh 'make build'
-                            sh 'make test'
-                            sh '''
-                                docker buildx create --use
-                                docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-                                docker buildx bake --file docker-bake.hcl linux
-                            '''
-                        }
+        stage('Build') {
+            parallel {
+                stage('Windows') {
+                    options {
+                        timeout(time: 60, unit: 'MINUTES')
                     }
-
-                    if(env.TAG_NAME != null) {
-                        def tagItems = env.TAG_NAME.split('-')
-                        if(tagItems.length == 2) {
-                            def remotingVersion = tagItems[0]
-                            def buildNumber = tagItems[1]
-                            // we need to build and publish the tag version
-                            infra.withDockerCredentials {
-                                sh """
-                                docker buildx create --use
-                                docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-                                export REMOTING_VERSION=$remotingVersion
-                                export BUILD_NUMBER=$buildNumber
-                                export ON_TAG=true
-                                docker buildx bake --push --file docker-bake.hcl linux
-                                """
+                    environment {
+                        DOCKERHUB_ORGANISATION = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}"
+                    }
+                    stages {
+                        stage('Build and Test') {
+                            // This stage is the "CI" and should be run on all code changes triggered by a code change
+                            when {
+                                not { buildingTag() }
+                            }
+                            steps {
+                                script {
+                                    def parallelBuilds = [:]
+                                    def images = ['jdk11-windowsservercore-ltsc2019', 'jdk11-nanoserver-1809', 'jdk17-windowsservercore-ltsc2019', 'jdk17-nanoserver-1809']
+                                    for (unboundImage in images) {
+                                        def image = unboundImage // Bind variable before the closure
+                                        // Prepare a map of the steps to run in parallel
+                                        parallelBuilds[image] = {
+                                            // Allocate a node for each image to avoid filling disk
+                                            node('docker-windows') {
+                                                // Cleanup the Docker Engine if the machine is reused (to avoid harddrive being filled)
+                                                powershell 'docker.exe system prune --volumes --force'
+                                                checkout scm
+                                                powershell '& ./make.ps1 -Build ' + image + ' test'
+                                                junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/**/junit-results.xml')
+                                            }
+                                        }
+                                    }
+                                    // Peform the parallel execution
+                                    parallel parallelBuilds
+                                }
                             }
                         }
-                    }
-                }
-            }
-            post {
-                always {
-                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/*.xml')
-                }
-            }
-        }
-
-        stage('Windows') {
-            matrix {
-                axes {
-                    axis {
-                        name 'IMAGE_NAME'
-                        values 'jdk11-windowsservercore-ltsc2019', 'jdk11-nanoserver-1809', 'jdk17-windowsservercore-ltsc2019', 'jdk17-nanoserver-1809'
-                    }
-                }
-
-                stages {
-                    stage('Build') {
-                        agent {
-                            label 'docker-windows'
-                        }
-                        options {
-                            timeout(time: 60, unit: 'MINUTES')
-                        }
-                        environment {
-                            DOCKERHUB_ORGANISATION = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}"
-                        }
-                        steps {
-                            powershell "& ./make.ps1 -Build ${env.IMAGE_NAME} test"
-                            script {
-                                def branchName = "${env.BRANCH_NAME}"
-                                if (branchName ==~ 'master') {
-                                    // we can't use dockerhub builds for windows
-                                    // so we publish here
+                        stage('Deploy to DockerHub') {
+                            // This stage is the "CD" and should only be run when a tag triggered the build
+                            when {
+                                buildingTag()
+                            }
+                            steps {
+                                script {
+                                    // This function is defined in the jenkins-infra/pipeline-library
                                     infra.withDockerCredentials {
-                                        powershell '& ./make.ps1 publish'
-                                    }
-                                }
-
-                                def tagName = "${env.TAG_NAME}"
-                                if(tagName =~ /\d(\.\d)+(-\d+)?/) {
-                                    // we need to build and publish the tagged version
-                                    infra.withDockerCredentials {
-                                        powershell "& ./make.ps1 -Build ${env.IMAGE_NAME} -PushVersions -VersionTag $tagName publish"
+                                        powershell "& ./make.ps1 -PushVersions -VersionTag $tagName publish"
                                     }
                                 }
                             }
                         }
-                        post {
-                            always {
-                                junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/**/junit-results.xml')
+                    }
+                }
+                stage('Linux') {
+                    agent {
+                        label "docker&&linux"
+                    }
+                    options {
+                        timeout(time: 30, unit: 'MINUTES')
+                    }
+                    environment {
+                        JENKINS_REPO = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}/inbound-agent"
+                    }
+                    stages {
+                        stage('Prepare Docker BuildX Runner for multi-arch') {
+                            steps {
+                                sh '''
+                                docker buildx create --use
+                                docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+                                '''
+                            }
+                        }
+                        stage('Build and Test') {
+                            // This stage is the "CI" and should be run on all code changes triggered by a code change
+                            when {
+                                not { buildingTag() }
+                            }
+                            steps {
+                                sh 'make build'
+                                sh 'make test'
+                                // If the tests are passing for Linux AMD64, then we can build all the CPU architectures
+                                sh 'docker buildx bake --file docker-bake.hcl linux'
+                            }
+                            post {
+                                always {
+                                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/*.xml')
+                                }
+                            }
+                        }
+                        stage('Deploy to DockerHub') {
+                            // This stage is the "CD" and should only be run when a tag triggered the build
+                            when {
+                                buildingTag()
+                            }
+                            steps {
+                                script {
+                                    // This function is defined in the jenkins-infra/pipeline-library
+                                    infra.withDockerCredentials {
+                                        sh '''
+                                        export IMAGE_TAG="${TAG_NAME}"
+                                        export ON_TAG=true
+                                        docker buildx bake --push --file docker-bake.hcl linux
+                                        '''
+                                    }
+                                }
                             }
                         }
                     }

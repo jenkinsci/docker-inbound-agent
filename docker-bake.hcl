@@ -22,7 +22,19 @@ group "linux-ppc64le" {
   targets = []
 }
 
-# update this to use a newer build number of the jenkins/agent image
+variable "IMAGE_TAG" {
+  default = "3063.v26e24490f041-1"
+}
+
+variable "REMOTING_VERSION" {
+  default = split("-", "${IMAGE_TAG}")[0]
+}
+
+variable "BUILD_NUMBER" {
+  default = split("-", "${IMAGE_TAG}")[1]
+}
+
+# update this to use a newer build number of the parent jenkins/agent image
 variable "AGENT_IMAGE_BUILD_NUMBER" {
   default = "1"
 }
@@ -33,10 +45,6 @@ variable "REGISTRY" {
 
 variable "JENKINS_REPO" {
   default = "jenkins/inbound-agent"
-}
-
-variable "REMOTING_VERSION" {
-  default = "3063.v26e24490f041"
 }
 
 # Used in the tag pushed to the jenkins/inbound-agent image, no need to update this the pipeline will change it
