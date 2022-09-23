@@ -22,14 +22,14 @@ pipeline {
                         axes {
                             axis {
                                 name 'CONTAINER_NAME'
-                                values 'jdk11-windowsservercore-ltsc2019', 'jdk11-nanoserver-1809', 'jdk17-windowsservercore-ltsc2019', 'jdk11-nanoserver-1809'
+                                values 'jdk11-windowsservercore-ltsc2019', 'jdk11-nanoserver-1809', 'jdk17-windowsservercore-ltsc2019', 'jdk17-nanoserver-1809'
                             }
                         }
 
                         options {
                             timeout(time: 60, unit: 'MINUTES')
                         }
-                        
+
                         environment {
                             DOCKERHUB_ORGANISATION = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}"
                         }
