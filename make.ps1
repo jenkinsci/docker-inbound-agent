@@ -30,7 +30,7 @@ Get-ChildItem -Recurse -Include windows -Directory | ForEach-Object {
         $items = $dir.Split("\")
         $jdkVersion = $items[0]
         $baseImage = $items[2]
-        $basicTag = "jdk${jdkVersion}-${baseImage}" 
+        $basicTag = "jdk${jdkVersion}-${baseImage}"
         $tags = @( $basicTag )
         if($jdkVersion -eq $defaultBuild) {
             $tags += $baseImage
@@ -39,7 +39,7 @@ Get-ChildItem -Recurse -Include windows -Directory | ForEach-Object {
         $builds[$basicTag] = @{
             'Folder' = $dir;
             'Tags' = $tags;
-        }        
+        }
     }
 }
 
@@ -209,12 +209,12 @@ if($Target -eq "publish") {
             }
         }
     }
+
+    if($exitCodes -ne 0) {
+        Write-Error "Publish stage failed!"
+    } else {
+        Write-Host "Publish stage passed!"
+    }
 }
 
-
-if($exitCodes -ne 0) {
-    Write-Error "Publish stage failed!"
-} else {
-    Write-Host "Publish stage passed!"
-}
 exit $exitCodes
