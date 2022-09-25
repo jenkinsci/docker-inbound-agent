@@ -68,7 +68,7 @@ pipeline {
                             DOCKERHUB_ORGANISATION = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}"
                         }
                         steps {
-                            powershell "& ./make.ps1 test"
+                            powershell "& ./make.ps1 -Build ${env.IMAGE_NAME} test"
                             script {
                                 def branchName = "${env.BRANCH_NAME}"
                                 if (branchName ==~ 'master') {
@@ -83,7 +83,7 @@ pipeline {
                                 if(tagName =~ /\d(\.\d)+(-\d+)?/) {
                                     // we need to build and publish the tagged version
                                     infra.withDockerCredentials {
-                                        powershell "& ./make.ps1 -PushVersions -VersionTag $tagName publish"
+                                        powershell "& ./make.ps1 -Build ${env.IMAGE_NAME} -PushVersions -VersionTag $tagName publish"
                                     }
                                 }
                             }
@@ -115,11 +115,11 @@ pipeline {
                                 infra.withDockerCredentials {
                                     if (branchName ==~ 'master') {
                                         // publish the images to Dockerhub
-                                            sh '''
-                                            docker buildx create --use
-                                            docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-                                            docker buildx bake --push --file docker-bake.hcl linux
-                                            '''
+                                        sh '''
+                                        docker buildx create --use
+                                        docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+                                        docker buildx bake --push --file docker-bake.hcl linux
+                                        '''
                                     } else if (env.TAG_NAME == null) {
                                         sh 'make build'
                                         sh 'make test'
