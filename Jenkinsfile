@@ -24,30 +24,30 @@ pipeline {
                         name 'IMAGE_NAME'
                         values 'linux', 'jdk11-windowsservercore-ltsc2019', 'jdk11-nanoserver-1809', 'jdk17-windowsservercore-ltsc2019', 'jdk17-nanoserver-1809'
                     }
+                }
 
-                    excludes {
-                        exclude {
-                            axis {
-                                name 'OS'
-                                values 'windows'
-                            }
-
-                            axis {
-                                name 'IMAGE_NAME'
-                                values 'linux'
-                            }
+                excludes {
+                    exclude {
+                        axis {
+                            name 'OS'
+                            values 'windows'
                         }
 
-                        exclude {
-                            axis {
-                                name 'OS'
-                                values 'linux'
-                            }
+                        axis {
+                            name 'IMAGE_NAME'
+                            values 'linux'
+                        }
+                    }
 
-                            axis {
-                                name 'IMAGE_NAME'
-                                notValue 'linux'
-                            }
+                    exclude {
+                        axis {
+                            name 'OS'
+                            values 'linux'
+                        }
+
+                        axis {
+                            name 'IMAGE_NAME'
+                            notValue 'linux'
                         }
                     }
                 }
@@ -161,7 +161,6 @@ pipeline {
             }
         }
     }
-
 }
 
 // vim: ft=groovy
