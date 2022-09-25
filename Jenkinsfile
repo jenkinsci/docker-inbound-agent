@@ -47,7 +47,7 @@ pipeline {
 
                         axis {
                             name 'IMAGE_NAME'
-                            notValue 'linux'
+                            notValues 'linux'
                         }
                     }
                 }
