@@ -1,6 +1,7 @@
+# escape=`
 # The MIT License
 #
-#  Copyright (c) 2015-2017, CloudBees, Inc.
+#  Copyright (c) 2019, Alex Earl
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +21,21 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-ARG version=4.9-1-alpine
-FROM jenkins/agent:$version
+ARG VERSION=4.9-1
+FROM jenkins/agent:${VERSION}-jdk17-windowsservercore-ltsc2019
 
-ARG version
-LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="$version"
+LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$VERSION"
 
 ARG user=jenkins
 
-USER root
-COPY ../../jenkins-agent /usr/local/bin/jenkins-agent
-RUN chmod +x /usr/local/bin/jenkins-agent &&\
-    ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
-USER ${user}
+RUN $output = net users ; `
+    if(-not ($output -match $env:user)) { `
+        net accounts /maxpwage:unlimited ; `
+        net user "$env:user" /add /expire:never /passwordreq:no ; `
+        net localgroup Administrators /add $env:user ; `
+        Set-LocalUser -Name $env:user -PasswordNeverExpires 1 `
+    }
 
-ENTRYPOINT ["/usr/local/bin/jenkins-agent"]
+COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
+USER ${user}
+ENTRYPOINT ["powershell.exe", "-f", "C:/ProgramData/Jenkins/jenkins-agent.ps1"]

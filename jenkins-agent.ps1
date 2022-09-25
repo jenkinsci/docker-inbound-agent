@@ -53,7 +53,6 @@ Param(
 # * JENKINS_PROTOCOLS:         Specify the remoting protocols to attempt when instanceIdentity is provided.
 
 if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
-	# if `docker run` only has one argument, we assume user is running alternate command like `powershell` or `pwsh` to inspect the image
 	Invoke-Expression "$Cmd"
 } else {
 
