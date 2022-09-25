@@ -122,7 +122,7 @@ function Run-Program($cmd, $params, $quiet=$false, $debug=$false) {
 
 function BuildNcatImage() {
     Write-Host "Building nmap image for testing"
-    $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect --type=image nmap"
+    $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect --type=image nmap" $true
     if($exitCode -ne 0) {
         Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build -t nmap -f ./tests/netcat-helper/Dockerfile-windows ./tests/netcat-helper"
