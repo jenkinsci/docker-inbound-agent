@@ -58,8 +58,8 @@ pipeline {
                             label 'docker-windows'
                         }
                         when {
-                            beforeAgent true                            
-                            when { environment name: 'OS', value: 'windows' }
+                            beforeAgent true
+                            environment name: 'OS', value: 'windows'
                         }
                         options {
                             timeout(time: 60, unit: 'MINUTES')
@@ -101,7 +101,7 @@ pipeline {
                         }
                         when {
                             beforeAgent true
-                            when { environment name: 'OS', value: 'linux' }
+                            environment name: 'OS', value: 'linux'
                         }
                         options {
                             timeout(time: 30, unit: 'MINUTES')
