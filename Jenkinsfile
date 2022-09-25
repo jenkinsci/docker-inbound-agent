@@ -13,7 +13,6 @@ pipeline {
     stages {
         stage('Build') {
             matrix {
-
                 axes {
                     axis {
                         name 'OS'
