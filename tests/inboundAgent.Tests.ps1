@@ -1,48 +1,49 @@
 Import-Module -DisableNameChecking -Force $PSScriptRoot/test_helpers.psm1
 
-$AGENT_IMAGE='jenkins-inbound-agent'
-$AGENT_CONTAINER='pester-jenkins-inbound-agent'
-$SHELL="powershell.exe"
+$global:AGENT_IMAGE='jenkins-inbound-agent'
+$global:AGENT_CONTAINER='pester-jenkins-inbound-agent'
+$global:SHELL="powershell.exe"
 
-$FOLDER = Get-EnvOrDefault 'FOLDER' ''
-$VERSION = Get-EnvOrDefault 'VERSION' '4.9-1'
+$global:FOLDER = Get-EnvOrDefault 'FOLDER' ''
+$global:VERSION = Get-EnvOrDefault 'VERSION' '4.9-1'
 
-$REAL_FOLDER=Resolve-Path -Path "$PSScriptRoot/../${FOLDER}"
+$REAL_FOLDER=Resolve-Path -Path "$PSScriptRoot/../${global:FOLDER}"
 
-if(($FOLDER -match '^(?<jdk>[0-9]+)[\\/](?<flavor>.+)$') -and (Test-Path $REAL_FOLDER)) {
-    $JDK = $Matches['jdk']
-    $FLAVOR = $Matches['flavor']
+if(($global:FOLDER -match '^(?<jdk>[0-9]+)[\\/](?<flavor>.+)$') -and (Test-Path $REAL_FOLDER)) {
+    $global:JDK = $Matches['jdk']
+    $global:FLAVOR = $Matches['flavor']
 } else {
-    Write-Error "Wrong folder format or folder does not exist: $FOLDER"
+    Write-Error "Wrong folder format or folder does not exist: $global:FOLDER"
     exit 1
 }
 
-if($FLAVOR -match "nanoserver-(\d+)") {
-    $AGENT_IMAGE += "-nanoserver"
-    $AGENT_CONTAINER += "-nanoserver-$($Matches[1])"
-    $SHELL = "pwsh.exe"
+if($global:FLAVOR -match "nanoserver-(\d+)") {
+    $global:AGENT_IMAGE += "-nanoserver"
+    $global:AGENT_CONTAINER += "-nanoserver-$($Matches[1])"
+    $global:SHELL = "pwsh.exe"
 }
 
-if($JDK -eq "11") {
-    $AGENT_IMAGE += ":jdk11"
-    $AGENT_CONTAINER += "-jdk11"
+if($global:JDK -eq "17") {
+    $global:AGENT_IMAGE += ":jdk17"
+    $global:AGENT_CONTAINER += "-jdk17"
 } else {
-    $AGENT_IMAGE += ":latest"
+    $global:AGENT_IMAGE += ":latest"
 }
 
-Cleanup($AGENT_CONTAINER)
+Cleanup($global:AGENT_CONTAINER)
 Cleanup("nmap")
 CleanupNetwork("jnlp-network")
 
 BuildNcatImage
 
-Describe "[$JDK $FLAVOR] build image" {
+Describe "[$global:JDK $global:FLAVOR] build image" {
     BeforeAll {
       Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
     }
 
     It 'builds image' {
-      $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg 'VERSION=$VERSION' -t $AGENT_IMAGE $FOLDER"
+      $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=$global:VERSION -t $global:AGENT_IMAGE $global:FOLDER"
+      # This failure was added on purpose to verify that the build will fail if a test fails
       $exitCode | Should -Be 0
     }
 
@@ -51,44 +52,45 @@ Describe "[$JDK $FLAVOR] build image" {
     }
 }
 
-Describe "[$JDK $FLAVOR] check user account" {
+Describe "[$global:JDK $global:FLAVOR] check default user account" {
     BeforeAll {
-        docker run -d -it --name "$AGENT_CONTAINER" -P "$AGENT_IMAGE" "$SHELL"
-        Is-ContainerRunning $AGENT_CONTAINER
+        docker run -d -it --name "$global:AGENT_CONTAINER" -P "$global:AGENT_IMAGE" -Cmd "$global:SHELL"
+        $LASTEXITCODE | Should -Be 0
+        Is-ContainerRunning $global:AGENT_CONTAINER | Should -BeTrue
     }
 
-    It 'Password never expires' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $AGENT_CONTAINER $SHELL -C `"if((net user jenkins | Select-String -Pattern 'Password expires') -match 'Never') { exit 0 } else { exit -1 }`""
+    It 'has a password that never expires' {
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $global:AGENT_CONTAINER $global:SHELL -C `"if((net user jenkins | Select-String -Pattern 'Password expires') -match 'Never') { exit 0 } else { net user jenkins ; exit -1 }`""
         $exitCode | Should -Be 0
     }
 
-    It 'Password not required' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $AGENT_CONTAINER $SHELL -C `"if((net user jenkins | Select-String -Pattern 'Password required') -match 'No') { exit 0 } else { exit -1 }`""
+    It 'has password policy of "not required"' {
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $global:AGENT_CONTAINER $global:SHELL -C `"if((net user jenkins | Select-String -Pattern 'Password required') -match 'No') { exit 0 } else { net user jenkins ; exit -1 }`""
         $exitCode | Should -Be 0
     }
 
     AfterAll {
-        Cleanup($AGENT_CONTAINER)
+        Cleanup($global:AGENT_CONTAINER)
     }
 }
 
-Describe "[$JDK $FLAVOR] image has jenkins-agent.ps1 in the correct location" {
+Describe "[$global:JDK $global:FLAVOR] image has jenkins-agent.ps1 in the correct location" {
     BeforeAll {
-        & docker run -dit --name "$AGENT_CONTAINER" -P "$AGENT_IMAGE" $SHELL
-        Is-ContainerRunning $AGENT_CONTAINER | Should -BeTrue
+        & docker run -dit --name "$global:AGENT_CONTAINER" -P "$global:AGENT_IMAGE" -Cmd $global:SHELL
+        Is-ContainerRunning $global:AGENT_CONTAINER | Should -BeTrue
     }
 
     It 'has jenkins-agent.ps1 in C:/ProgramData/Jenkins' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $AGENT_CONTAINER $SHELL -C `"if(Test-Path 'C:/ProgramData/Jenkins/jenkins-agent.ps1') { exit 0 } else { exit 1 }`""
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $global:AGENT_CONTAINER $global:SHELL -C `"if(Test-Path 'C:/ProgramData/Jenkins/jenkins-agent.ps1') { exit 0 } else { exit 1 }`""
         $exitCode | Should -Be 0
     }
 
     AfterAll {
-        Cleanup($AGENT_CONTAINER)
+        Cleanup($global:AGENT_CONTAINER)
     }
 }
 
-Describe "[$JDK $FLAVOR] image starts jenkins-agent.ps1 correctly (slow test)" {
+Describe "[$global:JDK $global:FLAVOR] image starts jenkins-agent.ps1 correctly (slow test)" {
     It 'connects to the nmap container' {
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "network create --driver nat jnlp-network"
         # Launch the netcat utility, listening at port 5000 for 30 sec
@@ -104,9 +106,11 @@ Describe "[$JDK $FLAVOR] image starts jenkins-agent.ps1 correctly (slow test)" {
         $nmap_ip = $stdout.Trim()
 
         # run Jenkins agent which tries to connect to the nmap container at port 5000
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --network=jnlp-network --name $AGENT_CONTAINER $AGENT_IMAGE -Url http://${nmap_ip}:5000 -Secret aaa -Name bbb"
+        $secret = "aaa"
+        $name = "bbb"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --network=jnlp-network --name $global:AGENT_CONTAINER $global:AGENT_IMAGE -Url http://${nmap_ip}:5000 $secret $name"
         $exitCode | Should -Be 0
-        Is-ContainerRunning $AGENT_CONTAINER | Should -BeTrue
+        Is-ContainerRunning $global:AGENT_CONTAINER | Should -BeTrue
 
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' 'wait nmap'
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' 'logs nmap'
@@ -115,38 +119,60 @@ Describe "[$JDK $FLAVOR] image starts jenkins-agent.ps1 correctly (slow test)" {
     }
 
     AfterAll {
-        Cleanup($AGENT_CONTAINER)
+        Cleanup($global:AGENT_CONTAINER)
         Cleanup("nmap")
         CleanupNetwork("jnlp-network")
     }
 }
 
-Describe "[$JDK $FLAVOR] build args" {
+Describe "[$global:JDK $global:FLAVOR] build args" {
     BeforeAll {
         Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
+        # an old jdk11 image version
+        $TEST_VERSION="4.7"
+        $DOCKER_AGENT_VERSION_SUFFIX="1"
+        if($global:JDK -eq '17') {
+            # the first jdk17 images for Windows
+            $TEST_VERSION = "4.10"
+            $DOCKER_AGENT_VERSION_SUFFIX="7"
+        }
+        $TEST_USER="foo"
+        $ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
     }
 
-    It -Skip 'uses build args correctly' {
-        $TEST_VERSION="4.3"
-        $TEST_USER="foo"
-
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=${TEST_VERSION}-2 --build-arg user=$TEST_USER -t $AGENT_IMAGE $FOLDER"
+    It 'builds image with arguments' {
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=${ARG_TEST_VERSION} --build-arg user=$TEST_USER -t $global:AGENT_IMAGE $global:FOLDER"
         $exitCode | Should -Be 0
 
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --name $AGENT_CONTAINER -P $AGENT_IMAGE $SHELL"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --name $global:AGENT_CONTAINER -P $global:AGENT_IMAGE -Cmd $global:SHELL"
         $exitCode | Should -Be 0
-        Is-ContainerRunning "$AGENT_CONTAINER" | Should -BeTrue
+        Is-ContainerRunning "$global:AGENT_CONTAINER" | Should -BeTrue
+    }
 
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $AGENT_CONTAINER $SHELL -c `"java -cp C:/ProgramData/Jenkins/agent.jar hudson.remoting.jnlp.Main -version`""
+    It "has the correct agent.jar version" {
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $global:AGENT_CONTAINER $global:SHELL -c `"java -cp C:/ProgramData/Jenkins/agent.jar hudson.remoting.jnlp.Main -version`""
         $exitCode | Should -Be 0
         $stdout | Should -Match $TEST_VERSION
+    }
 
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $AGENT_CONTAINER $SHELL -c `"(Get-ChildItem env:\ | Where-Object { `$_.Name -eq 'USERNAME' }).Value`""
+    It "has the correct (overridden) user account and the container is running as that user" {
+        # check that the user exists and is the user the container is running as
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $global:AGENT_CONTAINER $global:SHELL -c `"(Get-ChildItem env:\ | Where-Object { `$_.Name -eq 'USERNAME' }).Value`""
         $exitCode | Should -Be 0
         $stdout | Should -Match $TEST_USER
     }
 
+    It "has the correct password policy for overridden user account" {
+        # check that $TEST_USER's password never expires and that password is NOT required to login
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $global:AGENT_CONTAINER $global:SHELL -C `"if((net user $TEST_USER | Select-String -Pattern 'Password expires') -match 'Never') { exit 0 } else { net user $TEST_USER ; exit -1 }`""
+        $exitCode | Should -Be 0
+
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $global:AGENT_CONTAINER $global:SHELL -C `"if((net user $TEST_USER | Select-String -Pattern 'Password required') -match 'No') { exit 0 } else { net user $TEST_USER ; exit -1 }`""
+        $exitCode | Should -Be 0
+    }
+
     AfterAll {
+        Cleanup($global:AGENT_CONTAINER)
         Pop-Location -StackName 'agent'
     }
 }

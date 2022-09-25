@@ -72,8 +72,12 @@ function Retry-Command {
 }
 
 function Cleanup($name='') {
-    docker kill "$name" 2>&1 | Out-Null
-    docker rm -fv "$name" 2>&1 | Out-Null
+    try {
+        docker kill "$name" 2>&1 | Out-Null
+        docker rm -fv "$name" 2>&1 | Out-Null
+    } catch {
+        # do nothing....
+    }
 }
 
 function CleanupNetwork($name) {
@@ -91,8 +95,8 @@ function Is-ContainerRunning($container) {
     }
 }
 
-function Run-Program($cmd, $params, $quiet=$true) {
-    if(-not $quiet) {
+function Run-Program($cmd, $params, $quiet=$false, $debug=$false) {
+    if($debug) {
         Write-Host "cmd = $cmd, params = $params"
     }
     $psi = New-Object System.Diagnostics.ProcessStartInfo
@@ -118,7 +122,7 @@ function Run-Program($cmd, $params, $quiet=$true) {
 
 function BuildNcatImage() {
     Write-Host "Building nmap image for testing"
-    $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect --type=image nmap"
+    $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect --type=image nmap" $true
     if($exitCode -ne 0) {
         Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build -t nmap -f ./tests/netcat-helper/Dockerfile-windows ./tests/netcat-helper"
