@@ -128,15 +128,16 @@ Describe "[$global:JDK $global:FLAVOR] image starts jenkins-agent.ps1 correctly 
 Describe "[$global:JDK $global:FLAVOR] build args" {
     BeforeAll {
         Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
-        # an old jdk11 image version
-        $TEST_VERSION="3063.v26e24490f041"
+        # Old version used to test overriding the build arguments.
+        # This old version must have the same tag suffixes as the current 4 windows images (`-jdk11-nanoserver` etc.)
+        $TEST_VERSION="3046.v38db_38a_b_7a_86"
         $DOCKER_AGENT_VERSION_SUFFIX="1"
         $TEST_USER="foo"
         $ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
     }
 
     It 'builds image with arguments' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=${ARG_TEST_VERSION} --build-arg user=$TEST_USER -t $global:AGENT_IMAGE $global:FOLDER"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg version=${ARG_TEST_VERSION} --build-arg user=$TEST_USER -t $global:AGENT_IMAGE $global:FOLDER"
         $exitCode | Should -Be 0
 
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --name $global:AGENT_CONTAINER -P $global:AGENT_IMAGE -Cmd $global:SHELL"
