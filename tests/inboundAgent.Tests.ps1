@@ -129,13 +129,8 @@ Describe "[$global:JDK $global:FLAVOR] build args" {
     BeforeAll {
         Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
         # an old jdk11 image version
-        $TEST_VERSION="4.7"
+        $TEST_VERSION="3063.v26e24490f041"
         $DOCKER_AGENT_VERSION_SUFFIX="1"
-        if($global:JDK -eq '17') {
-            # the first jdk17 images for Windows
-            $TEST_VERSION = "4.10"
-            $DOCKER_AGENT_VERSION_SUFFIX="7"
-        }
         $TEST_USER="foo"
         $ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
     }
