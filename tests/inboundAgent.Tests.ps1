@@ -137,7 +137,7 @@ Describe "[$global:JDK $global:FLAVOR] build args" {
     }
 
     It 'builds image with arguments' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg version=${ARG_TEST_VERSION} --build-arg user=$TEST_USER -t $global:AGENT_IMAGE $global:FOLDER"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=${ARG_TEST_VERSION} --build-arg user=$TEST_USER -t $global:AGENT_IMAGE $global:FOLDER"
         $exitCode | Should -Be 0
 
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --name $global:AGENT_CONTAINER -P $global:AGENT_IMAGE -Cmd $global:SHELL"

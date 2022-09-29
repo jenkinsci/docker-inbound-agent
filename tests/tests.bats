@@ -55,7 +55,7 @@ SUT_IMAGE=$(get_sut_image)
   local sut_image="${SUT_IMAGE}-tests-${BATS_TEST_NUMBER}"
 
   docker buildx bake \
-    --set "${IMAGE}".args.version="${ARG_TEST_VERSION}" \
+    --set "${IMAGE}".args.VERSION="${ARG_TEST_VERSION}" \
     --set "${IMAGE}".args.user="${TEST_USER}" \
     --set "${IMAGE}".platform="linux/${ARCH}" \
     --set "${IMAGE}".tags="${sut_image}" \

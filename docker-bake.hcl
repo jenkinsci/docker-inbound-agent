@@ -16,12 +16,12 @@ group "linux-s390x" {
 
 #### This is the current (e.g. jenkins/inbound-agent) version (including build number suffix). Overridden by release builds from GIT_TAG.
 variable "IMAGE_TAG" {
-  default = "4.13.3-1"
+  default = "3028.va_a_436db_35078-1"
 }
 
 #### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_AGENT_VERSION>-<base-os>)
 variable "PARENT_IMAGE_AGENT_VERSION" {
-  default = "4.13.3-6"
+  default = "3028.va_a_436db_35078-3"
 }
 
 variable "REGISTRY" {
@@ -40,7 +40,7 @@ target "alpine_jdk8" {
   dockerfile = "8/alpine/Dockerfile"
   context = "."
   args = {
-    version = "${PARENT_IMAGE_AGENT_VERSION}-alpine-jdk8"
+    VERSION = "${PARENT_IMAGE_AGENT_VERSION}"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${IMAGE_TAG}-alpine-jdk8": "",
@@ -54,7 +54,7 @@ target "debian_jdk8" {
   dockerfile = "8/debian/Dockerfile"
   context = "."
   args = {
-    version = "${PARENT_IMAGE_AGENT_VERSION}-jdk8"
+    VERSION = "${PARENT_IMAGE_AGENT_VERSION}"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${IMAGE_TAG}-jdk8": "",
