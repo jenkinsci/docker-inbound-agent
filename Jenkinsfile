@@ -55,7 +55,7 @@ pipeline {
                                 script {
                                     // This function is defined in the jenkins-infra/pipeline-library
                                     infra.withDockerCredentials {
-                                        powershell "& ./make.ps1 -PushVersions -VersionTag $tagName publish"
+                                        powershell '& ./make.ps1 -PushVersions -VersionTag $env:TAG_NAME publish'
                                     }
                                 }
                             }
