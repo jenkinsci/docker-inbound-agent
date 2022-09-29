@@ -32,8 +32,6 @@ pipeline {
                                         parallelBuilds[image] = {
                                             // Allocate a node for each image to avoid filling disk
                                             node('docker-windows') {
-                                                // Cleanup the Docker Engine if the machine is reused (to avoid harddrive being filled)
-                                                powershell 'docker.exe system prune --volumes --force'
                                                 checkout scm
                                                 powershell '& ./make.ps1 -Build ' + image + ' test'
                                                 junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/**/junit-results.xml')
@@ -72,7 +70,7 @@ pipeline {
                         JENKINS_REPO = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}/inbound-agent"
                     }
                     stages {
-                        stage('Prepare Docker BuildX Runner for multi-arch') {
+                        stage('Prepare Docker') {
                             steps {
                                 sh '''
                                 docker buildx create --use

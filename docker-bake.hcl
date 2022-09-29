@@ -22,19 +22,18 @@ group "linux-ppc64le" {
   targets = []
 }
 
+#### This is the current (e.g. jenkins/inbound-agent) version (including build number suffix)
 variable "IMAGE_TAG" {
   default = "3063.v26e24490f041-1"
 }
-
 variable "REMOTING_VERSION" {
   default = split("-", "${IMAGE_TAG}")[0]
 }
-
 variable "BUILD_NUMBER" {
   default = split("-", "${IMAGE_TAG}")[1]
 }
 
-# update this to use a newer build number of the parent jenkins/agent image
+#### This is for the "parent" image to use: remoting version is interpolated from IMAGE_TAG) but parent image also have a build number suffix
 variable "AGENT_IMAGE_BUILD_NUMBER" {
   default = "1"
 }
