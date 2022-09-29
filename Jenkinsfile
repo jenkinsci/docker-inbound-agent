@@ -44,6 +44,9 @@ pipeline {
                             }
                         }
                         stage('Deploy to DockerHub') {
+                            agent {
+                                label 'docker-windows'
+                            }
                             // This stage is the "CD" and should only be run when a tag triggered the build
                             when {
                                 buildingTag()
