@@ -1,17 +1,11 @@
-# Note: additional setup is required, see https://github.com/jenkinsci/.github/blob/master/.github/release-drafter.adoc
-
-name: Release Drafter
+name: Release Drafter (Changelog)
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
 
 jobs:
   update_release_draft:
-    runs-on: ubuntu-latest
-    steps:
-      # Drafts your next Release notes as Pull Requests are merged into the default branch
-      - uses: release-drafter/release-drafter@v5
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: jenkinsci/.github/.github/workflows/release-drafter.yml@master
