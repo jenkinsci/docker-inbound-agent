@@ -36,5 +36,3 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     $proc = Start-Process "C:\nmap-install.exe" -PassThru -ArgumentList '/S' ; `
     $proc.WaitForExit() ; `
     Remove-Item -Path nmap-install.exe
-
-
