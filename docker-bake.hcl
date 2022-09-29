@@ -46,11 +46,6 @@ variable "JENKINS_REPO" {
   default = "jenkins/inbound-agent"
 }
 
-# Used in the tag pushed to the jenkins/inbound-agent image, no need to update this the pipeline will change it
-variable "BUILD_NUMBER" {
-  default = "1"
-}
-
 variable "ON_TAG" {
   default = "false"
 }
