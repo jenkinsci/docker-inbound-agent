@@ -48,7 +48,7 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
     foreach($tag in $builds[$Build]['Tags']) {
         Copy-Item -Path 'jenkins-agent.ps1' -Destination (Join-Path $builds[$Build]['Folder'] 'jenkins-agent.ps1') -Force
         Write-Host "Building $Build => tag=$tag"
-        $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $tag, $AdditionalArgs, $builds[$Build]['Folder']
+        $cmd = "docker build --build-arg 'version={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $tag, $AdditionalArgs, $builds[$Build]['Folder']
         Invoke-Expression $cmd
         $exitCodes += $lastExitCode
 
@@ -58,7 +58,7 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
                 $buildTag = "$VersionTag"
             }
             Write-Host "Building $Build => tag=$buildTag"
-            $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$Build]['Folder']
+            $cmd = "docker build --build-arg 'version={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$Build]['Folder']
             Invoke-Expression $cmd
             $exitCodes += $lastExitCode
         }
@@ -68,7 +68,7 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
         Copy-Item -Path 'jenkins-agent.ps1' -Destination (Join-Path $builds[$b]['Folder'] 'jenkins-agent.ps1') -Force
         foreach($tag in $builds[$b]['Tags']) {
             Write-Host "Building $b => tag=$tag"
-            $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $tag, $AdditionalArgs, $builds[$b]['Folder']
+            $cmd = "docker build --build-arg 'version={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $tag, $AdditionalArgs, $builds[$b]['Folder']
             Invoke-Expression $cmd
             $exitCodes += $lastExitCode
 
@@ -78,7 +78,7 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
                     $buildTag = "$VersionTag"
                 }
                 Write-Host "Building $Build => tag=$buildTag"
-                $cmd = "docker build --build-arg 'VERSION={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$b]['Folder']
+                $cmd = "docker build --build-arg 'version={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$b]['Folder']
                 Invoke-Expression $cmd
                 $exitCodes += $lastExitCode
             }

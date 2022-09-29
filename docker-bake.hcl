@@ -34,8 +34,8 @@ variable "BUILD_NUMBER" {
 }
 
 #### This is for the "parent" image to use: remoting version is interpolated from IMAGE_TAG) but parent image also have a build number suffix
-variable "AGENT_IMAGE_BUILD_NUMBER" {
-  default = "1"
+variable "PARENT_IMAGE_VERSION" {
+  default = "${REMOTING_VERSION}-1"
 }
 
 variable "REGISTRY" {
@@ -54,7 +54,7 @@ target "alpine_jdk11" {
   dockerfile = "11/alpine/Dockerfile"
   context = "."
   args = {
-    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-alpine-jdk11"
+    version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-alpine": "",
@@ -71,7 +71,7 @@ target "alpine_jdk17" {
   dockerfile = "17/alpine/Dockerfile"
   context = "."
   args = {
-    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-alpine-jdk17"
+    version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-alpine-jdk17": "",
@@ -85,7 +85,7 @@ target "debian_jdk11" {
   dockerfile = "11/debian/Dockerfile"
   context = "."
   args = {
-    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-jdk11"
+    version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}": "",
@@ -101,7 +101,7 @@ target "debian_jdk17" {
   dockerfile = "17/debian/Dockerfile"
   context = "."
   args = {
-    version = "${REMOTING_VERSION}-${AGENT_IMAGE_BUILD_NUMBER}-jdk17"
+    version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-jdk17": "",
