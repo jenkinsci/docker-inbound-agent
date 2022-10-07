@@ -14,10 +14,6 @@ group "linux-s390x" {
   targets = []
 }
 
-group "linux-ppc64le" {
-  targets = []
-}
-
 #### This is the current (e.g. jenkins/inbound-agent) version (including build number suffix). Overridden by release builds from GIT_TAG.
 variable "IMAGE_TAG" {
   default = "4.13.3-1"
