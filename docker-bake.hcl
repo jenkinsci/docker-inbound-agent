@@ -18,10 +18,6 @@ group "linux-s390x" {
   targets = []
 }
 
-group "linux-ppc64le" {
-  targets = []
-}
-
 #### This is the current (e.g. jenkins/inbound-agent) version (including build number suffix)
 variable "IMAGE_TAG" {
   default = "3063.v26e24490f041-1"
