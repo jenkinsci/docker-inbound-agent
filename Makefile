@@ -2,9 +2,9 @@ ROOT:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 IMAGE_NAME:=jenkins4eval/inbound-agent
 IMAGE_ALPINE:=${IMAGE_NAME}:alpine
-IMAGE_ALPINE_JDK11:=${IMAGE_NAME}:alpine-jdk11
+IMAGE_ALPINE_JDK8:=${IMAGE_NAME}:alpine-jdk8
 IMAGE_DEBIAN:=${IMAGE_NAME}:test
-IMAGE_JDK11:=${IMAGE_NAME}:jdk11
+IMAGE_JDK8:=${IMAGE_NAME}:jdk8
 
 ## For Docker <=20.04
 export DOCKER_BUILDKIT=1
@@ -28,7 +28,7 @@ check_image = make --silent list | grep -w '$(1)' >/dev/null 2>&1 || { echo "Err
 ## Base "docker buildx base" command to be reused everywhere
 bake_base_cli := docker buildx bake -f docker-bake.hcl --load
 
-.PHONY: build test test-alpine test-debian test-jdk11 test-jdk11-alpine
+.PHONY: build test test-alpine test-debian
 
 check-reqs:
 ## Build requirements
