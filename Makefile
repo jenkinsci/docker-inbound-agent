@@ -2,9 +2,9 @@ ROOT:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 IMAGE_NAME:=jenkins4eval/inbound-agent
 IMAGE_ALPINE:=${IMAGE_NAME}:alpine
-IMAGE_ALPINE_JDK11:=${IMAGE_NAME}:alpine-jdk11
+IMAGE_ALPINE_JDK8:=${IMAGE_NAME}:alpine-jdk8
 IMAGE_DEBIAN:=${IMAGE_NAME}:test
-IMAGE_JDK11:=${IMAGE_NAME}:jdk11
+IMAGE_JDK8:=${IMAGE_NAME}:jdk8
 
 ## For Docker <=20.04
 export DOCKER_BUILDKIT=1
@@ -14,7 +14,7 @@ export DOCKER_CLI_EXPERIMENTAL=enabled
 export BUILDKIT_PROGRESS=plain
 
 current_arch := $(shell uname -m)
-export ARCH ?= $(shell case $(current_arch) in (x86_64) echo "amd64" ;; (i386) echo "386";; (aarch64|arm64) echo "arm64" ;; (armv6*) echo "arm/v6";; (armv7*) echo "arm/v7";; (ppc64*|s390*|riscv*) echo $(current_arch);; (*) echo "UNKNOWN-CPU";; esac)
+export ARCH ?= $(shell case $(current_arch) in (x86_64) echo "amd64" ;; (i386) echo "386";; (aarch64|arm64) echo "arm64" ;; (armv6*) echo "arm/v6";; (armv7*) echo "arm/v7";; (s390*|riscv*) echo $(current_arch);; (*) echo "UNKNOWN-CPU";; esac)
 
 # Set to the path of a specific test suite to restrict execution only to this
 # default is "all test suites in the "tests/" directory
@@ -28,7 +28,7 @@ check_image = make --silent list | grep -w '$(1)' >/dev/null 2>&1 || { echo "Err
 ## Base "docker buildx base" command to be reused everywhere
 bake_base_cli := docker buildx bake -f docker-bake.hcl --load
 
-.PHONY: build test test-alpine test-debian test-jdk11 test-jdk11-alpine
+.PHONY: build test test-alpine test-debian
 
 check-reqs:
 ## Build requirements

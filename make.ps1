@@ -4,8 +4,8 @@ Param(
     [String] $Target = "build",
     [String] $AdditionalArgs = '',
     [String] $Build = '',
-    [String] $VersionTag = '4.11.2-1',
-    [String] $DockerAgentVersion = '4.11.2-1',
+    [String] $VersionTag = '3028.va_a_436db_35078-1',
+    [String] $DockerAgentVersion = '3028.va_a_436db_35078-3',
     [switch] $PushVersions = $false
 )
 
@@ -20,8 +20,8 @@ if(![String]::IsNullOrWhiteSpace($env:DOCKERHUB_ORGANISATION)) {
     $Organization = $env:DOCKERHUB_ORGANISATION
 }
 
-# this is the jdk version that will be used for the 'bare tag' images, e.g., jdk8-windowsservercore-1809 -> windowsserver-1809
-$defaultBuild = '8'
+# this is the jdk version that will be used for the 'bare tag' images, e.g., windowsserver-ltsc2019
+$defaultBuild = '11'
 $builds = @{}
 
 Get-ChildItem -Recurse -Include windows -Directory | ForEach-Object {
@@ -30,7 +30,7 @@ Get-ChildItem -Recurse -Include windows -Directory | ForEach-Object {
         $items = $dir.Split("\")
         $jdkVersion = $items[0]
         $baseImage = $items[2]
-        $basicTag = "jdk${jdkVersion}-${baseImage}" 
+        $basicTag = "jdk${jdkVersion}-${baseImage}"
         $tags = @( $basicTag )
         if($jdkVersion -eq $defaultBuild) {
             $tags += $baseImage
@@ -39,7 +39,7 @@ Get-ChildItem -Recurse -Include windows -Directory | ForEach-Object {
         $builds[$basicTag] = @{
             'Folder' = $dir;
             'Tags' = $tags;
-        }        
+        }
     }
 }
 
@@ -89,7 +89,7 @@ if($Target -eq "test") {
     $mod = Get-InstalledModule -Name Pester -MinimumVersion 4.9.0 -MaximumVersion 4.99.99 -ErrorAction SilentlyContinue
     if($null -eq $mod) {
         $module = "c:\Program Files\WindowsPowerShell\Modules\Pester"
-        if(Test-Path $module) {            
+        if(Test-Path $module) {
             takeown /F $module /A /R
             icacls $module /reset
             icacls $module /grant Administrators:'F' /inheritance:d /T

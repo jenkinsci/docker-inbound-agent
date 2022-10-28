@@ -20,11 +20,11 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-ARG version=4.9-1
-FROM jenkins/agent:$version
+ARG VERSION=3028.va_a_436db_35078-3
+FROM jenkins/agent:${VERSION}-jdk8
 
-ARG version
-LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="$version"
+ARG VERSION
+LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="${VERSION}"
 
 ARG user=jenkins
 

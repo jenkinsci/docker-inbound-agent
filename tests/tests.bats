@@ -45,18 +45,17 @@ SUT_IMAGE=$(get_sut_image)
 @test "[${SUT_IMAGE}] use build args correctly" {
   cd "${BATS_TEST_DIRNAME}"/.. || false
 
-  local ARG_TEST_VERSION
-  local TEST_VERSION="4.3"
-  local DOCKER_AGENT_VERSION_SUFFIX="4"
-  local TEST_USER="root"
+  # Old version used to test overriding the build arguments.
+  local TEST_VERSION="4.10"
+  local DOCKER_AGENT_VERSION_SUFFIX="5"
   local ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
-
+  local TEST_USER="root"
   local FOLDER=$(get_dockerfile_directory)
 
   local sut_image="${SUT_IMAGE}-tests-${BATS_TEST_NUMBER}"
 
   docker buildx bake \
-    --set "${IMAGE}".args.version="${ARG_TEST_VERSION}" \
+    --set "${IMAGE}".args.VERSION="${ARG_TEST_VERSION}" \
     --set "${IMAGE}".args.user="${TEST_USER}" \
     --set "${IMAGE}".platform="linux/${ARCH}" \
     --set "${IMAGE}".tags="${sut_image}" \

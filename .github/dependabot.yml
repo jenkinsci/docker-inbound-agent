@@ -1,27 +1,7 @@
 version: 2
 updates:
 - package-ecosystem: docker
-  directory: "/11/windows/windowsservercore-ltsc2019"
-  schedule:
-    interval: weekly
-  open-pull-requests-limit: 10
-- package-ecosystem: docker
-  directory: "/11/windows/nanoserver-1809"
-  schedule:
-    interval: weekly
-  open-pull-requests-limit: 10
-- package-ecosystem: docker
-  directory: "/11/debian"
-  schedule:
-    interval: weekly
-  open-pull-requests-limit: 10
-- package-ecosystem: docker
   directory: "/8/windows/nanoserver-1809"
-  schedule:
-    interval: weekly
-  open-pull-requests-limit: 10
-- package-ecosystem: docker
-  directory: "/8/windows/windowsservercore-1809"
   schedule:
     interval: weekly
   open-pull-requests-limit: 10
