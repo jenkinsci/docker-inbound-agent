@@ -46,8 +46,8 @@ SUT_IMAGE=$(get_sut_image)
   cd "${BATS_TEST_DIRNAME}"/.. || false
 
   # Old version used to test overriding the build arguments.
-  local TEST_VERSION="4.13"
-  local DOCKER_AGENT_VERSION_SUFFIX="4"
+  local TEST_VERSION="4.10"
+  local DOCKER_AGENT_VERSION_SUFFIX="5"
   local ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
   local TEST_USER="root"
   local FOLDER=$(get_dockerfile_directory)
