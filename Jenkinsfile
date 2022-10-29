@@ -52,7 +52,7 @@ pipeline {
                                 tag "*-jdk8"
                             }
                             environment {
-                                IMAGE_TAG = "${env.TAG_NAME.split('-').removeLast().join('-')}"
+                                IMAGE_TAG = "${env.TAG_NAME - '-jdk8'}"
                             }
                             steps {
                                 script {
@@ -107,7 +107,7 @@ pipeline {
                                 tag "*-jdk8"
                             }
                             environment {
-                                IMAGE_TAG = "${env.TAG_NAME.split('-').removeLast().join('-')}"
+                                IMAGE_TAG = "${env.TAG_NAME - '-jdk8'}"
                                 ON_TAG    = 'true'
                             }
                             steps {
