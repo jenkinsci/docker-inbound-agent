@@ -16,7 +16,7 @@ group "linux-s390x" {
 
 #### This is the current (e.g. jenkins/inbound-agent) version (including build number suffix). Overridden by release builds from GIT_TAG.
 variable "IMAGE_TAG" {
-  default = "3028.va_a_436db_35078-1"
+  default = "3028.va_a_436db_35078-2"
 }
 
 #### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_AGENT_VERSION>-<base-os>)
