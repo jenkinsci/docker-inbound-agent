@@ -18,20 +18,13 @@ group "linux-s390x" {
   targets = []
 }
 
-#### This is the current (e.g. jenkins/inbound-agent) version (including build number suffix)
-variable "IMAGE_TAG" {
+#### This is the current (e.g. jenkins/inbound-agent) version (including build number suffix). Overridden by release builds from GIT_TAG.variable "IMAGE_TAG" {
   default = "3063.v26e24490f041-1"
 }
-variable "REMOTING_VERSION" {
-  default = split("-", "${IMAGE_TAG}")[0]
-}
-variable "BUILD_NUMBER" {
-  default = split("-", "${IMAGE_TAG}")[1]
-}
 
-#### This is for the "parent" image to use: remoting version is interpolated from IMAGE_TAG) but parent image also have a build number suffix
+#### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_AGENT_VERSION>-<base-os>)
 variable "PARENT_IMAGE_VERSION" {
-  default = "${REMOTING_VERSION}-1"
+  default = "3063.v26e24490f041-1"
 }
 
 variable "REGISTRY" {
@@ -53,8 +46,8 @@ target "alpine_jdk11" {
     version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-alpine": "",
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-alpine-jdk11": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk11": "",
     "${REGISTRY}/${JENKINS_REPO}:alpine",
     "${REGISTRY}/${JENKINS_REPO}:alpine-jdk11",
     "${REGISTRY}/${JENKINS_REPO}:latest-alpine",
@@ -70,7 +63,7 @@ target "alpine_jdk17" {
     version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-alpine-jdk17": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk17": "",
     "${REGISTRY}/${JENKINS_REPO}:alpine-jdk17",
     "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk17",
   ]
@@ -84,8 +77,8 @@ target "debian_jdk11" {
     version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}": "",
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-jdk11": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk11": "",
     "${REGISTRY}/${JENKINS_REPO}:jdk11",
     "${REGISTRY}/${JENKINS_REPO}:latest",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk11",
@@ -100,7 +93,7 @@ target "debian_jdk17" {
     version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${REMOTING_VERSION}-${BUILD_NUMBER}-jdk17": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk17": "",
     "${REGISTRY}/${JENKINS_REPO}:jdk17",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk17",
   ]
