@@ -18,13 +18,14 @@ group "linux-s390x" {
   targets = []
 }
 
-#### This is the current (e.g. jenkins/inbound-agent) version (including build number suffix). Overridden by release builds from GIT_TAG.variable "IMAGE_TAG" {
-  default = "3063.v26e24490f041-1"
+#### This is the current (e.g. jenkins/inbound-agent) version (including build number suffix). Overridden by release builds from GIT_TAG.
+variable "IMAGE_TAG" {
+  default = "3071.v7e9b_0dc08466-1"
 }
 
 #### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_AGENT_VERSION>-<base-os>)
 variable "PARENT_IMAGE_VERSION" {
-  default = "3063.v26e24490f041-1"
+  default = "3071.v7e9b_0dc08466-1"
 }
 
 variable "REGISTRY" {
