@@ -1,4 +1,4 @@
-ARG version=3063.v26e24490f041-1
+ARG version=3071.v7e9b_0dc08466-1
 FROM jenkins/agent:${version}-jdk17
 
 ARG version
