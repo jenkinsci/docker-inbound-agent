@@ -204,6 +204,26 @@ targets:
         keyword: ARG
         matcher: version
     scmid: default
+  setDockerBakeDefaultParentImage:
+    name: Bump the parent image `jenkins/agent` version on the docker-bake.hcl file
+    kind: file
+    spec:
+      file: docker-bake.hcl
+      matchpattern: >-
+        variable(.*)"PARENT_IMAGE_VERSION"(.*){(.*)(\r\n|\r|\n)(.*)default(.*)=(.*)
+      replacepattern: >-
+        variable${1}"PARENT_IMAGE_VERSION"${2}{${3}${4}${5}default${6}= "{{ source "lastVersion" }}"
+    scmid: default
+  setWindowsMakePwshParentImage:
+    name: Bump the parent image `jenkins/agent` version on the windows make.ps1 file
+    kind: file
+    spec:
+      file: make.ps1
+      matchpattern: >-
+        \$DockerAgentVersion(.*)=(.*),
+      replacepattern: >-
+        $$DockerAgentVersion${1}= '{{ source "lastVersion" }}',
+    scmid: default
 
 pullrequests:
   default:
