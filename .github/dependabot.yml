@@ -1,17 +1,12 @@
+# Per https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates
 version: 2
 updates:
-- package-ecosystem: docker
-  directory: "/11/windows/windowsservercore-ltsc2019"
+
+# GitHub actions
+
+- package-ecosystem: "github-actions"
+  target-branch: master
+  directory: "/"
   schedule:
-    interval: weekly
-  open-pull-requests-limit: 10
-- package-ecosystem: docker
-  directory: "/11/windows/nanoserver-1809"
-  schedule:
-    interval: weekly
-  open-pull-requests-limit: 10
-- package-ecosystem: docker
-  directory: "/11/debian"
-  schedule:
-    interval: weekly
-  open-pull-requests-limit: 10
+    # Check for updates to GitHub Actions every week
+    interval: "weekly"
