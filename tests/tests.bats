@@ -1,80 +1,79 @@
 #!/usr/bin/env bats
 
 AGENT_CONTAINER=bats-jenkins-jnlp-agent
-NETCAT_HELPER_CONTAINER=netcat-helper
 
 load test_helpers
 
 buildNetcatImage
 
-SUT_IMAGE=$(get_sut_image)
+SUT_IMAGE="$(get_sut_image)"
 
 @test "[${SUT_IMAGE}] image has installed jenkins-agent in PATH" {
-  cid=$(docker run -d -it -P "${SUT_IMAGE}" /bin/bash)
+  local sut_cid
+  sut_cid="$(docker run -d -it -P "${SUT_IMAGE}" /bin/bash)"
 
-  is_agent_container_running $cid
+  is_agent_container_running "${sut_cid}"
 
-  run docker exec "${cid}" which jenkins-agent
+  run docker exec "${sut_cid}" which jenkins-agent
   [ "/usr/local/bin/jenkins-agent" = "${lines[0]}" ]
 
-  run docker exec "${cid}" which jenkins-agent
+  run docker exec "${sut_cid}" which jenkins-agent
   [ "/usr/local/bin/jenkins-agent" = "${lines[0]}" ]
 
-  cleanup $cid
+  cleanup "${sut_cid}"
 }
 
 @test "[${SUT_IMAGE}] image starts jenkins-agent correctly (slow test)" {
-  #  Spin off a helper image which contains netcat
-  netcat_cid=$(docker run -d -it --name netcat-helper netcat-helper:latest /bin/sh)
+  local netcat_cid sut_cid
+  # Spin off a helper image which launches the netcat utility, listening at port 5000 for 30 sec
+  netcat_cid="$(docker run -d -it netcat-helper:latest /bin/sh -c "timeout 30s nc -l 5000")"
 
   # Run jenkins agent which tries to connect to the netcat-helper container at port 5000
-  cid=$(docker run -d --link netcat-helper "${SUT_IMAGE}" -url http://netcat-helper:5000 aaa bbb)
+  sut_cid="$(docker run -d --link "${netcat_cid}" "${SUT_IMAGE}" -url "http://${netcat_cid}:5000" aaa bbb)"
 
-  # Launch the netcat utility, listening at port 5000 for 30 sec
-  # bats will capture the output from netcat and compare the first line
-  # of the header of the first HTTP request with the expected one
-  run docker exec netcat-helper /bin/sh -c "timeout 30s nc -l 5000"
+  # Wait for the whole process to take place (in resource-constrained environments it can take 100s of milliseconds)
+  sleep 5
 
-  # The GET request ends with a '\r'
-  [ $'GET /tcpSlaveAgentListener/ HTTP/1.1\r' = "${lines[0]}" ]
+  # Capture the logs output from netcat and check the header of the first HTTP request with the expected one
+  run docker logs "${netcat_cid}"
+  echo "${output}" | grep 'GET /tcpSlaveAgentListener/ HTTP/1.1'
 
-  cleanup $netcat_cid
-  cleanup $cid
+  cleanup "${netcat_cid}"
+  cleanup "${sut_cid}"
 }
 
 @test "[${SUT_IMAGE}] use build args correctly" {
   cd "${BATS_TEST_DIRNAME}"/.. || false
 
+  local TEST_VERSION DOCKER_AGENT_VERSION_SUFFIX ARG_TEST_VERSION TEST_USER sut_image sut_cid
+
   # Old version used to test overriding the build arguments.
   # This old version must have the same tag suffixes as the ones defined in the docker-bake file (`-jdk17`, `jdk11`, etc.)
-  local TEST_VERSION="3046.v38db_38a_b_7a_86"
-  local DOCKER_AGENT_VERSION_SUFFIX="1"
+  TEST_VERSION="3046.v38db_38a_b_7a_86"
+  DOCKER_AGENT_VERSION_SUFFIX="1"
 
-  local ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
-  local TEST_USER="root"
+  ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
+  TEST_USER="root"
 
-
-  local FOLDER=$(get_dockerfile_directory)
-
-  local sut_image="${SUT_IMAGE}-tests-${BATS_TEST_NUMBER}"
+  sut_image="${SUT_IMAGE}-tests-${BATS_TEST_NUMBER}"
 
   docker buildx bake \
     --set "${IMAGE}".args.version="${ARG_TEST_VERSION}" \
     --set "${IMAGE}".args.user="${TEST_USER}" \
-    --set "${IMAGE}".platform="linux/${ARCH}" \
+    --set "${IMAGE}".platform=linux/"${ARCH}" \
     --set "${IMAGE}".tags="${sut_image}" \
     --load \
       "${IMAGE}"
 
-  cid=$(docker run -d -it --name "${AGENT_CONTAINER}" -P "${sut_image}" /bin/sh)
+  sut_cid="$(docker run -d -it --name "${AGENT_CONTAINER}" -P "${sut_image}" /bin/sh)"
 
-  is_agent_container_running $cid
+  is_agent_container_running "${sut_cid}"
 
-  run docker exec "${cid}" sh -c "java -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -version"
+  run docker exec "${sut_cid}" sh -c "java -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main -version"
   [ "${TEST_VERSION}" = "${lines[0]}" ]
 
   run docker exec "${AGENT_CONTAINER}" sh -c "id -u -n ${TEST_USER}"
   [ "${TEST_USER}" = "${lines[0]}" ]
 
-  cleanup $cid
+  cleanup "${sut_cid}"
 }
