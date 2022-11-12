@@ -32,13 +32,11 @@ SUT_IMAGE="$(get_sut_image)"
   sut_cid="$(docker run -d --link "${netcat_cid}" "${SUT_IMAGE}" -url "http://${netcat_cid}:5000" aaa bbb)"
 
   # Wait for the whole process to take place (in resource-constrained environments it can take 100s of milliseconds)
-  sleep 1
+  sleep 5
 
-  # Capture the logs output from netcat and compare the first line
-  # of the header of the first HTTP request with the expected one
+  # Capture the logs output from netcat and check the header of the first HTTP request with the expected one
   run docker logs "${netcat_cid}"
-
-  [[ "${lines[0]}" = *"GET /tcpSlaveAgentListener/ HTTP/1.1"* ]]
+  echo "${output}" | grep 'GET /tcpSlaveAgentListener/ HTTP/1.1'
 
   cleanup "${netcat_cid}"
   cleanup "${sut_cid}"
