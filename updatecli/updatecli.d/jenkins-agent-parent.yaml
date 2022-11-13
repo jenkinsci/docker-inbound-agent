@@ -42,6 +42,14 @@ conditions:
       architecture: amd64
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-alpine-jdk17'
+  checkJdk11ArchlinuxDockerImage:
+    kind: dockerimage
+    name: Check if the container image "jenkins/agent:<lastVersion>-archlinux-jdk11" for linux/amd64 is available
+    disablesourceinput: true
+    spec:
+      architecture: amd64
+      image: jenkins/agent
+      tag: '{{source "lastVersion" }}-archlinux-jdk11'
   checkJdk11DebianAmd64DockerImage:
     kind: dockerimage
     name: Check if the container image "jenkins/agent:<lastVersion>-jdk11" for linux/amd64 is available
@@ -137,6 +145,15 @@ targets:
     kind: dockerfile
     spec:
       file: 11/alpine/Dockerfile
+      instruction:
+        keyword: ARG
+        matcher: version
+    scmid: default
+  setJdk11AarchlinuxDockerImage:
+    name: Bump the parent image `jenkins/agent` version on JDK11 Archlinux
+    kind: dockerfile
+    spec:
+      file: 11/archlinux/Dockerfile
       instruction:
         keyword: ARG
         matcher: version

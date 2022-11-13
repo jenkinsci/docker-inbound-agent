@@ -4,6 +4,7 @@ group "linux" {
     "alpine_jdk17",
     "debian_jdk11",
     "debian_jdk17",
+    "archlinux_jdk11",
   ]
 }
 
@@ -99,4 +100,21 @@ target "debian_jdk17" {
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk17",
   ]
   platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7"]
+}
+
+target "archlinux_jdk11" {
+  dockerfile = "11/archlinux/Dockerfile"
+  context = "."
+  args = {
+    version = "${PARENT_IMAGE_VERSION}"
+  }
+  tags = [
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-archlinux": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-archlinux-jdk11" : "",
+    "${REGISTRY}/${JENKINS_REPO}:archlinux",
+    "${REGISTRY}/${JENKINS_REPO}:latest-archlinux",
+    "${REGISTRY}/${JENKINS_REPO}:archlinux-jdk11",
+    "${REGISTRY}/${JENKINS_REPO}:latest-archlinux-jdk11",
+  ]
+  platforms = ["linux/amd64"]
 }
