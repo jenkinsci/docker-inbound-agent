@@ -32,7 +32,19 @@ SUT_IMAGE="$(get_sut_image)"
   sut_cid="$(docker run -d --link "${netcat_cid}" "${SUT_IMAGE}" -url "http://${netcat_cid}:5000" aaa bbb)"
 
   # Capture the logs output from netcat and check the header of the first HTTP request with the expected one
-  retry 30 1 sh -c "docker logs ${netcat_cid} | grep 'GET /tcpSlaveAgentListener/ HTTP/1.1'"
+  retry 30 1 sh -c "docker logs ${netcat_cid} | grep 'GET /tcpSlaveAgentListener/ HTTP/1.1'" || {
+    # Debug when the test is failing
+    echo "==DEBUG: content of the bats variable output=="
+    echo "${output}"
+    echo "==DEBUG: All containers=="
+    docker ps -a
+    echo "==DEBUG: Logs of the agent controller container with ID ${sut_cid}=="
+    docker logs "${sut_cid}"
+    echo "==DEBUG: Logs of the netcat container with ID ${netcat_cid}=="
+    docker logs "${netcat_cid}"
+    echo "==DEBUG: end=="
+    return 1
+  }
 
   cleanup "${netcat_cid}"
   cleanup "${sut_cid}"
