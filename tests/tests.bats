@@ -31,12 +31,8 @@ SUT_IMAGE="$(get_sut_image)"
   # Run jenkins agent which tries to connect to the netcat-helper container at port 5000
   sut_cid="$(docker run -d --link "${netcat_cid}" "${SUT_IMAGE}" -url "http://${netcat_cid}:5000" aaa bbb)"
 
-  # Wait for the whole process to take place (in resource-constrained environments it can take 100s of milliseconds)
-  sleep 5
-
   # Capture the logs output from netcat and check the header of the first HTTP request with the expected one
-  run docker logs "${netcat_cid}"
-  echo "${output}" | grep 'GET /tcpSlaveAgentListener/ HTTP/1.1'
+  retry 30 1 sh -c "docker logs ${netcat_cid} | grep 'GET /tcpSlaveAgentListener/ HTTP/1.1'"
 
   cleanup "${netcat_cid}"
   cleanup "${sut_cid}"
