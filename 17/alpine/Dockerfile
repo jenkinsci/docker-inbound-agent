@@ -21,10 +21,10 @@
 #  THE SOFTWARE.
 
 #TODO(oleg_nenashev): Does it also need an update?
-ARG version=3071.v7e9b_0dc08466-1
+ARG version=3071.v7e9b_0dc08466-5
 FROM jenkins/agent:${version}-alpine-jdk17
 
-ARG version
+ARG version=3071.v7e9b_0dc08466-5
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="$version"
 
 ARG user=jenkins
