@@ -145,7 +145,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on JDK11 Debian
     kind: dockerfile
     spec:
-      file: 11/alpine/Dockerfile
+      file: 11/debian/Dockerfile
       instruction:
         keyword: ARG
         matcher: version
@@ -181,7 +181,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on JDK17 Debian
     kind: dockerfile
     spec:
-      file: 17/alpine/Dockerfile
+      file: 17/debian/Dockerfile
       instruction:
         keyword: ARG
         matcher: version
