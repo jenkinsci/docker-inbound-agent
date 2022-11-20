@@ -42,60 +42,27 @@ conditions:
       architecture: amd64
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-alpine-jdk17'
-  checkJdk11DebianAmd64DockerImage:
+  checkJdk11DebianDockerImages:
     kind: dockerimage
     name: Check if the container image "jenkins/agent:<lastVersion>-jdk11" for linux/amd64 is available
     disablesourceinput: true
     spec:
-      architecture: amd64
+      architectures:
+        - amd64
+        - arm64
+        - arm/v7
+        - s390x
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-jdk11'
-  checkJdk11DebianArm64DockerImage:
-    kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk11" for linux/arm64 is available
-    disablesourceinput: true
-    spec:
-      architecture: arm64
-      image: jenkins/agent
-      tag: '{{source "lastVersion" }}-jdk11'
-  checkJdk11DebianArmv7DockerImage:
-    kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk11" for linux/arm/v7 is available
-    disablesourceinput: true
-    spec:
-      architecture: arm/v7
-      image: jenkins/agent
-      tag: '{{source "lastVersion" }}-jdk11'
-  checkJdk11DebianS390xDockerImage:
-    kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk11" for linux/s390x is available
-    disablesourceinput: true
-    spec:
-      architecture: s390x
-      image: jenkins/agent
-      tag: '{{source "lastVersion" }}-jdk11'
-  checkJdk17DebianAmd64DockerImage:
+  checkJdk17DebianDockerImages:
     kind: dockerimage
     name: Check if the container image "jenkins/agent:<lastVersion>-jdk17" for linux/amd64 is available
     disablesourceinput: true
     spec:
-      architecture: amd64
-      image: jenkins/agent
-      tag: '{{source "lastVersion" }}-jdk17'
-  checkJdk17DebianArm64DockerImage:
-    kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk17" for linux/arm64 is available
-    disablesourceinput: true
-    spec:
-      architecture: arm64
-      image: jenkins/agent
-      tag: '{{source "lastVersion" }}-jdk17'
-  checkJdk17DebianArmv7DockerImage:
-    kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk17" for linux/arm/v7 is available
-    disablesourceinput: true
-    spec:
-      architecture: arm/v7
+      architectures:
+        - amd64
+        - arm64
+        - arm/v7
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-jdk17'
   checkJdk11WindowsNanoserver1809DockerImage:
