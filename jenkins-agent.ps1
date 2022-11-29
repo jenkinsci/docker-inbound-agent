@@ -22,7 +22,7 @@
 
 [CmdletBinding()]
 Param(
-    $Cmd = '', # this is only used when docker run has one arg positional arg
+    $Cmd = '', # this must be specified explicitly
     $Url = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_URL)) { throw ("Url is required") } else { '' } ),
     [Parameter(Position=0)]$Secret = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_SECRET)) { throw ("Secret is required") } else { '' } ),
     [Parameter(Position=1)]$Name = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_AGENT_NAME)) { throw ("Name is required") } else { '' } ),
@@ -33,12 +33,14 @@ Param(
     $InstanceIdentity = '',
     $Protocols = '',
     $JenkinsJavaBin = '',
-    $JavaHome = $env:JAVA_HOME
+    $JavaHome = $env:JAVA_HOME,
+    $JenkinsJavaOpts = ''
 )
 
 # Usage jenkins-agent.ps1 [options] -Url http://jenkins -Secret [SECRET] -Name [AGENT_NAME]
 # Optional environment variables :
 # * JENKINS_JAVA_BIN : Java executable to use instead of the default in PATH or obtained from JAVA_HOME
+# * JENKINS_JAVA_OPTS : Java Options to use for the remoting process, otherwise obtained from JAVA_OPTS
 # * JENKINS_TUNNEL : HOST:PORT for a tunnel to route TCP traffic to jenkins host, when jenkins can't be directly accessed over network
 # * JENKINS_URL : alternate jenkins URL
 # * JENKINS_SECRET : agent secret, if not set as an argument
@@ -54,11 +56,11 @@ Param(
 if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
 	Invoke-Expression "$Cmd"
 } else {
-    $AgentArguments = @("-cp", "C:/ProgramData/Jenkins/agent.jar", "hudson.remoting.jnlp.Main", "-headless")
 
     # this maps the variable name from the CmdletBinding to environment variables
     $ParamMap = @{
         'JenkinsJavaBin' = 'JENKINS_JAVA_BIN';
+        'JenkinsJavaOpts' = 'JENKINS_JAVA_OPTS';
         'Tunnel' = 'JENKINS_TUNNEL';
         'Url' = 'JENKINS_URL';
         'Secret' = 'JENKINS_SECRET';
@@ -91,6 +93,19 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
         }
     }
 
+    $AgentArguments = @()
+
+    if(![System.String]::IsNullOrWhiteSpace($JenkinsJavaOpts)) {
+        # this magic will basically process the $JenkinsJavaOpts like a command line
+        # and split into an array, the command line processing follows the PowerShell
+        # commnd line processing, which means for things like -Dsomething.something=something,
+        # you need to quote the string like this: "-Dsomething.something=something" or else it
+        # will get parsed incorrectly.
+        $AgentArguments += Invoke-Expression "echo $JenkinsJavaOpts"
+    }
+
+    $AgentArguments += @("-cp", "C:/ProgramData/Jenkins/agent.jar", "hudson.remoting.jnlp.Main", "-headless")
+
     if(![System.String]::IsNullOrWhiteSpace($Tunnel)) {
         $AgentArguments += @("-tunnel", "`"$Tunnel`"")
     }
@@ -116,7 +131,7 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
     if(![System.String]::IsNullOrWhiteSpace($InstanceIdentity)) {
         $AgentArguments += @('-instanceIdentity', $InstanceIdentity)
     }
-    
+
     if(![System.String]::IsNullOrWhiteSpace($Protocols)) {
         $AgentArguments += @('-protocols', $Protocols)
     }

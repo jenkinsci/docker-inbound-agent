@@ -43,7 +43,6 @@ Describe "[$global:JDK $global:FLAVOR] build image" {
 
     It 'builds image' {
       $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=$global:VERSION -t $global:AGENT_IMAGE $global:FOLDER"
-      # This failure was added on purpose to verify that the build will fail if a test fails
       $exitCode | Should -Be 0
     }
 
@@ -170,5 +169,39 @@ Describe "[$global:JDK $global:FLAVOR] build args" {
     AfterAll {
         Cleanup($global:AGENT_CONTAINER)
         Pop-Location -StackName 'agent'
+    }
+}
+
+
+Describe "[$global:JDK $global:FLAVOR] passing JVM options (slow test)" {
+    It "shows the java version with --show-version" {
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "network create --driver nat jnlp-network"
+        # Launch the netcat utility, listening at port 5000 for 30 sec
+        # bats will capture the output from netcat and compare the first line
+        # of the header of the first HTTP request with the expected one
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --name nmap --network=jnlp-network nmap:latest ncat.exe -w 30 -l 5000"
+        $exitCode | Should -Be 0
+        Is-ContainerRunning "nmap" | Should -BeTrue
+
+        # get the ip address of the nmap container
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect -f `"{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}`" nmap"
+        $exitCode | Should -Be 0
+        $nmap_ip = $stdout.Trim()
+
+        # run Jenkins agent which tries to connect to the nmap container at port 5000
+        $secret = "aaa"
+        $name = "bbb"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --network=jnlp-network --name $global:AGENT_CONTAINER $global:AGENT_IMAGE -Url http://${nmap_ip}:5000 -JenkinsJavaOpts `"--show-version`" $secret $name"
+        $exitCode | Should -Be 0
+        Is-ContainerRunning $global:AGENT_CONTAINER | Should -BeTrue
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "logs $global:AGENT_CONTAINER"
+        $exitCode | Should -Be 0
+        $stdout | Should -Match "OpenJDK Runtime Environment Temurin-${global:JDK}"
+    }
+
+    AfterAll {
+        Cleanup($global:AGENT_CONTAINER)
+        Cleanup("nmap")
+        CleanupNetwork("jnlp-network")
     }
 }
