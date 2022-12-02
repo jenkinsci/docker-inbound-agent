@@ -39,7 +39,7 @@ To run a Docker container with [Work Directory](https://github.com/jenkinsci/rem
 Optional environment variables:
 
 * `JENKINS_JAVA_BIN`: Path to Java executable to use instead of the default in PATH or obtained from JAVA_HOME
-* `JENKINS_JAVA_OPTS` : Java Options to use for the remoting process, otherwise obtained from JAVA_OPTS, **Warning!** :exclamation: mandatory double quotes around this value for windows.
+* `JENKINS_JAVA_OPTS` : Java Options to use for the remoting process, otherwise obtained from JAVA_OPTS, **Warning!** :exclamation: mandatory double quotes around this value for windows in case of specials characters, for example `-XX:+PrintCommandLineFlags` need to be surrounded by quotes.
 * `JENKINS_URL`: url for the Jenkins server, can be used as a replacement to `-url` option, or to set alternate jenkins URL
 * `JENKINS_TUNNEL`: (`HOST:PORT`) connect to this agent host and port instead of Jenkins server, assuming this one do route TCP traffic to Jenkins master. Useful when when Jenkins runs behind a load balancer, reverse proxy, etc.
 * `JENKINS_SECRET`: agent secret, if not set as an argument
