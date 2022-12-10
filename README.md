@@ -39,7 +39,7 @@ To run a Docker container with [Work Directory](https://github.com/jenkinsci/rem
 Optional environment variables:
 
 * `JENKINS_JAVA_BIN`: Path to Java executable to use instead of the default in PATH or obtained from JAVA_HOME
-* `JENKINS_JAVA_OPTS` : Java Options to use for the remoting process, otherwise obtained from JAVA_OPTS
+* `JENKINS_JAVA_OPTS` : Java Options to use for the remoting process, otherwise obtained from JAVA_OPTS, **Warning** :exclamation: For more information on Windows usage, please see the **Windows Jenkins Java Opts** [section below](#windows-jenkins-java-opts).
 * `JENKINS_URL`: url for the Jenkins server, can be used as a replacement to `-url` option, or to set alternate jenkins URL
 * `JENKINS_TUNNEL`: (`HOST:PORT`) connect to this agent host and port instead of Jenkins server, assuming this one do route TCP traffic to Jenkins master. Useful when when Jenkins runs behind a load balancer, reverse proxy, etc.
 * `JENKINS_SECRET`: agent secret, if not set as an argument
@@ -49,6 +49,26 @@ Optional environment variables:
 * `JENKINS_DIRECT_CONNECTION`: (`HOST:PORT`) Connect directly to this TCP agent port, skipping the HTTP(S) connection parameter download.
 * `JENKINS_INSTANCE_IDENTITY`: The base64 encoded InstanceIdentity byte array of the Jenkins master. When this is set, the agent skips connecting to an HTTP(S) port for connection info.
 * `JENKINS_PROTOCOLS`: Specify the remoting protocols to attempt when `JENKINS_INSTANCE_IDENTITY` is provided.
+
+
+## Windows Jenkins Java Opts
+
+The processing of the JENKINS_JAVA_OPTS environment variable or -JenkinsJavaOpts command line parameter follow the [https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_parsing?view=powershell-7.3](command parsing semantics of Powershell). This means that if a parameter contains any characters that are part of an expression in Powershell, it will need to be surrounded by quotes. 
+For example:
+
+-XX:+PrintCommandLineFlags --show-version
+
+This would need to be escaped with quotes like this:
+
+"-XX:+PrintCommandLineFlags" --show-version
+
+Or another example:
+-Dsome.property=some value --show-version
+
+This would need to be escaped like this:
+
+"-Dsome.property='some value'" --show-version
+
 
 ## Configuration specifics
 
