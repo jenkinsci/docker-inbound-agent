@@ -21,7 +21,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-ARG version=3077.vd69cf116da_6f-3
+ARG version=3077.vd69cf116da_6f-4
 FROM jenkins/agent:${version}-jdk17-windowsservercore-ltsc2019
 
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$version"
