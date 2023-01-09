@@ -1,7 +1,7 @@
-ARG version=3085.vc4c6977c075a-2
+ARG version=3085.vc4c6977c075a-3
 FROM jenkins/agent:${version}-jdk17
 
-ARG version=3085.vc4c6977c075a-2
+ARG version=3085.vc4c6977c075a-3
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="$version"
 
 ARG user=jenkins
