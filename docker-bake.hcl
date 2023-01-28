@@ -25,7 +25,7 @@ variable "IMAGE_TAG" {
 
 #### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_AGENT_VERSION>-<base-os>)
 variable "PARENT_IMAGE_VERSION" {
-  default = "3085.vc4c6977c075a-4"
+  default = "3085.vc4c6977c075a-5"
 }
 
 variable "REGISTRY" {
