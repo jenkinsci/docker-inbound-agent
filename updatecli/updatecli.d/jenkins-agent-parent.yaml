@@ -192,9 +192,9 @@ targets:
         $$DockerAgentVersion${1}= '{{ source "lastVersion" }}',
     scmid: default
 
-pullrequests:
+actions:
   default:
-    kind: github
+    kind: github/pullrequest
     scmid: default
     title: Bump the parent image `jenkins/agent` version to {{ source "lastVersion" }}
     spec:
