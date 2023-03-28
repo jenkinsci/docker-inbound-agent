@@ -52,6 +52,7 @@ conditions:
         - arm64
         - arm/v7
         - s390x
+        - ppc64le
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-jdk11'
   checkJdk17DebianDockerImages:

@@ -18,6 +18,13 @@ group "linux-s390x" {
   targets = []
 }
 
+group "linux-ppc64le" {
+  targets = [
+    "debian_jdk11",
+    "debian_jdk17",
+  ]
+}
+
 #### This is the current (e.g. jenkins/inbound-agent) version (including build number suffix). Overridden by release builds from GIT_TAG.
 variable "IMAGE_TAG" {
   default = "3071.v7e9b_0dc08466-1"
@@ -84,7 +91,7 @@ target "debian_jdk11" {
     "${REGISTRY}/${JENKINS_REPO}:latest",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk11",
   ]
-  platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7", "linux/s390x"]
+  platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7", "linux/s390x", "linux/ppc64le"]
 }
 
 target "debian_jdk17" {
@@ -98,5 +105,5 @@ target "debian_jdk17" {
     "${REGISTRY}/${JENKINS_REPO}:jdk17",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk17",
   ]
-  platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7"]
+  platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7", "linux/ppc64le"]
 }
