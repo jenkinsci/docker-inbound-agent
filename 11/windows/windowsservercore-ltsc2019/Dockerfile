@@ -27,6 +27,7 @@ FROM jenkins/agent:${version}-jdk11-windowsservercore-ltsc2019
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$version"
 
 ARG user=jenkins
+ENV user=$user
 
 RUN $output = net users ; `
     if(-not ($output -match $env:user)) { `
