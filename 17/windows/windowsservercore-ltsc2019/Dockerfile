@@ -22,8 +22,11 @@
 #  THE SOFTWARE.
 
 ARG version=3107.v665000b_51092-6
-FROM jenkins/agent:${version}-jdk17-windowsservercore-ltsc2019
+FROM jenkins/agent:${version}-jdk11-windowsservercore-ltsc2019
 
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+ARG version=3107.v665000b_51092-6
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$version"
 
 ARG user=jenkins
