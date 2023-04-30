@@ -5,7 +5,6 @@ $global:AGENT_CONTAINER='pester-jenkins-inbound-agent'
 $global:SHELL="powershell.exe"
 
 $global:FOLDER = Get-EnvOrDefault 'FOLDER' ''
-$global:VERSION = Get-EnvOrDefault 'VERSION' '4.9-1'
 
 $REAL_FOLDER=Resolve-Path -Path "$PSScriptRoot/../${global:FOLDER}"
 
@@ -42,7 +41,7 @@ Describe "[$global:JDK $global:FLAVOR] build image" {
     }
 
     It 'builds image' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg VERSION=$global:VERSION -t $global:AGENT_IMAGE $global:FOLDER"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --tag $global:AGENT_IMAGE --file $global:FOLDER/Dockerfile ./"
         $exitCode | Should -Be 0
     }
 
@@ -53,7 +52,7 @@ Describe "[$global:JDK $global:FLAVOR] build image" {
 
 Describe "[$global:JDK $global:FLAVOR] check default user account" {
     BeforeAll {
-        docker run -d -it --name "$global:AGENT_CONTAINER" -P "$global:AGENT_IMAGE" -Cmd "$global:SHELL"
+        docker run --detach --tty --name "$global:AGENT_CONTAINER" "$global:AGENT_IMAGE" -Cmd "$global:SHELL"
         $LASTEXITCODE | Should -Be 0
         Is-ContainerRunning $global:AGENT_CONTAINER | Should -BeTrue
     }
@@ -75,7 +74,8 @@ Describe "[$global:JDK $global:FLAVOR] check default user account" {
 
 Describe "[$global:JDK $global:FLAVOR] image has jenkins-agent.ps1 in the correct location" {
     BeforeAll {
-        & docker run -dit --name "$global:AGENT_CONTAINER" -P "$global:AGENT_IMAGE" -Cmd $global:SHELL
+        docker run --detach --tty --name "$global:AGENT_CONTAINER" "$global:AGENT_IMAGE" -Cmd "$global:SHELL"
+        $LASTEXITCODE | Should -Be 0
         Is-ContainerRunning $global:AGENT_CONTAINER | Should -BeTrue
     }
 
@@ -95,19 +95,19 @@ Describe "[$global:JDK $global:FLAVOR] image starts jenkins-agent.ps1 correctly 
         # Launch the netcat utility, listening at port 5000 for 30 sec
         # bats will capture the output from netcat and compare the first line
         # of the header of the first HTTP request with the expected one
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --name nmap --network=jnlp-network nmap:latest ncat.exe -w 30 -l 5000"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run --detach --tty --name nmap --network=jnlp-network nmap:latest ncat.exe -w 30 -l 5000"
         $exitCode | Should -Be 0
         Is-ContainerRunning "nmap" | Should -BeTrue
 
         # get the ip address of the nmap container
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect -f `"{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}`" nmap"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect --format `"{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}`" nmap"
         $exitCode | Should -Be 0
         $nmap_ip = $stdout.Trim()
 
         # run Jenkins agent which tries to connect to the nmap container at port 5000
         $secret = "aaa"
         $name = "bbb"
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --network=jnlp-network --name $global:AGENT_CONTAINER $global:AGENT_IMAGE -Url http://${nmap_ip}:5000 $secret $name"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run --detach --tty --network=jnlp-network --name $global:AGENT_CONTAINER $global:AGENT_IMAGE -Url http://${nmap_ip}:5000 $secret $name"
         $exitCode | Should -Be 0
         Is-ContainerRunning $global:AGENT_CONTAINER | Should -BeTrue
 
@@ -138,7 +138,7 @@ Describe "[$global:JDK $global:FLAVOR] build args" {
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg version=${ARG_TEST_VERSION} -t $global:AGENT_IMAGE $global:FOLDER"
         $exitCode | Should -Be 0
 
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --name $global:AGENT_CONTAINER -P $global:AGENT_IMAGE -Cmd $global:SHELL"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run --detach --tty --name $global:AGENT_CONTAINER $global:AGENT_IMAGE -Cmd $global:SHELL"
         $exitCode | Should -Be 0
         Is-ContainerRunning "$global:AGENT_CONTAINER" | Should -BeTrue
     }
@@ -155,26 +155,25 @@ Describe "[$global:JDK $global:FLAVOR] build args" {
     }
 }
 
-
 Describe "[$global:JDK $global:FLAVOR] passing JVM options (slow test)" {
     It "shows the java version with --show-version" {
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "network create --driver nat jnlp-network"
         # Launch the netcat utility, listening at port 5000 for 30 sec
         # bats will capture the output from netcat and compare the first line
         # of the header of the first HTTP request with the expected one
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --name nmap --network=jnlp-network nmap:latest ncat.exe -w 30 -l 5000"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run --detach --tty --name nmap --network=jnlp-network nmap:latest ncat.exe -w 30 -l 5000"
         $exitCode | Should -Be 0
         Is-ContainerRunning "nmap" | Should -BeTrue
 
         # get the ip address of the nmap container
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect -f `"{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}`" nmap"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect --format `"{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}`" nmap"
         $exitCode | Should -Be 0
         $nmap_ip = $stdout.Trim()
 
         # run Jenkins agent which tries to connect to the nmap container at port 5000
         $secret = "aaa"
         $name = "bbb"
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run -dit --network=jnlp-network --name $global:AGENT_CONTAINER $global:AGENT_IMAGE -Url http://${nmap_ip}:5000 -JenkinsJavaOpts `"--show-version`" $secret $name"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run --detach --tty --network=jnlp-network --name $global:AGENT_CONTAINER $global:AGENT_IMAGE -Url http://${nmap_ip}:5000 -JenkinsJavaOpts `"--show-version`" $secret $name"
         $exitCode | Should -Be 0
         Is-ContainerRunning $global:AGENT_CONTAINER | Should -BeTrue
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "logs $global:AGENT_CONTAINER"
