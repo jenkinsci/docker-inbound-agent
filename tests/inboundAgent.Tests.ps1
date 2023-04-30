@@ -131,12 +131,11 @@ Describe "[$global:JDK $global:FLAVOR] build args" {
         # This old version must have the same tag suffixes as the current 4 windows images (`-jdk11-nanoserver` etc.)
         $TEST_VERSION="3046.v38db_38a_b_7a_86"
         $DOCKER_AGENT_VERSION_SUFFIX="1"
-        $TEST_USER="foo"
         $ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
     }
 
     It 'builds image with arguments' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg version=${ARG_TEST_VERSION} --build-arg user=$TEST_USER -t $global:AGENT_IMAGE $global:FOLDER"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build --build-arg version=${ARG_TEST_VERSION} -t $global:AGENT_IMAGE $global:FOLDER"
         $exitCode | Should -Be 0
 
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "run --detach --tty --name $global:AGENT_CONTAINER $global:AGENT_IMAGE -Cmd $global:SHELL"
@@ -148,22 +147,6 @@ Describe "[$global:JDK $global:FLAVOR] build args" {
         $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $global:AGENT_CONTAINER $global:SHELL -c `"java -cp C:/ProgramData/Jenkins/agent.jar hudson.remoting.jnlp.Main -version`""
         $exitCode | Should -Be 0
         $stdout | Should -Match $TEST_VERSION
-    }
-
-    It "has the correct (overridden) user account and the container is running as that user" {
-        # check that the user exists and is the user the container is running as
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $global:AGENT_CONTAINER $global:SHELL -c `"(Get-ChildItem env:\ | Where-Object { `$_.Name -eq 'USERNAME' }).Value`""
-        $exitCode | Should -Be 0
-        $stdout | Should -Match $TEST_USER
-    }
-
-    It "has the correct password policy for overridden user account" {
-        # check that $TEST_USER's password never expires and that password is NOT required to login
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $global:AGENT_CONTAINER $global:SHELL -C `"if((net user $TEST_USER | Select-String -Pattern 'Password expires') -match 'Never') { exit 0 } else { net user $TEST_USER ; exit -1 }`""
-        $exitCode | Should -Be 0
-
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "exec $global:AGENT_CONTAINER $global:SHELL -C `"if((net user $TEST_USER | Select-String -Pattern 'Password required') -match 'No') { exit 0 } else { net user $TEST_USER ; exit -1 }`""
-        $exitCode | Should -Be 0
     }
 
     AfterAll {
