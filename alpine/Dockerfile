@@ -1,6 +1,6 @@
 # The MIT License
 #
-#  Copyright (c) 2015-2020, CloudBees, Inc.
+#  Copyright (c) 2015-2020, CloudBees, Inc. and other Jenkins contributors
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,8 @@
 
 #TODO(oleg_nenashev): Does it also need an update?
 ARG version=3107.v665000b_51092-10
-FROM jenkins/agent:${version}-alpine-jdk11
+ARG JAVA_MAJOR_VERSION=17
+FROM jenkins/agent:"${version}"-alpine-jdk"${JAVA_MAJOR_VERSION}"
 
 ARG version=3107.v665000b_51092-10
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="$version"
