@@ -2,7 +2,6 @@
 Param(
     [Parameter(Position=1)]
     [String] $Target = "build",
-    [String] $AdditionalArgs = '',
     [String] $Build = '',
     [String] $VersionTag = '3071.v7e9b_0dc08466-1',
     [String] $DockerAgentVersion = '3107.v665000b_51092-10',
@@ -24,32 +23,48 @@ if(![String]::IsNullOrWhiteSpace($env:DOCKERHUB_ORGANISATION)) {
 $defaultBuild = '11'
 $builds = @{}
 
-Get-ChildItem -Recurse -Include windows -Directory | ForEach-Object {
-    Get-ChildItem -Directory -Path $_ | Where-Object { Test-Path (Join-Path $_.FullName "Dockerfile") } | ForEach-Object {
-        $dir = $_.FullName.Replace((Get-Location), "").TrimStart("\")
-        $items = $dir.Split("\")
-        $jdkVersion = $items[0]
-        $baseImage = $items[2]
-        $basicTag = "jdk${jdkVersion}-${baseImage}"
-        $tags = @( $basicTag )
-        if($jdkVersion -eq $defaultBuild) {
-            $tags += $baseImage
-        }
+# TODO: use docker-compose / tooling like with docker-agent
+$images = 'jdk11-nanoserver-1809', 'jdk11-windowsservercore-ltsc2019', 'jdk17-nanoserver-1809', 'jdk17-windowsservercore-ltsc2019'
+Foreach($image in $images) {
+    $items = $image.Split('-')
+    # Remove the 'jdk' prefix (3 first characters)
+    $jdkMajorVersion = $items[0].Remove(0,3)
+    $windowsFlavor = $items[1]
+    $windowsVersion = $items[2]
+    $baseImage = "${windowsFlavor}-${windowsVersion}"
+    $dir = "windows/${baseImage}"
 
-        $builds[$basicTag] = @{
-            'Folder' = $dir;
-            'Tags' = $tags;
-        }
+    Write-Host "New windows image to build: jenkins/jenkins:${baseImage} with JDK ${jdkMajorVersion} in ${dir}"
+
+    $tags = @( $image )
+    if($jdkMajorVersion -eq $defaultBuild) {
+        $tags += $baseImage
     }
+
+    $builds[$image] = @{
+        'Folder' = $dir;
+        'Tags' = $tags;
+        'JdkMajorVersion' = $jdkMajorVersion;
+    }
+}
+
+function Build-Image {
+    param (
+        [String] $Build,
+        [String] $ImageName,
+        [String] $RemotingVersion,
+        [String] $JdkMajorVersion,
+        [String] $Folder
+    )
+
+    Write-Host "Building $Build with name $imageName"
+    docker build --build-arg "version=${RemotingVersion}" --build-arg "JAVA_MAJOR_VERSION=${JdkMajorVersion}" --tag="${ImageName}" --file="${Folder}/Dockerfile" ./
 }
 
 $exitCodes = 0
 if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
     foreach($tag in $builds[$Build]['Tags']) {
-        Copy-Item -Path 'jenkins-agent.ps1' -Destination (Join-Path $builds[$Build]['Folder'] 'jenkins-agent.ps1') -Force
-        Write-Host "Building $Build => tag=$tag"
-        $cmd = "docker build --build-arg 'version={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $tag, $AdditionalArgs, $builds[$Build]['Folder']
-        Invoke-Expression $cmd
+        Build-Image -Build $Build -ImageName "${Organization}/${Repository}:${tag}" -RemotingVersion $DockerAgentVersion -JdkMajorVersion $builds[$Build]['JdkMajorVersion'] -Folder $builds[$Build]['Folder']
         $exitCodes += $lastExitCode
 
         if($PushVersions) {
@@ -57,19 +72,14 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
             if($tag -eq 'latest') {
                 $buildTag = "$VersionTag"
             }
-            Write-Host "Building $Build => tag=$buildTag"
-            $cmd = "docker build --build-arg 'version={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$Build]['Folder']
-            Invoke-Expression $cmd
+            Build-Image -Build $Build -ImageName "${Organization}/${Repository}:${buildTag}" -RemotingVersion $DockerAgentVersion -JdkMajorVersion $builds[$Build]['JdkMajorVersion'] -Folder $builds[$Build]['Folder']
             $exitCodes += $lastExitCode
         }
     }
 } else {
     foreach($b in $builds.Keys) {
-        Copy-Item -Path 'jenkins-agent.ps1' -Destination (Join-Path $builds[$b]['Folder'] 'jenkins-agent.ps1') -Force
         foreach($tag in $builds[$b]['Tags']) {
-            Write-Host "Building $b => tag=$tag"
-            $cmd = "docker build --build-arg 'version={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $tag, $AdditionalArgs, $builds[$b]['Folder']
-            Invoke-Expression $cmd
+            Build-Image -Build $Build -ImageName "${Organization}/${Repository}:${tag}" -RemotingVersion $DockerAgentVersion -JdkMajorVersion $builds[$b]['JdkMajorVersion'] -Folder $builds[$b]['Folder']
             $exitCodes += $lastExitCode
 
             if($PushVersions) {
@@ -77,9 +87,7 @@ if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)
                 if($tag -eq 'latest') {
                     $buildTag = "$VersionTag"
                 }
-                Write-Host "Building $Build => tag=$buildTag"
-                $cmd = "docker build --build-arg 'version={0}' -t {1}/{2}:{3} {4} {5}" -f $DockerAgentVersion, $Organization, $Repository, $buildTag, $AdditionalArgs, $builds[$b]['Folder']
-                Invoke-Expression $cmd
+                Build-Image -Build $Build -ImageName "${Organization}/${Repository}:${buildTag}" -RemotingVersion $DockerAgentVersion -JdkMajorVersion $builds[$b]['JdkMajorVersion'] -Folder $builds[$b]['Folder']
                 $exitCodes += $lastExitCode
             }
         }
@@ -121,7 +129,9 @@ if($Target -eq "test") {
 
     if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
         $folder = $builds[$Build]['Folder']
-        $env:FOLDER = $builds[$Build]['Folder']
+        $env:AGENT_IMAGE = $Build
+        $env:FOLDER = $folder
+        $env:JAVA_MAJOR_VERSION = $builds[$Build]['JdkMajorVersion']
         $env:VERSION = $DockerAgentVersion
 
         if(Test-Path ".\target\$folder") {
@@ -136,12 +146,16 @@ if($Target -eq "test") {
         } else {
             Write-Host "There were $($TestResults.PassedCount) passed tests out of $($TestResults.TotalCount) in $Build"
         }
-
+        Remove-Item env:\AGENT_IMAGE
         Remove-Item env:\FOLDER
+        Remove-Item env:\JAVA_MAJOR_VERSION
+        Remove-Item env:\VERSION
     } else {
         foreach($b in $builds.Keys) {
             $folder = $builds[$b]['Folder']
+            $env:AGENT_IMAGE = $b
             $env:FOLDER = $folder
+            $env:JAVA_MAJOR_VERSION = $builds[$Build]['JdkMajorVersion']
             $env:VERSION = $DockerAgentVersion
             if(Test-Path ".\target\$folder") {
                 Remove-Item -Recurse -Force ".\target\$folder"
@@ -155,7 +169,10 @@ if($Target -eq "test") {
             } else {
                 Write-Host "There were $($TestResults.PassedCount) passed tests out of $($TestResults.TotalCount) in $Build"
             }
+            Remove-Item env:\AGENT_IMAGE
             Remove-Item env:\FOLDER
+            Remove-Item env:\JAVA_MAJOR_VERSION
+            Remove-Item env:\VERSION
         }
     }
 
