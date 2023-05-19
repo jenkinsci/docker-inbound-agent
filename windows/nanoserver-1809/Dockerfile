@@ -22,7 +22,8 @@
 #  THE SOFTWARE.
 
 ARG version=3107.v665000b_51092-10
-FROM jenkins/agent:${version}-jdk11-nanoserver-1809
+ARG JAVA_MAJOR_VERSION=17
+FROM jenkins/agent:"${version}"-jdk"${JAVA_MAJOR_VERSION}"-nanoserver-1809
 
 ARG version=3107.v665000b_51092-10
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$version"
