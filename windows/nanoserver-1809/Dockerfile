@@ -21,11 +21,11 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-ARG version=3107.v665000b_51092-15
+ARG version=3131.vf2b_b_798b_ce99-1
 ARG JAVA_MAJOR_VERSION=17
 FROM jenkins/agent:"${version}"-jdk"${JAVA_MAJOR_VERSION}"-nanoserver-1809
 
-ARG version=3107.v665000b_51092-15
+ARG version=3131.vf2b_b_798b_ce99-1
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$version"
 
 COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
