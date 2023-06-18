@@ -4,7 +4,7 @@ Param(
     [String] $Target = "build",
     [String] $Build = '',
     [String] $VersionTag = '3071.v7e9b_0dc08466-1',
-    [String] $DockerAgentVersion = '3107.v665000b_51092-16',
+    [String] $DockerAgentVersion = '3131.vf2b_b_798b_ce99-1',
     [switch] $PushVersions = $false
 )
 
