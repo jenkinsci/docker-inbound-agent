@@ -23,7 +23,7 @@
 [CmdletBinding()]
 Param(
     $Cmd = '', # this must be specified explicitly
-    $Url = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_URL)) { throw ("Url is required") } else { '' } ),
+    $Url = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_URL) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_DIRECT_CONNECTION)) { throw ("Url is required") } else { '' } ),
     [Parameter(Position=0)]$Secret = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_SECRET)) { throw ("Secret is required") } else { '' } ),
     [Parameter(Position=1)]$Name = $( if([System.String]::IsNullOrWhiteSpace($Cmd) -and [System.String]::IsNullOrWhiteSpace($env:JENKINS_AGENT_NAME)) { throw ("Name is required") } else { '' } ),
     $Tunnel = '',
