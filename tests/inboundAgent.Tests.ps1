@@ -1,19 +1,19 @@
 Import-Module -DisableNameChecking -Force $PSScriptRoot/test_helpers.psm1
 
 $global:AGENT_IMAGE = Get-EnvOrDefault 'AGENT_IMAGE' ''
-$global:FOLDER = Get-EnvOrDefault 'FOLDER' ''
-$global:JAVA_MAJOR_VERSION = Get-EnvOrDefault 'JAVA_MAJOR_VERSION' ''
+$global:IMAGE_FOLDER = Get-EnvOrDefault 'IMAGE_FOLDER' ''
 $global:VERSION = Get-EnvOrDefault 'VERSION' ''
 
 # TODO: make this name unique for concurency
 $global:CONTAINERNAME = 'pester-jenkins-inbound-agent-{0}' -f $global:AGENT_IMAGE
 
-$REAL_FOLDER=Resolve-Path -Path "$PSScriptRoot/../${global:FOLDER}"
+# TODO: delete as not used?
+# $REAL_IMAGE_FOLDER=Resolve-Path -Path "$PSScriptRoot/../${global:IMAGE_FOLDER}"
 
 $items = $global:AGENT_IMAGE.Split("-")
 
 # Remove the 'jdk' prefix (3 first characters)
-$global:JDKMAJORVERSION = $items[0].Remove(0,3)
+$global:JAVA_MAJOR_VERSION = $items[0].Remove(0,3)
 $global:WINDOWSFLAVOR = $items[1]
 $global:WINDOWSVERSION = $items[2]
 
@@ -31,7 +31,7 @@ BuildNcatImage
 
 Describe "[$global:AGENT_IMAGE] build image" {
     It 'builds image' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg version=${global:VERSION} --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${global:AGENT_IMAGE} --file $global:FOLDER/Dockerfile ./"
+        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg VERSION=${global:VERSION} --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${global:AGENT_IMAGE} --file ${global:IMAGE_FOLDER}/Dockerfile.${global:WINDOWSFLAVOR} ${global:IMAGE_FOLDER}"
         $exitCode | Should -Be 0
     }
 }
@@ -122,7 +122,7 @@ Describe "[$global:AGENT_IMAGE] custom build args" {
     }
 
     It 'builds image with arguments' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg version=${ARG_TEST_VERSION} --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${customImageName} --file=${global:FOLDER}/Dockerfile ./"
+        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg VERSION=${ARG_TEST_VERSION} --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${customImageName} --file=${global:IMAGE_FOLDER}/Dockerfile.${global:WINDOWSFLAVOR} ${global:IMAGE_FOLDER}"
         $exitCode | Should -Be 0
 
         $exitCode, $stdout, $stderr = Run-Program 'docker' "run --detach --tty --name $global:CONTAINERNAME $customImageName -Cmd $global:CONTAINERSHELL"
@@ -165,7 +165,7 @@ Describe "[$global:AGENT_IMAGE] passing JVM options (slow test)" {
         Is-ContainerRunning $global:CONTAINERNAME | Should -BeTrue
         $exitCode, $stdout, $stderr = Run-Program 'docker' "logs $global:CONTAINERNAME"
         $exitCode | Should -Be 0
-        $stdout | Should -Match "OpenJDK Runtime Environment Temurin-${global:JDKMAJORVERSION}"
+        $stdout | Should -Match "OpenJDK Runtime Environment Temurin-${global:JAVA_MAJOR_VERSION}"
     }
 
     AfterAll {

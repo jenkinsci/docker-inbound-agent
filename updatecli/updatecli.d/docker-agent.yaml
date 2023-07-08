@@ -104,7 +104,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on JDK11 Alpine
     kind: dockerfile
     spec:
-      file: alpine/Dockerfile
+      file: linux/Dockerfile.alpine
       instruction:
         keyword: ARG
         matcher: version
@@ -113,7 +113,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on JDK11 Debian
     kind: dockerfile
     spec:
-      file: debian/Dockerfile
+      file: linux/Dockerfile.debian
       instruction:
         keyword: ARG
         matcher: version
@@ -122,7 +122,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on JDK11 Windows Nanoserver 1809
     kind: dockerfile
     spec:
-      file: windows/nanoserver-1809/Dockerfile
+      file: windows/Dockerfile.nanoserver
       instruction:
         keyword: ARG
         matcher: version
@@ -131,7 +131,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on JDK11 Windows Server 2019
     kind: dockerfile
     spec:
-      file: windows/windowsservercore-ltsc2019/Dockerfile
+      file: windows/windowsservercore
       instruction:
         keyword: ARG
         matcher: version
@@ -140,7 +140,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on JDK17 Alpine
     kind: dockerfile
     spec:
-      file: alpine/Dockerfile
+      file: linux/Dockerfile.alpine
       instruction:
         keyword: ARG
         matcher: version
@@ -149,7 +149,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on JDK17 Debian
     kind: dockerfile
     spec:
-      file: debian/Dockerfile
+      file: linux/Dockerfile.debian
       instruction:
         keyword: ARG
         matcher: version
@@ -158,7 +158,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on JDK17 Windows Nanoserver 1809
     kind: dockerfile
     spec:
-      file: windows/nanoserver-1809/Dockerfile
+      file: windows/windowsservercore
       instruction:
         keyword: ARG
         matcher: version
@@ -178,9 +178,9 @@ targets:
     spec:
       file: docker-bake.hcl
       matchpattern: >-
-        variable(.*)"PARENT_IMAGE_VERSION"(.*){(.*)(\r\n|\r|\n)(.*)default(.*)=(.*)
+        variable(.*)"DOCKER_AGENT_VERSION"(.*){(.*)(\r\n|\r|\n)(.*)default(.*)=(.*)
       replacepattern: >-
-        variable${1}"PARENT_IMAGE_VERSION"${2}{${3}${4}${5}default${6}= "{{ source "lastVersion" }}"
+        variable${1}"DOCKER_AGENT_VERSION"${2}{${3}${4}${5}default${6}= "{{ source "lastVersion" }}"
     scmid: default
   setWindowsMakePwshParentImage:
     name: Bump the parent image `jenkins/agent` version on the windows make.ps1 file

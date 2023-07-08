@@ -3,26 +3,28 @@ Param(
     [Parameter(Position=1)]
     [String] $Target = "build",
     [String] $Build = '',
-    [String] $RemotingVersion = '3131.vf2b_b_798b_ce99',
+    [String] $DockerAgentVersion = '3131.vf2b_b_798b_ce99-2',
     [String] $BuildNumber = '1',
-    [switch] $PushVersions = $false,
-    [switch] $DisableEnvProps = $false
+    [switch] $PushVersions = $false
+    # [switch] $PushVersions = $false,
+    # [switch] $DisableEnvProps = $false
 )
 
 $ErrorActionPreference = "Stop"
-$Repository = 'agent'
+$Repository = 'inbound-agent'
 $Organization = 'jenkins'
 
-if(!$DisableEnvProps) {
-    Get-Content env.props | ForEach-Object {
-        $items = $_.Split("=")
-        if($items.Length -eq 2) {
-            $name = $items[0].Trim()
-            $value = $items[1].Trim()
-            Set-Item -Path "env:$($name)" -Value $value
-        }
-    }
-}
+# TODO: not needed? Commented for now, env.props contains DOCKER_AGENT_VERSION in docker-agent
+# if(!$DisableEnvProps) {
+#     Get-Content env.props | ForEach-Object {
+#         $items = $_.Split("=")
+#         if($items.Length -eq 2) {
+#             $name = $items[0].Trim()
+#             $value = $items[1].Trim()
+#             Set-Item -Path "env:$($name)" -Value $value
+#         }
+#     }
+# }
 
 if(![String]::IsNullOrWhiteSpace($env:DOCKERHUB_REPO)) {
     $Repository = $env:DOCKERHUB_REPO
@@ -32,8 +34,8 @@ if(![String]::IsNullOrWhiteSpace($env:DOCKERHUB_ORGANISATION)) {
     $Organization = $env:DOCKERHUB_ORGANISATION
 }
 
-if(![String]::IsNullOrWhiteSpace($env:REMOTING_VERSION)) {
-    $RemotingVersion = $env:REMOTING_VERSION
+if(![String]::IsNullOrWhiteSpace($env:DOCKER_AGENT_VERSION)) {
+    $DockerAgentVersion = $env:DOCKER_AGENT_VERSION
 }
 
 # Check for required commands
@@ -61,7 +63,7 @@ Function Test-CommandExists {
 # this is the jdk version that will be used for the 'bare tag' images, e.g., jdk8-windowsservercore-1809 -> windowsserver-1809
 $defaultJdk = '11'
 $builds = @{}
-$env:REMOTING_VERSION = "$RemotingVersion"
+$env:DOCKER_AGENT_VERSION = "$DockerAgentVersion"
 $ProgressPreference = 'SilentlyContinue' # Disable Progress bar for faster downloads
 
 Test-CommandExists "docker"
@@ -74,16 +76,20 @@ $baseDockerBuildCmd = '{0} build --parallel --pull' -f $baseDockerCmd
 Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
     $image = $_
     $items = $image.Split("-")
+    # Remove the 'jdk' prefix (3 first characters)
     $jdkMajorVersion = $items[0].Remove(0,3)
     $windowsType = $items[1]
     $windowsVersion = $items[2]
-
+    
     $baseImage = "${windowsType}-${windowsVersion}"
-    $versionTag = "${RemotingVersion}-${BuildNumber}-${image}"
+    $versionTag = "${DockerAgentVersion}-${BuildNumber}-${image}"
     $tags = @( $image, $versionTag )
-    if($jdkMajorVersion -eq "$defaultJdk") {
-        $tags += $baseImage
-    }
+    # TODO: keep it here too? (from docker-agent)
+    # if($jdkMajorVersion -eq "$defaultJdk") {
+    #     $tags += $baseImage
+    # }
+
+    Write-Host "New Windows image to build ($image): ${Organization}/${Repository}:${baseImage} with JDK ${jdkMajorVersion}"
 
     $builds[$image] = @{
         'Tags' = $tags;
@@ -114,8 +120,11 @@ function Test-Image {
 
     $env:AGENT_IMAGE = $ImageName
     $env:IMAGE_FOLDER = Invoke-Expression "$baseDockerCmd config" 2>$null |  yq -r ".services.${ImageName}.build.context"
-    $env:VERSION = "$RemotingVersion-$BuildNumber"
+    # TODO: review build number removal (?)
+    # $env:VERSION = "$DockerAgentVersion-$BuildNumber"
+    $env:VERSION = $DockerAgentVersion
 
+    Write-Host "= TEST: image folder ${env:IMAGE_FOLDER}, version ${env:VERSION}"
 
     if(Test-Path ".\target\$ImageName") {
         Remove-Item -Recurse -Force ".\target\$ImageName"
@@ -180,6 +189,7 @@ if($target -eq "test") {
     }
 }
 
+# TODO: dry mode?
 function Publish-Image {
     param (
         [String] $Build,
@@ -207,9 +217,9 @@ if($target -eq "publish") {
             }
 
             if($PushVersions) {
-                $buildTag = "$RemotingVersion-$BuildNumber-$tag"
+                $buildTag = "$DockerAgentVersion-$BuildNumber-$tag"
                 if($tag -eq 'latest') {
-                    $buildTag = "$RemotingVersion-$BuildNumber"
+                    $buildTag = "$DockerAgentVersion-$BuildNumber"
                 }
                 Publish-Image "$Build" "${Organization}/${Repository}:${buildTag}"
                 if($lastExitCode -ne 0) {
@@ -226,9 +236,9 @@ if($target -eq "publish") {
                 }
 
                 if($PushVersions) {
-                    $buildTag = "$RemotingVersion-$BuildNumber-$tag"
+                    $buildTag = "$DockerAgentVersion-$BuildNumber-$tag"
                     if($tag -eq 'latest') {
-                        $buildTag = "$RemotingVersion-$BuildNumber"
+                        $buildTag = "$DockerAgentVersion-$BuildNumber"
                     }
                     Publish-Image "$b" "${Organization}/${Repository}:${buildTag}"
                     if($lastExitCode -ne 0) {

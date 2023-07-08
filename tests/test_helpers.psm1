@@ -114,7 +114,7 @@ function Run-Program($cmd, $params, $quiet=$false, $debug=$false) {
     $stderr = $proc.StandardError.ReadToEnd()
     $proc.WaitForExit()
     if(($proc.ExitCode -ne 0) -and (-not $quiet)) {
-        Write-Host "`n`nstdout:`n$stdout`n`nstderr:`n$stderr`n`n"
+        Write-Host "`n`nstdout:`n$stdout`n`nstderr:`n$stderr`n`n`cmd:`n$cmd`n`nparams:`n$params`n`n"
     }
 
     return $proc.ExitCode, $stdout, $stderr

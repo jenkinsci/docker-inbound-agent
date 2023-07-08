@@ -30,8 +30,8 @@ variable "IMAGE_TAG" {
   default = "3071.v7e9b_0dc08466-1"
 }
 
-#### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_AGENT_VERSION>-<base-os>)
-variable "PARENT_IMAGE_VERSION" {
+#### This is for the "parent" image version to use (jenkins/agent:<DOCKER_AGENT_VERSION>-<base-os>)
+variable "DOCKER_AGENT_VERSION" {
   default = "3131.vf2b_b_798b_ce99-4"
 }
 
@@ -48,15 +48,15 @@ variable "ON_TAG" {
 }
 
 target "alpine_jdk11" {
-  dockerfile = "alpine/Dockerfile"
-  context = "."
+  dockerfile = "Dockerfile.alpine"
+  context = "./linux/"
   args = {
     JAVA_MAJOR_VERSION = "11"
-    version = "${PARENT_IMAGE_VERSION}"
+    VERSION = "${DOCKER_AGENT_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine": "",
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk11": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${DOCKER_AGENT_VERSION}-alpine": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${DOCKER_AGENT_VERSION}-alpine-jdk11": "",
     "${REGISTRY}/${JENKINS_REPO}:alpine",
     "${REGISTRY}/${JENKINS_REPO}:alpine-jdk11",
     "${REGISTRY}/${JENKINS_REPO}:latest-alpine",
@@ -66,14 +66,14 @@ target "alpine_jdk11" {
 }
 
 target "alpine_jdk17" {
-  dockerfile = "alpine/Dockerfile"
-  context = "."
+  dockerfile = "Dockerfile.alpine"
+  context = "./linux/"
   args = {
     JAVA_MAJOR_VERSION = "17"
-    version = "${PARENT_IMAGE_VERSION}"
+    VERSION = "${DOCKER_AGENT_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk17": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${DOCKER_AGENT_VERSION}-alpine-jdk17": "",
     "${REGISTRY}/${JENKINS_REPO}:alpine-jdk17",
     "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk17",
   ]
@@ -81,15 +81,15 @@ target "alpine_jdk17" {
 }
 
 target "debian_jdk11" {
-  dockerfile = "debian/Dockerfile"
-  context = "."
+  dockerfile = "Dockerfile.debian"
+  context = "./linux/"
   args = {
     JAVA_MAJOR_VERSION = "11"
-    version = "${PARENT_IMAGE_VERSION}"
+    VERSION = "${DOCKER_AGENT_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}": "",
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk11": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${DOCKER_AGENT_VERSION}": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${DOCKER_AGENT_VERSION}-jdk11": "",
     "${REGISTRY}/${JENKINS_REPO}:jdk11",
     "${REGISTRY}/${JENKINS_REPO}:latest",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk11",
@@ -98,14 +98,14 @@ target "debian_jdk11" {
 }
 
 target "debian_jdk17" {
-  dockerfile = "debian/Dockerfile"
-  context = "."
+  dockerfile = "Dockerfile.debian"
+  context = "./linux/"
   args = {
     JAVA_MAJOR_VERSION = "17"
-    version = "${PARENT_IMAGE_VERSION}"
+    VERSION = "${DOCKER_AGENT_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk17": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${DOCKER_AGENT_VERSION}-jdk17": "",
     "${REGISTRY}/${JENKINS_REPO}:jdk17",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk17",
   ]
