@@ -1,0 +1,33 @@
+services:
+  jdk11-nanoserver-1809:
+    image: jdk11-nanoserver-1809
+    build:
+      context: ./windows/nanoserver-1809/
+      args:
+        JAVA_HOME: "C:/openjdk-11"
+        JAVA_VERSION: "11.0.19_7"
+        VERSION: ${REMOTING_VERSION}
+  jdk17-nanoserver-1809:
+    image: jdk17-nanoserver-1809
+    build:
+      context: ./windows/nanoserver-1809/
+      args:
+        JAVA_HOME: "C:/openjdk-17"
+        JAVA_VERSION: "17.0.7_7"
+        VERSION: ${REMOTING_VERSION}
+  jdk11-windowsservercore-ltsc2019:
+    image: jdk11-windowsservercore-ltsc2019
+    build:
+      context: ./windows/windowsservercore-ltsc2019/
+      args:
+        JAVA_HOME: "C:/openjdk-11"
+        JAVA_VERSION: "11.0.19_7"
+        VERSION: ${REMOTING_VERSION}
+  jdk17-windowsservercore-ltsc2019:
+    image: jdk17-windowsservercore-ltsc2019
+    build:
+      context: ./windows/windowsservercore-ltsc2019/
+      args:
+        JAVA_HOME: "C:/openjdk-17"
+        JAVA_VERSION: "17.0.7_7"
+        VERSION: ${REMOTING_VERSION}

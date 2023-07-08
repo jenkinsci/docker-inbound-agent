@@ -3,115 +3,88 @@ pipeline {
 
     options {
         buildDiscarder(logRotator(daysToKeepStr: '10'))
-        timestamps()
     }
 
     stages {
-        stage('Build') {
-            parallel {
-                stage('Windows') {
-                    options {
-                        timeout(time: 60, unit: 'MINUTES')
-                    }
-                    environment {
-                        DOCKERHUB_ORGANISATION = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}"
-                    }
-                    stages {
-                        stage('Build and Test') {
-                            // This stage is the "CI" and should be run on all code changes triggered by a code change
-                            when {
-                                not { buildingTag() }
-                            }
-                            steps {
-                                script {
-                                    def parallelBuilds = [:]
-                                    def images = ['jdk11-windowsservercore-ltsc2019', 'jdk11-nanoserver-1809', 'jdk17-windowsservercore-ltsc2019', 'jdk17-nanoserver-1809']
-                                    for (unboundImage in images) {
-                                        def image = unboundImage // Bind variable before the closure
-                                        // Prepare a map of the steps to run in parallel
-                                        parallelBuilds[image] = {
-                                            // Allocate a node for each image to avoid filling disk
-                                            node('docker-windows') {
-                                                checkout scm
-                                                powershell '& ./make.ps1 -Build ' + image + ' test'
-                                                junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/**/junit-results.xml')
-                                            }
-                                        }
-                                    }
-                                    // Peform the parallel execution
-                                    parallel parallelBuilds
-                                }
-                            }
-                        }
-                        stage('Deploy to DockerHub') {
-                            agent {
-                                label 'docker-windows'
-                            }
-                            // This stage is the "CD" and should only be run when a tag triggered the build
-                            when {
-                                buildingTag()
-                            }
-                            steps {
-                                script {
-                                    // This function is defined in the jenkins-infra/pipeline-library
-                                    infra.withDockerCredentials {
-                                        powershell '& ./make.ps1 -PushVersions -VersionTag $env:TAG_NAME publish'
-                                    }
-                                }
-                            }
-                        }
+        stage('docker-agent') {
+            failFast true
+            matrix {
+                axes {
+                    axis {
+                        name 'AGENT_TYPE'
+                        values 'linux', 'windows-2019'
                     }
                 }
-                stage('Linux') {
-                    agent {
-                        label "docker&&linux"
-                    }
-                    options {
-                        timeout(time: 30, unit: 'MINUTES')
-                    }
-                    environment {
-                        JENKINS_REPO = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}/inbound-agent"
-                    }
-                    stages {
-                        stage('Prepare Docker') {
-                            steps {
-                                sh '''
-                                docker buildx create --use
-                                docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-                                '''
-                            }
+                stages {
+                    stage('Main') {
+                        agent {
+                            label env.AGENT_TYPE
                         }
-                        stage('Build and Test') {
-                            // This stage is the "CI" and should be run on all code changes triggered by a code change
-                            when {
-                                not { buildingTag() }
-                            }
-                            steps {
-                                sh 'make build'
-                                sh 'make test'
-                                // If the tests are passing for Linux AMD64, then we can build all the CPU architectures
-                                sh 'docker buildx bake --file docker-bake.hcl linux'
-                            }
-                            post {
-                                always {
-                                    junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/*.xml')
+                        options {
+                            timeout(time: 30, unit: 'MINUTES')
+                        }
+                        environment {
+                            DOCKERHUB_ORGANISATION = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}"
+                        }
+                        stages {
+                            stage('Prepare Docker') {
+                                when {
+                                    environment name: 'AGENT_TYPE', value: 'linux'
+                                }
+                                steps {
+                                    sh '''
+                                    docker buildx create --use
+                                    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+                                    '''
                                 }
                             }
-                        }
-                        stage('Deploy to DockerHub') {
-                            // This stage is the "CD" and should only be run when a tag triggered the build
-                            when {
-                                buildingTag()
+                            stage('Build and Test') {
+                                // This stage is the "CI" and should be run on all code changes triggered by a code change
+                                when {
+                                    not { buildingTag() }
+                                }
+                                steps {
+                                    script {
+                                        if(isUnix()) {
+                                            sh './build.sh'
+                                            sh './build.sh test'
+                                            // If the tests are passing for Linux AMD64, then we can build all the CPU architectures
+                                            sh 'docker buildx bake --file docker-bake.hcl linux'
+                                        } else {
+                                            powershell "& ./build.ps1 test"
+                                        }
+                                    }
+                                }
+                                post {
+                                    always {
+                                        junit(allowEmptyResults: true, keepLongStdio: true, testResults: 'target/**/junit-results.xml')
+                                    }
+                                }
                             }
-                            steps {
-                                script {
-                                    // This function is defined in the jenkins-infra/pipeline-library
-                                    infra.withDockerCredentials {
-                                        sh '''
-                                        export IMAGE_TAG="${TAG_NAME}"
-                                        export ON_TAG=true
-                                        docker buildx bake --push --file docker-bake.hcl linux
-                                        '''
+                            stage('Deploy to DockerHub') {
+                                // This stage is the "CD" and should only be run when a tag triggered the build
+                                when {
+                                    buildingTag()
+                                }
+                                steps {
+                                    script {
+                                        def tagItems = env.TAG_NAME.split('-')
+                                        if(tagItems.length == 2) {
+                                            def remotingVersion = tagItems[0]
+                                            def buildNumber = tagItems[1]
+                                            // This function is defined in the jenkins-infra/pipeline-library
+                                            infra.withDockerCredentials {
+                                                if (isUnix()) {
+                                                    sh """
+                                                    docker buildx create --use
+                                                    docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+                                                    ./build.sh -r ${remotingVersion} -b ${buildNumber} -d publish
+                                                    """
+                                                } else {
+                                                    powershell "& ./build.ps1 -PushVersions -RemotingVersion $remotingVersion -BuildNumber $buildNumber -DisableEnvProps publish"
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
