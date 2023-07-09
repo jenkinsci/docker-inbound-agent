@@ -3,16 +3,17 @@ Param(
     [Parameter(Position=1)]
     [String] $Target = "build",
     [String] $Build = '',
-    [String] $DockerAgentVersion = '3131.vf2b_b_798b_ce99-2',
+    [String] $DockerAgentVersion = '3131.vf2b_b_798b_ce99-4',
     [String] $BuildNumber = '1',
     [switch] $PushVersions = $false
     # [switch] $PushVersions = $false,
     # [switch] $DisableEnvProps = $false
 )
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference ='Stop'
 $Repository = 'inbound-agent'
 $Organization = 'jenkins'
+$AgentType = 'windows-2019'
 
 # TODO: not needed? Commented for now, env.props contains DOCKER_AGENT_VERSION in docker-agent
 # if(!$DisableEnvProps) {
@@ -38,6 +39,10 @@ if(![String]::IsNullOrWhiteSpace($env:DOCKER_AGENT_VERSION)) {
     $DockerAgentVersion = $env:DOCKER_AGENT_VERSION
 }
 
+if(![String]::IsNullOrWhiteSpace($env:AGENT_TYPE)) {
+    $AgentType = $env:AGENT_TYPE
+}
+
 # Check for required commands
 Function Test-CommandExists {
     # From https://devblogs.microsoft.com/scripting/use-a-powershell-function-to-see-if-a-command-exists/
@@ -60,10 +65,19 @@ Function Test-CommandExists {
     }
 }
 
-# this is the jdk version that will be used for the 'bare tag' images, e.g., jdk8-windowsservercore-1809 -> windowsserver-1809
-$defaultJdk = '11'
+# # this is the jdk version that will be used for the 'bare tag' images, e.g., jdk8-windowsservercore-1809 -> windowsserver-1809
+# $defaultJdk = '11'
 $builds = @{}
 $env:DOCKER_AGENT_VERSION = "$DockerAgentVersion"
+$env:WINDOWS_VERSION_NAME = $AgentType.replace('windows-', 'ltsc')
+$env:NANOSERVER_VERSION_NAME = $env:WINDOWS_VERSION_NAME
+$env:WINDOWS_VERSION_TAG = $env:WINDOWS_VERSION_NAME
+$env:NANOSERVER_VERSION_TAG = $env:WINDOWS_VERSION_NAME
+# We need to keep the `jdkN-nanoserver-1809` images for now, cf https://github.com/jenkinsci/docker-agent/issues/451
+if ($AgentType -eq 'windows-2019') {
+    $env:NANOSERVER_VERSION_TAG = 1809
+    $env:NANOSERVER_VERSION_NAME = 1809
+}
 $ProgressPreference = 'SilentlyContinue' # Disable Progress bar for faster downloads
 
 Test-CommandExists "docker"
@@ -74,7 +88,9 @@ $baseDockerCmd = 'docker-compose --file=build-windows.yaml'
 $baseDockerBuildCmd = '{0} build --parallel --pull' -f $baseDockerCmd
 
 Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
-    $image = $_
+    $image = '{0}-{1}' -f $_, $env:WINDOWS_VERSION_NAME
+    # Special case for nanoserver-1809 images
+    $image = $image.replace('nanoserver-ltsc2019', 'nanoserver-1809')
     $items = $image.Split("-")
     # Remove the 'jdk' prefix (3 first characters)
     $jdkMajorVersion = $items[0].Remove(0,3)
@@ -119,7 +135,8 @@ function Test-Image {
     Write-Host "= TEST: Testing image ${ImageName}:"
 
     $env:AGENT_IMAGE = $ImageName
-    $env:IMAGE_FOLDER = Invoke-Expression "$baseDockerCmd config" 2>$null |  yq -r ".services.${ImageName}.build.context"
+    $serviceName = $ImageName.SubString(0, $ImageName.LastIndexOf('-'))
+    $env:IMAGE_FOLDER = Invoke-Expression "$baseDockerCmd config" 2>$null |  yq -r ".services.${serviceName}.build.context"
     # TODO: review build number removal (?)
     # $env:VERSION = "$DockerAgentVersion-$BuildNumber"
     $env:VERSION = $DockerAgentVersion
@@ -175,6 +192,7 @@ if($target -eq "test") {
     if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
         Test-Image $Build
     } else {
+        Write-Host "= TEST: Testing all images"
         foreach($image in $builds.Keys) {
             Test-Image $image
         }

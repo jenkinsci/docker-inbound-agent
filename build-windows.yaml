@@ -1,29 +1,33 @@
 services:
-  jdk11-nanoserver-1809:
-    image: jdk11-nanoserver-1809
+  jdk11-nanoserver:
+    image: jdk11-nanoserver-${NANOSERVER_VERSION_NAME}
     build:
       context: ./windows/
       dockerfile: Dockerfile.nanoserver
       args:
         VERSION: ${DOCKER_AGENT_VERSION}
-  jdk17-nanoserver-1809:
-    image: jdk17-nanoserver-1809
+        WINDOWS_VERSION_TAG: ${NANOSERVER_VERSION_TAG}
+  jdk17-nanoserver:
+    image: jdk17-nanoserver-${NANOSERVER_VERSION_NAME}
     build:
       context: ./windows/
       dockerfile: Dockerfile.nanoserver
       args:
         VERSION: ${DOCKER_AGENT_VERSION}
-  jdk11-windowsservercore-ltsc2019:
-    image: jdk11-windowsservercore-ltsc2019
+        WINDOWS_VERSION_TAG: ${NANOSERVER_VERSION_TAG}
+  jdk11-windowsservercore:
+    image: jdk11-windowsservercore-${WINDOWS_VERSION_NAME}
     build:
       context: ./windows/
       dockerfile: Dockerfile.windowsservercore
       args:
         VERSION: ${DOCKER_AGENT_VERSION}
-  jdk17-windowsservercore-ltsc2019:
-    image: jdk17-windowsservercore-ltsc2019
+        WINDOWS_VERSION_TAG: ${WINDOWS_VERSION_TAG}
+  jdk17-windowsservercore:
+    image: jdk17-windowsservercore-${WINDOWS_VERSION_NAME}
     build:
       context: ./windows/
       dockerfile: Dockerfile.windowsservercore
       args:
         VERSION: ${DOCKER_AGENT_VERSION}
+        WINDOWS_VERSION_TAG: ${WINDOWS_VERSION_TAG}

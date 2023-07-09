@@ -3,12 +3,10 @@ Import-Module -DisableNameChecking -Force $PSScriptRoot/test_helpers.psm1
 $global:AGENT_IMAGE = Get-EnvOrDefault 'AGENT_IMAGE' ''
 $global:IMAGE_FOLDER = Get-EnvOrDefault 'IMAGE_FOLDER' ''
 $global:VERSION = Get-EnvOrDefault 'VERSION' ''
+$global:WINDOWS_VERSION_TAG = Get-EnvOrDefault 'WINDOWS_VERSION_TAG' ''
 
 # TODO: make this name unique for concurency
 $global:CONTAINERNAME = 'pester-jenkins-inbound-agent-{0}' -f $global:AGENT_IMAGE
-
-# TODO: delete as not used?
-# $REAL_IMAGE_FOLDER=Resolve-Path -Path "$PSScriptRoot/../${global:IMAGE_FOLDER}"
 
 $items = $global:AGENT_IMAGE.Split("-")
 
@@ -20,6 +18,10 @@ $global:WINDOWSVERSION = $items[2]
 $global:CONTAINERSHELL="powershell.exe"
 if($global:WINDOWSFLAVOR -eq 'nanoserver') {
     $global:CONTAINERSHELL = "pwsh.exe"
+    # Special case for nanoserver-1809
+    if($global:WINDOWSVERSION -eq '1809') {
+        $global:WINDOWS_VERSION_TAG = '1809'
+    }
 }
 
 
@@ -27,11 +29,11 @@ Cleanup($global:CONTAINERNAME)
 Cleanup("nmap")
 CleanupNetwork("jnlp-network")
 
-BuildNcatImage
+BuildNcatImage($global:WINDOWS_VERSION_TAG)
 
 Describe "[$global:AGENT_IMAGE] build image" {
     It 'builds image' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg VERSION=${global:VERSION} --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${global:AGENT_IMAGE} --file ${global:IMAGE_FOLDER}/Dockerfile.${global:WINDOWSFLAVOR} ${global:IMAGE_FOLDER}"
+        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg VERSION=${global:VERSION} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWS_VERSION_TAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${global:AGENT_IMAGE} --file ${global:IMAGE_FOLDER}/Dockerfile.${global:WINDOWSFLAVOR} ${global:IMAGE_FOLDER}"
         $exitCode | Should -Be 0
     }
 }
@@ -115,14 +117,14 @@ Describe "[$global:AGENT_IMAGE] custom build args" {
         Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
         # Old version used to test overriding the build arguments.
         # This old version must have the same tag suffixes as the current 4 windows images (`-jdk11-nanoserver` etc.)
-        $TEST_VERSION = "3046.v38db_38a_b_7a_86"
-        $DOCKER_AGENT_VERSION_SUFFIX = "1"
+        $TEST_VERSION = "3131.vf2b_b_798b_ce99"
+        $DOCKER_AGENT_VERSION_SUFFIX = "4"
         $ARG_TEST_VERSION = "${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
         $customImageName = "custom-${global:AGENT_IMAGE}"
     }
 
     It 'builds image with arguments' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg VERSION=${ARG_TEST_VERSION} --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${customImageName} --file=${global:IMAGE_FOLDER}/Dockerfile.${global:WINDOWSFLAVOR} ${global:IMAGE_FOLDER}"
+        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg VERSION=${ARG_TEST_VERSION} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWS_VERSION_TAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${customImageName} --file=${global:IMAGE_FOLDER}/Dockerfile.${global:WINDOWSFLAVOR} ${global:IMAGE_FOLDER}"
         $exitCode | Should -Be 0
 
         $exitCode, $stdout, $stderr = Run-Program 'docker' "run --detach --tty --name $global:CONTAINERNAME $customImageName -Cmd $global:CONTAINERSHELL"

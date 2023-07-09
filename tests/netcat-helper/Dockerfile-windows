@@ -22,7 +22,8 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-FROM mcr.microsoft.com/windows/servercore:1809
+ARG WINDOWS_VERSION_TAG=1809
+FROM mcr.microsoft.com/windows/servercore:"${WINDOWS_VERSION_TAG}"
 
 SHELL ["powershell.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 

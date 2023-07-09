@@ -120,12 +120,12 @@ function Run-Program($cmd, $params, $quiet=$false, $debug=$false) {
     return $proc.ExitCode, $stdout, $stderr
 }
 
-function BuildNcatImage() {
-    Write-Host "Building nmap image for testing"
+function BuildNcatImage($windowsVersionTag) {
+    Write-Host "Building nmap image (Windows version '${windowsVersionTag}') for testing"
     $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "inspect --type=image nmap" $true
     if($exitCode -ne 0) {
         Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
-        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build -t nmap -f ./tests/netcat-helper/Dockerfile-windows ./tests/netcat-helper"
+        $exitCode, $stdout, $stderr = Run-Program 'docker.exe' "build -t nmap --build-arg `"WINDOWS_VERSION_TAG=${windowsVersionTag}`" -f ./tests/netcat-helper/Dockerfile-windows ./tests/netcat-helper"
         $exitCode | Should -Be 0
         Pop-Location -StackName 'agent'
     }
