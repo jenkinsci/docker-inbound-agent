@@ -5,7 +5,7 @@ services:
       context: ./
       dockerfile: ./windows/nanoserver/Dockerfile
       args:
-        VERSION: ${DOCKER_AGENT_VERSION}
+        version: ${PARENT_IMAGE_VERSION}
         WINDOWS_VERSION_TAG: ${NANOSERVER_VERSION_TAG}
   jdk17-nanoserver:
     image: jdk17-nanoserver-${NANOSERVER_VERSION_NAME}
@@ -13,7 +13,7 @@ services:
       context: ./
       dockerfile: ./windows/nanoserver/Dockerfile
       args:
-        VERSION: ${DOCKER_AGENT_VERSION}
+        version: ${PARENT_IMAGE_VERSION}
         WINDOWS_VERSION_TAG: ${NANOSERVER_VERSION_TAG}
   jdk11-windowsservercore:
     image: jdk11-windowsservercore-${WINDOWS_VERSION_NAME}
@@ -21,7 +21,7 @@ services:
       context: ./
       dockerfile: ./windows/windowsservercore/Dockerfile
       args:
-        VERSION: ${DOCKER_AGENT_VERSION}
+        version: ${PARENT_IMAGE_VERSION}
         WINDOWS_VERSION_TAG: ${WINDOWS_VERSION_TAG}
   jdk17-windowsservercore:
     image: jdk17-windowsservercore-${WINDOWS_VERSION_NAME}
@@ -29,5 +29,5 @@ services:
       context: ./
       dockerfile: ./windows/windowsservercore/Dockerfile
       args:
-        VERSION: ${DOCKER_AGENT_VERSION}
+        version: ${PARENT_IMAGE_VERSION}
         WINDOWS_VERSION_TAG: ${WINDOWS_VERSION_TAG}

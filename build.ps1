@@ -3,7 +3,7 @@ Param(
     [Parameter(Position=1)]
     [String] $Target = "build",
     [String] $Build = '',
-    [String] $DockerAgentVersion = '3131.vf2b_b_798b_ce99-4',
+    [String] $ParentImageVersion = '3131.vf2b_b_798b_ce99-4',
     [String] $BuildNumber = '1',
     [switch] $PushVersions = $false
     # [switch] $PushVersions = $false,
@@ -15,7 +15,7 @@ $Repository = 'inbound-agent'
 $Organization = 'jenkins'
 $AgentType = 'windows-2019'
 
-# TODO: not needed? Commented for now, env.props contains DOCKER_AGENT_VERSION in docker-agent
+# TODO: not needed? Commented for now, env.props contains PARENT_IMAGE_VERSION in docker-agent
 # if(!$DisableEnvProps) {
 #     Get-Content env.props | ForEach-Object {
 #         $items = $_.Split("=")
@@ -35,8 +35,8 @@ if(![String]::IsNullOrWhiteSpace($env:DOCKERHUB_ORGANISATION)) {
     $Organization = $env:DOCKERHUB_ORGANISATION
 }
 
-if(![String]::IsNullOrWhiteSpace($env:DOCKER_AGENT_VERSION)) {
-    $DockerAgentVersion = $env:DOCKER_AGENT_VERSION
+if(![String]::IsNullOrWhiteSpace($env:PARENT_IMAGE_VERSION)) {
+    $ParentImageVersion = $env:PARENT_IMAGE_VERSION
 }
 
 if(![String]::IsNullOrWhiteSpace($env:AGENT_TYPE)) {
@@ -68,7 +68,7 @@ Function Test-CommandExists {
 # # this is the jdk version that will be used for the 'bare tag' images, e.g., jdk8-windowsservercore-1809 -> windowsserver-1809
 # $defaultJdk = '11'
 $builds = @{}
-$env:DOCKER_AGENT_VERSION = "$DockerAgentVersion"
+$env:PARENT_IMAGE_VERSION = "$ParentImageVersion"
 $env:WINDOWS_VERSION_NAME = $AgentType.replace('windows-', 'ltsc')
 $env:NANOSERVER_VERSION_NAME = $env:WINDOWS_VERSION_NAME
 $env:WINDOWS_VERSION_TAG = $env:WINDOWS_VERSION_NAME
@@ -98,7 +98,7 @@ Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
     $windowsVersion = $items[2]
     
     $baseImage = "${windowsType}-${windowsVersion}"
-    $versionTag = "${DockerAgentVersion}-${BuildNumber}-${image}"
+    $versionTag = "${ParentImageVersion}-${BuildNumber}-${image}"
     $tags = @( $image, $versionTag )
     # TODO: keep it here too? (from docker-agent)
     # if($jdkMajorVersion -eq "$defaultJdk") {
@@ -138,8 +138,8 @@ function Test-Image {
     $serviceName = $ImageName.SubString(0, $ImageName.LastIndexOf('-'))
     $env:BUILD_CONTEXT = Invoke-Expression "$baseDockerCmd config" 2>$null |  yq -r ".services.${serviceName}.build.context"
     # TODO: review build number removal (?)
-    # $env:VERSION = "$DockerAgentVersion-$BuildNumber"
-    $env:VERSION = $DockerAgentVersion
+    # $env:VERSION = "$ParentImageVersion-$BuildNumber"
+    $env:VERSION = $ParentImageVersion
 
     Write-Host "= TEST: image folder ${env:BUILD_CONTEXT}, version ${env:VERSION}"
 
@@ -235,9 +235,9 @@ if($target -eq "publish") {
             }
 
             if($PushVersions) {
-                $buildTag = "$DockerAgentVersion-$BuildNumber-$tag"
+                $buildTag = "$ParentImageVersion-$BuildNumber-$tag"
                 if($tag -eq 'latest') {
-                    $buildTag = "$DockerAgentVersion-$BuildNumber"
+                    $buildTag = "$ParentImageVersion-$BuildNumber"
                 }
                 Publish-Image "$Build" "${Organization}/${Repository}:${buildTag}"
                 if($lastExitCode -ne 0) {
@@ -254,9 +254,9 @@ if($target -eq "publish") {
                 }
 
                 if($PushVersions) {
-                    $buildTag = "$DockerAgentVersion-$BuildNumber-$tag"
+                    $buildTag = "$ParentImageVersion-$BuildNumber-$tag"
                     if($tag -eq 'latest') {
-                        $buildTag = "$DockerAgentVersion-$BuildNumber"
+                        $buildTag = "$ParentImageVersion-$BuildNumber"
                     }
                     Publish-Image "$b" "${Organization}/${Repository}:${buildTag}"
                     if($lastExitCode -ne 0) {
