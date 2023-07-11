@@ -142,9 +142,9 @@ targets:
     spec:
       file: docker-bake.hcl
       matchpattern: >-
-        variable(.*)"DOCKER_AGENT_VERSION"(.*){(.*)(\r\n|\r|\n)(.*)default(.*)=(.*)
+        variable(.*)"PARENT_IMAGE_VERSION"(.*){(.*)(\r\n|\r|\n)(.*)default(.*)=(.*)
       replacepattern: >-
-        variable${1}"DOCKER_AGENT_VERSION"${2}{${3}${4}${5}default${6}= "{{ source "lastVersion" }}"
+        variable${1}"PARENT_IMAGE_VERSION"${2}{${3}${4}${5}default${6}= "{{ source "lastVersion" }}"
     scmid: default
   setWindowsBuildPwshParentImage:
     name: Bump the parent image `jenkins/agent` version on the Windows build.ps1 powershell script
