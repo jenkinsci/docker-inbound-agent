@@ -136,12 +136,12 @@ function Test-Image {
 
     $env:AGENT_IMAGE = $ImageName
     $serviceName = $ImageName.SubString(0, $ImageName.LastIndexOf('-'))
-    $env:IMAGE_FOLDER = Invoke-Expression "$baseDockerCmd config" 2>$null |  yq -r ".services.${serviceName}.build.context"
+    $env:BUILD_CONTEXT = Invoke-Expression "$baseDockerCmd config" 2>$null |  yq -r ".services.${serviceName}.build.context"
     # TODO: review build number removal (?)
     # $env:VERSION = "$DockerAgentVersion-$BuildNumber"
     $env:VERSION = $DockerAgentVersion
 
-    Write-Host "= TEST: image folder ${env:IMAGE_FOLDER}, version ${env:VERSION}"
+    Write-Host "= TEST: image folder ${env:BUILD_CONTEXT}, version ${env:VERSION}"
 
     if(Test-Path ".\target\$ImageName") {
         Remove-Item -Recurse -Force ".\target\$ImageName"
@@ -156,7 +156,7 @@ function Test-Image {
         Write-Host "There were $($TestResults.PassedCount) passed tests out of $($TestResults.TotalCount) in $ImageName"
     }
     Remove-Item env:\AGENT_IMAGE
-    Remove-Item env:\IMAGE_FOLDER
+    Remove-Item env:\BUILD_CONTEXT
     Remove-Item env:\VERSION
 }
 

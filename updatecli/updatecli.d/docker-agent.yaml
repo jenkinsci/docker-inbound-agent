@@ -104,7 +104,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on Alpine
     kind: dockerfile
     spec:
-      file: linux/Dockerfile.alpine
+      file: alpine/Dockerfile
       instruction:
         keyword: ARG
         matcher: version
@@ -113,7 +113,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on Debian
     kind: dockerfile
     spec:
-      file: linux/Dockerfile.debian
+      file: debian/Dockerfile
       instruction:
         keyword: ARG
         matcher: version
@@ -122,7 +122,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on Windows Nanoserver
     kind: dockerfile
     spec:
-      file: windows/Dockerfile.nanoserver
+      file: windows/nanoserver/Dockerfile
       instruction:
         keyword: ARG
         matcher: version
@@ -131,7 +131,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on Windows Server Core
     kind: dockerfile
     spec:
-      file: windows/windowsservercore
+      file: windows/windowsservercore/Dockerfile
       instruction:
         keyword: ARG
         matcher: version
