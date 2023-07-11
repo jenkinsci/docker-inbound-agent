@@ -48,8 +48,8 @@ variable "ON_TAG" {
 }
 
 target "alpine_jdk11" {
-  dockerfile = "./alpine/Dockerfile"
-  context = "./"
+  dockerfile = "alpine/Dockerfile"
+  context = "."
   args = {
     JAVA_MAJOR_VERSION = "11"
     VERSION = "${DOCKER_AGENT_VERSION}"
@@ -66,8 +66,8 @@ target "alpine_jdk11" {
 }
 
 target "alpine_jdk17" {
-  dockerfile = "./alpine/Dockerfile"
-  context = "./"
+  dockerfile = "alpine/Dockerfile"
+  context = "."
   args = {
     JAVA_MAJOR_VERSION = "17"
     VERSION = "${DOCKER_AGENT_VERSION}"
@@ -81,8 +81,8 @@ target "alpine_jdk17" {
 }
 
 target "debian_jdk11" {
-  dockerfile = "./debian/Dockerfile"
-  context = "./"
+  dockerfile = "debian/Dockerfile"
+  context = "."
   args = {
     JAVA_MAJOR_VERSION = "11"
     VERSION = "${DOCKER_AGENT_VERSION}"
@@ -98,8 +98,8 @@ target "debian_jdk11" {
 }
 
 target "debian_jdk17" {
-  dockerfile = "./debian/Dockerfile"
-  context = "./"
+  dockerfile = "debian/Dockerfile"
+  context = "."
   args = {
     JAVA_MAJOR_VERSION = "17"
     VERSION = "${DOCKER_AGENT_VERSION}"
