@@ -6,26 +6,12 @@ Param(
     [String] $ParentImageVersion = '3131.vf2b_b_798b_ce99-4',
     [String] $BuildNumber = '1',
     [switch] $PushVersions = $false
-    # [switch] $PushVersions = $false,
-    # [switch] $DisableEnvProps = $false
 )
 
 $ErrorActionPreference ='Stop'
 $Repository = 'inbound-agent'
 $Organization = 'jenkins'
 $AgentType = 'windows-2019'
-
-# TODO: not needed? Commented for now, env.props contains PARENT_IMAGE_VERSION in docker-agent
-# if(!$DisableEnvProps) {
-#     Get-Content env.props | ForEach-Object {
-#         $items = $_.Split("=")
-#         if($items.Length -eq 2) {
-#             $name = $items[0].Trim()
-#             $value = $items[1].Trim()
-#             Set-Item -Path "env:$($name)" -Value $value
-#         }
-#     }
-# }
 
 if(![String]::IsNullOrWhiteSpace($env:DOCKERHUB_REPO)) {
     $Repository = $env:DOCKERHUB_REPO
@@ -66,7 +52,7 @@ Function Test-CommandExists {
 }
 
 # # this is the jdk version that will be used for the 'bare tag' images, e.g., jdk8-windowsservercore-1809 -> windowsserver-1809
-# $defaultJdk = '11'
+$defaultJdk = '11'
 $builds = @{}
 $env:PARENT_IMAGE_VERSION = "$ParentImageVersion"
 $env:WINDOWS_VERSION_NAME = $AgentType.replace('windows-', 'ltsc')
@@ -100,10 +86,9 @@ Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
     $baseImage = "${windowsType}-${windowsVersion}"
     $versionTag = "${ParentImageVersion}-${BuildNumber}-${image}"
     $tags = @( $image, $versionTag )
-    # TODO: keep it here too? (from docker-agent)
-    # if($jdkMajorVersion -eq "$defaultJdk") {
-    #     $tags += $baseImage
-    # }
+    if($jdkMajorVersion -eq "$defaultJdk") {
+        $tags += $baseImage
+    }
 
     Write-Host "New Windows image to build ($image): ${Organization}/${Repository}:${baseImage} with JDK ${jdkMajorVersion}"
 
@@ -137,8 +122,6 @@ function Test-Image {
     $env:AGENT_IMAGE = $ImageName
     $serviceName = $ImageName.SubString(0, $ImageName.LastIndexOf('-'))
     $env:BUILD_CONTEXT = Invoke-Expression "$baseDockerCmd config" 2>$null |  yq -r ".services.${serviceName}.build.context"
-    # TODO: review build number removal (?)
-    # $env:version = "$ParentImageVersion-$BuildNumber"
     $env:version = $ParentImageVersion
 
     Write-Host "= TEST: image folder ${env:BUILD_CONTEXT}, version ${env:version}"
