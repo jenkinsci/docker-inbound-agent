@@ -52,7 +52,7 @@ target "alpine_jdk11" {
   context = "."
   args = {
     JAVA_MAJOR_VERSION = "11"
-    VERSION = "${PARENT_IMAGE_VERSION}"
+    version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine": "",
@@ -70,7 +70,7 @@ target "alpine_jdk17" {
   context = "."
   args = {
     JAVA_MAJOR_VERSION = "17"
-    VERSION = "${PARENT_IMAGE_VERSION}"
+    version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk17": "",
@@ -85,7 +85,7 @@ target "debian_jdk11" {
   context = "."
   args = {
     JAVA_MAJOR_VERSION = "11"
-    VERSION = "${PARENT_IMAGE_VERSION}"
+    version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}": "",
@@ -102,7 +102,7 @@ target "debian_jdk17" {
   context = "."
   args = {
     JAVA_MAJOR_VERSION = "17"
-    VERSION = "${PARENT_IMAGE_VERSION}"
+    version = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk17": "",

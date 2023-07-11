@@ -138,10 +138,10 @@ function Test-Image {
     $serviceName = $ImageName.SubString(0, $ImageName.LastIndexOf('-'))
     $env:BUILD_CONTEXT = Invoke-Expression "$baseDockerCmd config" 2>$null |  yq -r ".services.${serviceName}.build.context"
     # TODO: review build number removal (?)
-    # $env:VERSION = "$ParentImageVersion-$BuildNumber"
-    $env:VERSION = $ParentImageVersion
+    # $env:version = "$ParentImageVersion-$BuildNumber"
+    $env:version = $ParentImageVersion
 
-    Write-Host "= TEST: image folder ${env:BUILD_CONTEXT}, version ${env:VERSION}"
+    Write-Host "= TEST: image folder ${env:BUILD_CONTEXT}, version ${env:version}"
 
     if(Test-Path ".\target\$ImageName") {
         Remove-Item -Recurse -Force ".\target\$ImageName"

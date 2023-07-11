@@ -2,7 +2,7 @@ Import-Module -DisableNameChecking -Force $PSScriptRoot/test_helpers.psm1
 
 $global:AGENT_IMAGE = Get-EnvOrDefault 'AGENT_IMAGE' ''
 $global:BUILD_CONTEXT = Get-EnvOrDefault 'BUILD_CONTEXT' ''
-$global:VERSION = Get-EnvOrDefault 'VERSION' ''
+$global:version = Get-EnvOrDefault 'VERSION' ''
 $global:WINDOWS_VERSION_TAG = Get-EnvOrDefault 'WINDOWS_VERSION_TAG' ''
 
 # TODO: make this name unique for concurency
@@ -33,7 +33,7 @@ BuildNcatImage($global:WINDOWS_VERSION_TAG)
 
 Describe "[$global:AGENT_IMAGE] build image" {
     It 'builds image' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg VERSION=${global:VERSION} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWS_VERSION_TAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${global:AGENT_IMAGE} --file ./windows/${global:WINDOWSFLAVOR}/Dockerfile ${global:BUILD_CONTEXT}"
+        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg version=${global:version} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWS_VERSION_TAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${global:AGENT_IMAGE} --file ./windows/${global:WINDOWSFLAVOR}/Dockerfile ${global:BUILD_CONTEXT}"
         $exitCode | Should -Be 0
     }
 }
@@ -124,7 +124,7 @@ Describe "[$global:AGENT_IMAGE] custom build args" {
     }
 
     It 'builds image with arguments' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg VERSION=${ARG_TEST_VERSION} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWS_VERSION_TAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${customImageName} --file=./windows/${global:WINDOWSFLAVOR}/Dockerfile ${global:BUILD_CONTEXT}"
+        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg version=${ARG_TEST_VERSION} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWS_VERSION_TAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${customImageName} --file=./windows/${global:WINDOWSFLAVOR}/Dockerfile ${global:BUILD_CONTEXT}"
         $exitCode | Should -Be 0
 
         $exitCode, $stdout, $stderr = Run-Program 'docker' "run --detach --tty --name $global:CONTAINERNAME $customImageName -Cmd $global:CONTAINERSHELL"
