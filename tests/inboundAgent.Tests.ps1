@@ -33,7 +33,6 @@ BuildNcatImage($global:WINDOWS_VERSION_TAG)
 
 Describe "[$global:AGENT_IMAGE] build image" {
     It 'builds image' {
-        # TODO: fix
         $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg VERSION=${global:VERSION} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWS_VERSION_TAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${global:AGENT_IMAGE} --file ./windows/${global:WINDOWSFLAVOR}/Dockerfile ${global:BUILD_CONTEXT}"
         $exitCode | Should -Be 0
     }
@@ -117,7 +116,7 @@ Describe "[$global:AGENT_IMAGE] custom build args" {
     BeforeAll {
         Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
         # Old version used to test overriding the build arguments.
-        # This old version must have the same tag suffixes as the current 4 windows images (`-jdk11-nanoserver` etc.)
+        # This old version must have the same tag suffixes as the current windows images (`-jdk11-nanoserver` etc.), and the same Windows version (2019, 2022, etc.)
         $TEST_VERSION = "3131.vf2b_b_798b_ce99"
         $DOCKER_AGENT_VERSION_SUFFIX = "4"
         $ARG_TEST_VERSION = "${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
@@ -125,7 +124,6 @@ Describe "[$global:AGENT_IMAGE] custom build args" {
     }
 
     It 'builds image with arguments' {
-        # TODO: fix
         $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg VERSION=${ARG_TEST_VERSION} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWS_VERSION_TAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${customImageName} --file=./windows/${global:WINDOWSFLAVOR}/Dockerfile ${global:BUILD_CONTEXT}"
         $exitCode | Should -Be 0
 
