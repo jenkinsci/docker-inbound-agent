@@ -97,6 +97,9 @@ Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
     }
 }
 
+Write-Host '= PREPARE: List of images and tags to be processed:'
+ConvertTo-Json $builds
+
 if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
     Write-Host "= BUILD: Building image ${Build}..."
     $dockerBuildCmd = '{0} {1}' -f $baseDockerBuildCmd, $Build
