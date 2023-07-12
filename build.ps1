@@ -90,8 +90,6 @@ Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
         $tags += $baseImage
     }
 
-    Write-Host "New Windows image to build ($image): ${Organization}/${Repository}:${baseImage} with JDK ${jdkMajorVersion}"
-
     $builds[$image] = @{
         'Tags' = $tags;
     }
@@ -193,15 +191,11 @@ if($target -eq "test") {
     }
 }
 
-# TODO: dry mode?
 function Publish-Image {
     param (
         [String] $Build,
         [String] $ImageName
     )
-    # foreach($tag in $builds[$ImageName]['Tags']) {
-    #     $fullImageName = '{0}/{1}:{2}' -f $Organization, $Repository, $tag
-    #     $cmd = "docker tag {0} {1}" -f $ImageName, $tag
     Write-Host "= PUBLISH: Tagging $Build => full name = $ImageName"
     docker tag "$Build" "$ImageName"
 
