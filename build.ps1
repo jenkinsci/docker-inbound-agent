@@ -3,7 +3,7 @@ Param(
     [Parameter(Position=1)]
     [String] $Target = "build",
     [String] $Build = '',
-    [String] $ParentImageVersion = '3131.vf2b_b_798b_ce99-4',
+    [String]  = '3131.vf2b_b_798b_ce99-5',
     [String] $BuildNumber = '1',
     [switch] $PushVersions = $false
 )
