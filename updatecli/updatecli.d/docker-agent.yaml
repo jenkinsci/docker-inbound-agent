@@ -100,8 +100,8 @@ conditions:
       tag: '{{source "lastVersion" }}-jdk17-windowsservercore-ltsc2019'
 
 targets:
-  setJdk11AlpineDockerImage:
-    name: Bump the parent image `jenkins/agent` version on JDK11 Alpine
+  setAlpineDockerImage:
+    name: Bump the parent image `jenkins/agent` version on Alpine
     kind: dockerfile
     spec:
       file: alpine/Dockerfile
@@ -109,8 +109,8 @@ targets:
         keyword: ARG
         matcher: version
     scmid: default
-  setJdk11DebianDockerImage:
-    name: Bump the parent image `jenkins/agent` version on JDK11 Debian
+  setDebianDockerImage:
+    name: Bump the parent image `jenkins/agent` version on Debian
     kind: dockerfile
     spec:
       file: debian/Dockerfile
@@ -118,56 +118,20 @@ targets:
         keyword: ARG
         matcher: version
     scmid: default
-  setJdk11WindowsNanoserver1809DockerImage:
-    name: Bump the parent image `jenkins/agent` version on JDK11 Windows Nanoserver 1809
+  setsNanoserverDockerImage:
+    name: Bump the parent image `jenkins/agent` version on Windows Nanoserver
     kind: dockerfile
     spec:
-      file: windows/nanoserver-1809/Dockerfile
+      file: windows/nanoserver/Dockerfile
       instruction:
         keyword: ARG
         matcher: version
     scmid: default
-  setJdk11WindowsServer2019DockerImage:
-    name: Bump the parent image `jenkins/agent` version on JDK11 Windows Server 2019
+  setWindowsServerCoreDockerImage:
+    name: Bump the parent image `jenkins/agent` version on Windows Server Core
     kind: dockerfile
     spec:
-      file: windows/windowsservercore-ltsc2019/Dockerfile
-      instruction:
-        keyword: ARG
-        matcher: version
-    scmid: default
-  setJdk17AlpineDockerImage:
-    name: Bump the parent image `jenkins/agent` version on JDK17 Alpine
-    kind: dockerfile
-    spec:
-      file: alpine/Dockerfile
-      instruction:
-        keyword: ARG
-        matcher: version
-    scmid: default
-  setJdk17DebianDockerImage:
-    name: Bump the parent image `jenkins/agent` version on JDK17 Debian
-    kind: dockerfile
-    spec:
-      file: debian/Dockerfile
-      instruction:
-        keyword: ARG
-        matcher: version
-    scmid: default
-  setJdk17WindowsNanoserver1809DockerImage:
-    name: Bump the parent image `jenkins/agent` version on JDK17 Windows Nanoserver 1809
-    kind: dockerfile
-    spec:
-      file: windows/nanoserver-1809/Dockerfile
-      instruction:
-        keyword: ARG
-        matcher: version
-    scmid: default
-  setJdk17WindowsServer2019DockerImage:
-    name: Bump the parent image `jenkins/agent` version on JDK17 Windows Server 2019
-    kind: dockerfile
-    spec:
-      file: windows/windowsservercore-ltsc2019/Dockerfile
+      file: windows/windowsservercore/Dockerfile
       instruction:
         keyword: ARG
         matcher: version
@@ -182,11 +146,11 @@ targets:
       replacepattern: >-
         variable${1}"PARENT_IMAGE_VERSION"${2}{${3}${4}${5}default${6}= "{{ source "lastVersion" }}"
     scmid: default
-  setWindowsMakePwshParentImage:
-    name: Bump the parent image `jenkins/agent` version on the windows make.ps1 file
+  setWindowsBuildPwshParentImage:
+    name: Bump the parent image `jenkins/agent` version on the Windows build.ps1 powershell script
     kind: file
     spec:
-      file: make.ps1
+      file: build.ps1
       matchpattern: >-
         \$DockerAgentVersion(.*)=(.*),
       replacepattern: >-

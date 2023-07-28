@@ -45,14 +45,14 @@ SUT_IMAGE="$(get_sut_image)"
 @test "[${SUT_IMAGE}] use build args correctly" {
   cd "${BATS_TEST_DIRNAME}"/.. || false
 
-  local TEST_VERSION DOCKER_AGENT_VERSION_SUFFIX ARG_TEST_VERSION TEST_USER sut_image sut_cid
+  local TEST_VERSION PARENT_IMAGE_VERSION_SUFFIX ARG_TEST_VERSION TEST_USER sut_image sut_cid
 
   # Old version used to test overriding the build arguments.
   # This old version must have the same tag suffixes as the ones defined in the docker-bake file (`-jdk17`, `jdk11`, etc.)
-  TEST_VERSION="3046.v38db_38a_b_7a_86"
-  DOCKER_AGENT_VERSION_SUFFIX="1"
+  TEST_VERSION="3131.vf2b_b_798b_ce99"
+  PARENT_IMAGE_VERSION_SUFFIX="4"
 
-  ARG_TEST_VERSION="${TEST_VERSION}-${DOCKER_AGENT_VERSION_SUFFIX}"
+  ARG_TEST_VERSION="${TEST_VERSION}-${PARENT_IMAGE_VERSION_SUFFIX}"
   TEST_USER="root"
 
   sut_image="${SUT_IMAGE}-tests-${BATS_TEST_NUMBER}"

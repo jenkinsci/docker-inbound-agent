@@ -30,7 +30,7 @@ variable "IMAGE_TAG" {
   default = "3071.v7e9b_0dc08466-1"
 }
 
-#### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_AGENT_VERSION>-<base-os>)
+#### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_VERSION>-<base-os>)
 variable "PARENT_IMAGE_VERSION" {
   default = "3131.vf2b_b_798b_ce99-4"
 }
