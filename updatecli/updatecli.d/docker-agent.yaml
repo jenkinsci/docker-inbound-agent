@@ -154,7 +154,7 @@ targets:
       matchpattern: >-
         \$ParentImageVersion(.*)=(.*),
       replacepattern: >-
-        $ParentImageVersion${1}= '{{ source "lastVersion" }}',
+        $$ParentImageVersion${1}= '{{ source "lastVersion" }}',
     scmid: default
 
 actions:
