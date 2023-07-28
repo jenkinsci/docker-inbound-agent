@@ -12,7 +12,7 @@ pipeline {
                 axes {
                     axis {
                         name 'AGENT_TYPE'
-                        values 'linux', 'windows-2019'
+                        values 'linux', 'windows-2019', 'windows-2022'
                     }
                 }
                 stages {
