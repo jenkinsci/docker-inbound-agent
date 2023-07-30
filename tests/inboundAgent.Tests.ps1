@@ -145,7 +145,7 @@ Describe "[$global:AGENT_IMAGE] custom build args" {
 }
 
 Describe "[$global:AGENT_IMAGE] passing JVM options (slow test)" {
-    It "shows the java version with --show-version" {
+    It "shows the java version ${global:JAVA_MAJOR_VERSION}  with --show-version" {
         $exitCode, $stdout, $stderr = Run-Program 'docker' "network create --driver nat jnlp-network"
         # Launch the netcat utility, listening at port 5000 for 30 sec
         # bats will capture the output from netcat and compare the first line
