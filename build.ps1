@@ -3,9 +3,7 @@ Param(
     [Parameter(Position=1)]
     [String] $Target = "build",
     [String] $Build = '',
-    [String] $ParentImageVersion = '3131.vf2b_b_798b_ce99-4',
-    [String] $BuildNumber = '1',
-    [switch] $PushVersions = $false
+    [String] $ParentImageVersion = '3131.vf2b_b_798b_ce99-4'
 )
 
 $ErrorActionPreference ='Stop'
@@ -213,17 +211,6 @@ if($target -eq "publish") {
             if($lastExitCode -ne 0) {
                 $publishFailed = 1
             }
-
-            if($PushVersions) {
-                $buildTag = "$ParentImageVersion-$BuildNumber-$tag"
-                if($tag -eq 'latest') {
-                    $buildTag = "$ParentImageVersion-$BuildNumber"
-                }
-                Publish-Image "$Build" "${Organization}/${Repository}:${buildTag}"
-                if($lastExitCode -ne 0) {
-                    $publishFailed = 1
-                }
-            }
         }
     } else {
         foreach($b in $builds.Keys) {
@@ -231,17 +218,6 @@ if($target -eq "publish") {
                 Publish-Image "$b" "${Organization}/${Repository}:${tag}"
                 if($lastExitCode -ne 0) {
                     $publishFailed = 1
-                }
-
-                if($PushVersions) {
-                    $buildTag = "$ParentImageVersion-$BuildNumber-$tag"
-                    if($tag -eq 'latest') {
-                        $buildTag = "$ParentImageVersion-$BuildNumber"
-                    }
-                    Publish-Image "$b" "${Organization}/${Repository}:${buildTag}"
-                    if($lastExitCode -ne 0) {
-                        $publishFailed = 1
-                    }
                 }
             }
         }
