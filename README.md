@@ -53,7 +53,7 @@ Optional environment variables:
 
 ## Windows Jenkins Java Opts
 
-The processing of the JENKINS_JAVA_OPTS environment variable or -JenkinsJavaOpts command line parameter follow the [https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_parsing?view=powershell-7.3](command parsing semantics of Powershell). This means that if a parameter contains any characters that are part of an expression in Powershell, it will need to be surrounded by quotes. 
+The processing of the JENKINS_JAVA_OPTS environment variable or -JenkinsJavaOpts command line parameter follow the [command parsing semantics of Powershell](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_parsing?view=powershell-7.3). This means that if a parameter contains any characters that are part of an expression in Powershell, it will need to be surrounded by quotes. 
 For example:
 
 -XX:+PrintCommandLineFlags --show-version
