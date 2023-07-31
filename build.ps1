@@ -93,10 +93,6 @@ Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
     $builds[$image] = @{
         'Tags' = $tags;
     }
-
-    # TODO: remove, debug only
-    $debug = '$_: {0}, $env:WINDOWS_VERSION_NAME: {1}, $image: {2}, $jdkMajorVersion: {3}, $baseImage: {4}, $VersionTag: {5}, $completeVersionTag: {6}' -f $_, $env:WINDOWS_VERSION_NAME, $image, $jdkMajorVersion, $baseImage, $VersionTag, $completeVersionTag
-    Write-Host $debug
 }
 
 Write-Host '= PREPARE: List of images and tags to be processed:'
