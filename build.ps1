@@ -215,7 +215,7 @@ if($target -eq "publish") {
             }
 
             if($PushVersions) {
-                $buildTag = "$VersionTag-$tag"
+                $buildTag = "$tag"
                 if($tag -eq 'latest') {
                     $buildTag = "$VersionTag"
                 }
@@ -234,7 +234,7 @@ if($target -eq "publish") {
                 }
 
                 if($PushVersions) {
-                    $buildTag = "$VersionTag-$tag"
+                    $buildTag = "$tag"
                     if($tag -eq 'latest') {
                         $buildTag = "$VersionTag"
                     }
