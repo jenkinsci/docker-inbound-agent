@@ -84,7 +84,8 @@ Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
     $windowsVersion = $items[2]
 
     $baseImage = "${windowsType}-${windowsVersion}"
-    $tags = @( $image, $VersionTag )
+    $versionTag = "${VersionTag}-${image}"
+    $tags = @( $image, $versionTag )
     if($jdkMajorVersion -eq "$defaultJdk") {
         $tags += $baseImage
     }
