@@ -51,7 +51,7 @@ pipeline {
                                             // If the tests are passing for Linux AMD64, then we can build all the CPU architectures
                                             sh 'docker buildx bake --file docker-bake.hcl linux'
                                         } else {
-                                            powershell "& ./build.ps1 test"
+                                            powershell '& ./build.ps1 test'
                                         }
                                     }
                                 }
@@ -76,7 +76,7 @@ pipeline {
                                                 docker buildx bake --push --file docker-bake.hcl linux
                                                 '''
                                             } else {
-                                                powershell "& ./build.ps1 -PushVersions -VersionTag $env:TAG_NAME publish"
+                                                powershell '& ./build.ps1 -PushVersions -VersionTag $env:TAG_NAME publish'
                                             }
                                         }
                                     }
