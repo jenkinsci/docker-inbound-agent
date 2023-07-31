@@ -213,26 +213,6 @@ if($target -eq "publish") {
             if($lastExitCode -ne 0) {
                 $publishFailed = 1
             }
-        }
-
-        if($PushVersions) {
-            $buildTag = "$VersionTag-$tag"
-            if($tag -eq 'latest') {
-                $buildTag = "$VersionTag"
-            }
-            Publish-Image "$b" "${Organization}/${Repository}:${buildTag}"
-            if($lastExitCode -ne 0) {
-                $publishFailed = 1
-            }
-        }
-    } else {
-        foreach($b in $builds.Keys) {
-            foreach($tag in $Builds[$b]['Tags']) {
-                Publish-Image "$b" "${Organization}/${Repository}:${tag}"
-                if($lastExitCode -ne 0) {
-                    $publishFailed = 1
-                }
-            }
 
             if($PushVersions) {
                 $buildTag = "$VersionTag-$tag"
@@ -242,6 +222,26 @@ if($target -eq "publish") {
                 Publish-Image "$b" "${Organization}/${Repository}:${buildTag}"
                 if($lastExitCode -ne 0) {
                     $publishFailed = 1
+                }
+            }    
+        }
+    } else {
+        foreach($b in $builds.Keys) {
+            foreach($tag in $Builds[$b]['Tags']) {
+                Publish-Image "$b" "${Organization}/${Repository}:${tag}"
+                if($lastExitCode -ne 0) {
+                    $publishFailed = 1
+                }
+
+                if($PushVersions) {
+                    $buildTag = "$VersionTag-$tag"
+                    if($tag -eq 'latest') {
+                        $buildTag = "$VersionTag"
+                    }
+                    Publish-Image "$b" "${Organization}/${Repository}:${buildTag}"
+                    if($lastExitCode -ne 0) {
+                        $publishFailed = 1
+                    }
                 }
             }
         }
