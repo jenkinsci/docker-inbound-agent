@@ -152,9 +152,9 @@ targets:
     spec:
       file: build.ps1
       matchpattern: >-
-        \$ParentImageVersion(.*)=(.*),
+        ParentImageVersion(.*)=(.*)
       replacepattern: >-
-        $ParentImageVersion${1}= '{{ source "lastVersion" }}',
+        ParentImageVersion${1}= '{{ source "lastVersion" }}'
     scmid: default
 
 actions:
