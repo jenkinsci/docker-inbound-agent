@@ -223,7 +223,7 @@ if($target -eq "publish") {
                 if($lastExitCode -ne 0) {
                     $publishFailed = 1
                 }
-            }    
+            }
         }
     } else {
         foreach($b in $builds.Keys) {
