@@ -3,8 +3,8 @@ Param(
     [Parameter(Position=1)]
     [String] $Target = "build",
     [String] $Build = '',
+    [String] $VersionTag = 'NEXT_TAG_VERSION',
     [String] $ParentImageVersion = '3131.vf2b_b_798b_ce99-5',
-    [String] $BuildNumber = '1',
     [switch] $PushVersions = $false
 )
 
@@ -84,8 +84,8 @@ Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
     $windowsVersion = $items[2]
 
     $baseImage = "${windowsType}-${windowsVersion}"
-    $versionTag = "${ParentImageVersion}-${BuildNumber}-${image}"
-    $tags = @( $image, $versionTag )
+    $completeVersionTag = "${VersionTag}-${image}"
+    $tags = @( $image, $completeVersionTag )
     if($jdkMajorVersion -eq "$defaultJdk") {
         $tags += $baseImage
     }
@@ -215,15 +215,15 @@ if($target -eq "publish") {
             }
 
             if($PushVersions) {
-                $buildTag = "$ParentImageVersion-$BuildNumber-$tag"
+                $buildTag = "$VersionTag-$tag"
                 if($tag -eq 'latest') {
-                    $buildTag = "$ParentImageVersion-$BuildNumber"
+                    $buildTag = "$VersionTag"
                 }
-                Publish-Image "$Build" "${Organization}/${Repository}:${buildTag}"
+                Publish-Image "$b" "${Organization}/${Repository}:${buildTag}"
                 if($lastExitCode -ne 0) {
                     $publishFailed = 1
                 }
-            }
+            }    
         }
     } else {
         foreach($b in $builds.Keys) {
@@ -234,9 +234,9 @@ if($target -eq "publish") {
                 }
 
                 if($PushVersions) {
-                    $buildTag = "$ParentImageVersion-$BuildNumber-$tag"
+                    $buildTag = "$VersionTag-$tag"
                     if($tag -eq 'latest') {
-                        $buildTag = "$ParentImageVersion-$BuildNumber"
+                        $buildTag = "$VersionTag"
                     }
                     Publish-Image "$b" "${Organization}/${Repository}:${buildTag}"
                     if($lastExitCode -ne 0) {
