@@ -3,6 +3,7 @@ Param(
     [Parameter(Position=1)]
     [String] $Target = "build",
     [String] $Build = '',
+    [String] $VersionTag = 'NEXT_TAG_VERSION',
     [String] $ParentImageVersion = '3131.vf2b_b_798b_ce99-4'
 )
 
@@ -82,8 +83,7 @@ Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
     $windowsVersion = $items[2]
 
     $baseImage = "${windowsType}-${windowsVersion}"
-    $versionTag = "${ParentImageVersion}-${image}"
-    $tags = @( $image, $versionTag )
+    $tags = @( $image, $VersionTag )
     if($jdkMajorVersion -eq "$defaultJdk") {
         $tags += $baseImage
     }

@@ -76,7 +76,7 @@ pipeline {
                                                 docker buildx bake --push --file docker-bake.hcl linux
                                                 '''
                                             } else {
-                                                powershell "& ./build.ps1 publish"
+                                                powershell "& ./build.ps1 -VersionTag $env:TAG_NAME publish"
                                             }
                                         }
                                     }
