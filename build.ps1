@@ -4,7 +4,7 @@ Param(
     [String] $Target = "build",
     [String] $Build = '',
     [String] $VersionTag = 'NEXT_TAG_VERSION',
-    [String] $ParentImageVersion = '3131.vf2b_b_798b_ce99-5',
+    [String] $ParentImageVersion = '3142.vcfca_0cd92128-1',
     [switch] $PushVersions = $false
 )
 
