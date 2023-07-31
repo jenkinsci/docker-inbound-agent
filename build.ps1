@@ -4,6 +4,7 @@ Param(
     [String] $Target = "build",
     [String] $Build = '',
     [String] $VersionTag = 'NEXT_TAG_VERSION',
+    [switch] $PushVersions = $false,
     [String] $ParentImageVersion = '3131.vf2b_b_798b_ce99-4'
 )
 
@@ -212,10 +213,32 @@ if($target -eq "publish") {
                 $publishFailed = 1
             }
         }
+
+        if($PushVersions) {
+            $buildTag = "$VersionTag-$tag"
+            if($tag -eq 'latest') {
+                $buildTag = "$VersionTag"
+            }
+            Publish-Image "$b" "${Organization}/${Repository}:${buildTag}"
+            if($lastExitCode -ne 0) {
+                $publishFailed = 1
+            }
+        }
     } else {
         foreach($b in $builds.Keys) {
             foreach($tag in $Builds[$b]['Tags']) {
                 Publish-Image "$b" "${Organization}/${Repository}:${tag}"
+                if($lastExitCode -ne 0) {
+                    $publishFailed = 1
+                }
+            }
+
+            if($PushVersions) {
+                $buildTag = "$VersionTag-$tag"
+                if($tag -eq 'latest') {
+                    $buildTag = "$VersionTag"
+                }
+                Publish-Image "$b" "${Organization}/${Repository}:${buildTag}"
                 if($lastExitCode -ne 0) {
                     $publishFailed = 1
                 }
