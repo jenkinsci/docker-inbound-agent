@@ -1,11 +1,8 @@
 name: Update Docker Hub Description
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - README.md
-      - .github/workflows/sync-dockerhub-readme.yaml
+  on:
+    release:
+      types: [ published ]
   workflow_dispatch:
 
 jobs:
