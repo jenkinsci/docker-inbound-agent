@@ -1,8 +1,7 @@
 name: Update Docker Hub Description
 on:
-  on:
-    release:
-      types: [ published ]
+  release:
+    types: [ published ]
   workflow_dispatch:
 
 jobs:
