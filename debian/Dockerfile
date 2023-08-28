@@ -1,8 +1,8 @@
-ARG version=3142.vcfca_0cd92128-2
+ARG version=3148.v532a_7e715ee3-1
 ARG JAVA_MAJOR_VERSION=17
 FROM jenkins/agent:"${version}"-jdk"${JAVA_MAJOR_VERSION}"
 
-ARG version=3142.vcfca_0cd92128-2
+ARG version=3148.v532a_7e715ee3-1
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols" Vendor="Jenkins project" Version="$version"
 
 ARG user=jenkins
