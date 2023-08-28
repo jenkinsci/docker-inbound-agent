@@ -21,12 +21,12 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-ARG version=3142.vcfca_0cd92128-2
+ARG version=3148.v532a_7e715ee3-1
 ARG JAVA_MAJOR_VERSION=17
 ARG WINDOWS_VERSION_TAG=ltsc2019
 FROM jenkins/agent:"${version}"-jdk"${JAVA_MAJOR_VERSION}"-windowsservercore-"${WINDOWS_VERSION_TAG}"
 
-ARG version=3142.vcfca_0cd92128-2
+ARG version=3148.v532a_7e715ee3-1
 LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$version"
 
 COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
