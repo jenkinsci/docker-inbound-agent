@@ -11,7 +11,7 @@ These images are deprecated, use [jenkins/inbound-agent](https://hub.docker.com/
 This is an image for [Jenkins](https://jenkins.io) agents using TCP or WebSockets to establish inbound connection to the Jenkins master.
 This agent is powered by the [Jenkins Remoting library](https://github.com/jenkinsci/remoting), which version is being taken from the base [Docker Agent](https://github.com/jenkinsci/docker-agent/) image.
 
-See [Jenkins Distributed builds](https://wiki.jenkins-ci.org/display/JENKINS/Distributed+builds) for more info.
+See [Using Agents](https://www.jenkins.io/doc/book/using/using-agents/) for more info.
 
 ## Running
 
