@@ -26,8 +26,5 @@ ARG JAVA_MAJOR_VERSION=17
 ARG WINDOWS_VERSION_TAG=ltsc2019
 FROM jenkins/agent:"${version}"-jdk"${JAVA_MAJOR_VERSION}"-windowsservercore-"${WINDOWS_VERSION_TAG}"
 
-ARG version=3148.v532a_7e715ee3-1
-LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$version"
-
 COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
 ENTRYPOINT ["powershell.exe", "-f", "C:/ProgramData/Jenkins/jenkins-agent.ps1"]
