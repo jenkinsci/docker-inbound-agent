@@ -8,10 +8,10 @@ Param(
     [switch] $PushVersions = $false
 )
 
-$ErrorActionPreference ='Stop'
+$ErrorActionPreference = 'Stop'
 $Repository = 'inbound-agent'
 $Organization = 'jenkins'
-$AgentType = 'windows-2019'
+$ImageType = 'windowsservercore-ltsc2019'
 
 if(![String]::IsNullOrWhiteSpace($env:DOCKERHUB_REPO)) {
     $Repository = $env:DOCKERHUB_REPO
@@ -25,8 +25,8 @@ if(![String]::IsNullOrWhiteSpace($env:PARENT_IMAGE_VERSION)) {
     $ParentImageVersion = $env:PARENT_IMAGE_VERSION
 }
 
-if(![String]::IsNullOrWhiteSpace($env:AGENT_TYPE)) {
-    $AgentType = $env:AGENT_TYPE
+if(![String]::IsNullOrWhiteSpace($env:IMAGE_TYPE)) {
+    $ImageType = $env:IMAGE_TYPE
 }
 
 # Check for required commands
@@ -55,15 +55,15 @@ Function Test-CommandExists {
 $defaultJdk = '11'
 $builds = @{}
 $env:PARENT_IMAGE_VERSION = "$ParentImageVersion"
-$env:WINDOWS_VERSION_NAME = $AgentType.replace('windows-', 'ltsc')
-$env:NANOSERVER_VERSION_NAME = $env:WINDOWS_VERSION_NAME
-$env:WINDOWS_VERSION_TAG = $env:WINDOWS_VERSION_NAME
-$env:NANOSERVER_VERSION_TAG = $env:WINDOWS_VERSION_NAME
-# We need to keep the `jdkN-nanoserver-1809` images for now, cf https://github.com/jenkinsci/docker-agent/issues/451
-if ($AgentType -eq 'windows-2019') {
-    $env:NANOSERVER_VERSION_TAG = 1809
-    $env:NANOSERVER_VERSION_NAME = 1809
-}
+
+$items = $ImageType.Split("-")
+$env:WINDOWS_FLAVOR = $items[0]
+$env:WINDOWS_VERSION_TAG = $items[1]
+
+# # Uncomment to help debugging when working on this script
+# Write-Host "= DEBUG: env vars"
+# Get-ChildItem Env: | ForEach-Object { Write-Host "$($_.Name) = $($_.Value)" }
+
 $ProgressPreference = 'SilentlyContinue' # Disable Progress bar for faster downloads
 
 Test-CommandExists "docker"
@@ -74,18 +74,15 @@ $baseDockerCmd = 'docker-compose --file=build-windows.yaml'
 $baseDockerBuildCmd = '{0} build --parallel --pull' -f $baseDockerCmd
 
 Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
-    $image = '{0}-{1}' -f $_, $env:WINDOWS_VERSION_NAME
-    # Special case for nanoserver-1809 images
-    $image = $image.replace('nanoserver-ltsc2019', 'nanoserver-1809')
-    $items = $image.Split("-")
-    # Remove the 'jdk' prefix (3 first characters)
-    $jdkMajorVersion = $items[0].Remove(0,3)
-    $windowsType = $items[1]
-    $windowsVersion = $items[2]
+    $image = '{0}-{1}-{2}' -f $_, $env:WINDOWS_FLAVOR, $env:WINDOWS_VERSION_TAG # Ex: "jdk11-windowsservercore-ltsc2019"
 
-    $baseImage = "${windowsType}-${windowsVersion}"
+    # Remove the 'jdk' prefix (3 first characters)
+    $jdkMajorVersion = $_.Remove(0,3)
+
+    $baseImage = "${env:WINDOWS_FLAVOR}-${env:WINDOWS_VERSION_TAG}"
     $completeVersionTag = "${VersionTag}-${image}"
     $tags = @( $image, $completeVersionTag )
+    # Additional image tag without any 'jdk' prefix for the default JDK
     if($jdkMajorVersion -eq "$defaultJdk") {
         $tags += $baseImage
     }
@@ -95,7 +92,7 @@ Invoke-Expression "$baseDockerCmd config --services" 2>$null | ForEach-Object {
     }
 }
 
-Write-Host '= PREPARE: List of images and tags to be processed:'
+Write-Host "= PREPARE: List of ${Organization}/${Repository} images and tags to be processed for ${ImageType}:"
 ConvertTo-Json $builds
 
 if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
@@ -118,14 +115,12 @@ function Test-Image {
         $ImageName
     )
 
-    Write-Host "= TEST: Testing image ${ImageName}:"
+    Write-Host "= TEST: Testing image ${ImageName}:" # Ex: jdk11-windowsservercore-ltsc2019
 
     $env:AGENT_IMAGE = $ImageName
-    $serviceName = $ImageName.SubString(0, $ImageName.LastIndexOf('-'))
+    $serviceName = $ImageName.SubString(0, $ImageName.IndexOf('-'))
     $env:BUILD_CONTEXT = Invoke-Expression "$baseDockerCmd config" 2>$null |  yq -r ".services.${serviceName}.build.context"
     $env:version = $ParentImageVersion
-
-    Write-Host "= TEST: image folder ${env:BUILD_CONTEXT}, version ${env:version}"
 
     if(Test-Path ".\target\$ImageName") {
         Remove-Item -Recurse -Force ".\target\$ImageName"
@@ -176,7 +171,7 @@ if($target -eq "test") {
     if(![System.String]::IsNullOrWhiteSpace($Build) -and $builds.ContainsKey($Build)) {
         Test-Image $Build
     } else {
-        Write-Host "= TEST: Testing all images"
+        Write-Host "= TEST: Testing all images..."
         foreach($image in $builds.Keys) {
             Test-Image $image
         }

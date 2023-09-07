@@ -3,37 +3,35 @@ Import-Module -DisableNameChecking -Force $PSScriptRoot/test_helpers.psm1
 $global:AGENT_IMAGE = Get-EnvOrDefault 'AGENT_IMAGE' ''
 $global:BUILD_CONTEXT = Get-EnvOrDefault 'BUILD_CONTEXT' ''
 $global:version = Get-EnvOrDefault 'VERSION' ''
-$global:WINDOWS_VERSION_TAG = Get-EnvOrDefault 'WINDOWS_VERSION_TAG' ''
-
-# TODO: make this name unique for concurency
-$global:CONTAINERNAME = 'pester-jenkins-inbound-agent-{0}' -f $global:AGENT_IMAGE
 
 $items = $global:AGENT_IMAGE.Split("-")
 
 # Remove the 'jdk' prefix (3 first characters)
-$global:JAVA_MAJOR_VERSION = $items[0].Remove(0,3)
+$global:JAVAMAJORVERSION = $items[0].Remove(0,3)
 $global:WINDOWSFLAVOR = $items[1]
-$global:WINDOWSVERSION = $items[2]
+$global:WINDOWSVERSIONTAG = $items[2]
+
+# TODO: make this name unique for concurency
+$global:CONTAINERNAME = 'pester-jenkins-inbound-agent-{0}' -f $global:AGENT_IMAGE
 
 $global:CONTAINERSHELL="powershell.exe"
 if($global:WINDOWSFLAVOR -eq 'nanoserver') {
     $global:CONTAINERSHELL = "pwsh.exe"
-    # Special case for nanoserver-1809
-    if($global:WINDOWSVERSION -eq '1809') {
-        $global:WINDOWS_VERSION_TAG = '1809'
-    }
 }
 
+# # Uncomment to help debugging when working on this script
+# Write-Host "= DEBUG: global vars"
+# Get-Variable -Scope Global | ForEach-Object { Write-Host "$($_.Name) = $($_.Value)" }
 
 Cleanup($global:CONTAINERNAME)
 Cleanup("nmap")
 CleanupNetwork("jnlp-network")
 
-BuildNcatImage($global:WINDOWS_VERSION_TAG)
+BuildNcatImage($global:WINDOWSVERSIONTAG)
 
 Describe "[$global:AGENT_IMAGE] build image" {
     It 'builds image' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg version=${global:version} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWS_VERSION_TAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${global:AGENT_IMAGE} --file ./windows/${global:WINDOWSFLAVOR}/Dockerfile ${global:BUILD_CONTEXT}"
+        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg version=${global:version} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWSVERSIONTAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVAMAJORVERSION} --tag=${global:AGENT_IMAGE} --file ./windows/${global:WINDOWSFLAVOR}/Dockerfile ${global:BUILD_CONTEXT}"
         $exitCode | Should -Be 0
     }
 }
@@ -124,7 +122,7 @@ Describe "[$global:AGENT_IMAGE] custom build args" {
     }
 
     It 'builds image with arguments' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg version=${ARG_TEST_VERSION} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWS_VERSION_TAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVA_MAJOR_VERSION} --tag=${customImageName} --file=./windows/${global:WINDOWSFLAVOR}/Dockerfile ${global:BUILD_CONTEXT}"
+        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg version=${ARG_TEST_VERSION} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWSVERSIONTAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVAMAJORVERSION} --build-arg WINDOWS_FLAVOR=${global:WINDOWSFLAVOR} --build-arg CONTAINER_SHELL=${global:CONTAINERSHELL} --tag=${customImageName} --file=./windows/Dockerfile ${global:BUILD_CONTEXT}"
         $exitCode | Should -Be 0
 
         $exitCode, $stdout, $stderr = Run-Program 'docker' "run --detach --tty --name $global:CONTAINERNAME $customImageName -Cmd $global:CONTAINERSHELL"
@@ -145,7 +143,7 @@ Describe "[$global:AGENT_IMAGE] custom build args" {
 }
 
 Describe "[$global:AGENT_IMAGE] passing JVM options (slow test)" {
-    It "shows the java version ${global:JAVA_MAJOR_VERSION} with --show-version" {
+    It "shows the java version ${global:JAVAMAJORVERSION} with --show-version" {
         $exitCode, $stdout, $stderr = Run-Program 'docker' "network create --driver nat jnlp-network"
         # Launch the netcat utility, listening at port 5000 for 30 sec
         # bats will capture the output from netcat and compare the first line
@@ -167,7 +165,7 @@ Describe "[$global:AGENT_IMAGE] passing JVM options (slow test)" {
         Is-ContainerRunning $global:CONTAINERNAME | Should -BeTrue
         $exitCode, $stdout, $stderr = Run-Program 'docker' "logs $global:CONTAINERNAME"
         $exitCode | Should -Be 0
-        $stdout | Should -Match "OpenJDK Runtime Environment Temurin-${global:JAVA_MAJOR_VERSION}"
+        $stdout | Should -Match "OpenJDK Runtime Environment Temurin-${global:JAVAMAJORVERSION}"
     }
 
     AfterAll {
