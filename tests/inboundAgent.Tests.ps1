@@ -115,8 +115,8 @@ Describe "[$global:AGENT_IMAGE] custom build args" {
         Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
         # Old version used to test overriding the build arguments.
         # This old version must have the same tag suffixes as the current windows images (`-jdk11-nanoserver` etc.), and the same Windows version (2019, 2022, etc.)
-        $TEST_VERSION = "3131.vf2b_b_798b_ce99"
-        $PARENT_IMAGE_VERSION_SUFFIX = "4"
+        $TEST_VERSION = "3148.v532a_7e715ee3"
+        $PARENT_IMAGE_VERSION_SUFFIX = "3"
         $ARG_TEST_VERSION = "${TEST_VERSION}-${PARENT_IMAGE_VERSION_SUFFIX}"
         $customImageName = "custom-${global:AGENT_IMAGE}"
     }
