@@ -75,6 +75,38 @@ Describe "[$global:AGENT_IMAGE] image has jenkins-agent.ps1 in the correct locat
     }
 }
 
+Describe "[$global:AGENT_IMAGE] custom build args" {
+    BeforeAll {
+        Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
+        # Old version used to test overriding the build arguments.
+        # This old version must have the same tag suffixes as the current windows images (`-jdk11-nanoserver` etc.), and the same Windows version (2019, 2022, etc.)
+        $TEST_VERSION = "3148.v532a_7e715ee3"
+        $PARENT_IMAGE_VERSION_SUFFIX = "3"
+        $ARG_TEST_VERSION = "${TEST_VERSION}-${PARENT_IMAGE_VERSION_SUFFIX}"
+        $customImageName = "custom-${global:AGENT_IMAGE}"
+    }
+
+    It 'builds image with arguments' {
+        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg version=${ARG_TEST_VERSION} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWSVERSIONTAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVAMAJORVERSION} --build-arg WINDOWS_FLAVOR=${global:WINDOWSFLAVOR} --build-arg CONTAINER_SHELL=${global:CONTAINERSHELL} --tag=${customImageName} --file=./windows/${global:WINDOWSFLAVOR}/Dockerfile ${global:BUILD_CONTEXT}"
+        $exitCode | Should -Be 0
+
+        $exitCode, $stdout, $stderr = Run-Program 'docker' "run --detach --tty --name $global:CONTAINERNAME $customImageName -Cmd $global:CONTAINERSHELL"
+        $exitCode | Should -Be 0
+        Is-ContainerRunning "$global:CONTAINERNAME" | Should -BeTrue
+    }
+
+    It "has the correct agent.jar version" {
+        $exitCode, $stdout, $stderr = Run-Program 'docker' "exec $global:CONTAINERNAME $global:CONTAINERSHELL -c `"java -cp C:/ProgramData/Jenkins/agent.jar hudson.remoting.jnlp.Main -version`""
+        $exitCode | Should -Be 0
+        $stdout | Should -Match $TEST_VERSION
+    }
+
+    AfterAll {
+        Cleanup($global:CONTAINERNAME)
+        Pop-Location -StackName 'agent'
+    }
+}
+
 Describe "[$global:AGENT_IMAGE] image starts jenkins-agent.ps1 correctly (slow test)" {
     It 'connects to the nmap container' {
         $exitCode, $stdout, $stderr = Run-Program 'docker' "network create --driver nat jnlp-network"
@@ -107,38 +139,6 @@ Describe "[$global:AGENT_IMAGE] image starts jenkins-agent.ps1 correctly (slow t
         Cleanup($global:CONTAINERNAME)
         Cleanup("nmap")
         CleanupNetwork("jnlp-network")
-    }
-}
-
-Describe "[$global:AGENT_IMAGE] custom build args" {
-    BeforeAll {
-        Push-Location -StackName 'agent' -Path "$PSScriptRoot/.."
-        # Old version used to test overriding the build arguments.
-        # This old version must have the same tag suffixes as the current windows images (`-jdk11-nanoserver` etc.), and the same Windows version (2019, 2022, etc.)
-        $TEST_VERSION = "3148.v532a_7e715ee3"
-        $PARENT_IMAGE_VERSION_SUFFIX = "3"
-        $ARG_TEST_VERSION = "${TEST_VERSION}-${PARENT_IMAGE_VERSION_SUFFIX}"
-        $customImageName = "custom-${global:AGENT_IMAGE}"
-    }
-
-    It 'builds image with arguments' {
-        $exitCode, $stdout, $stderr = Run-Program 'docker' "build --build-arg version=${ARG_TEST_VERSION} --build-arg `"WINDOWS_VERSION_TAG=${global:WINDOWSVERSIONTAG}`" --build-arg JAVA_MAJOR_VERSION=${global:JAVAMAJORVERSION} --build-arg WINDOWS_FLAVOR=${global:WINDOWSFLAVOR} --build-arg CONTAINER_SHELL=${global:CONTAINERSHELL} --tag=${customImageName} --file=./windows/${global:WINDOWSFLAVOR}/Dockerfile ${global:BUILD_CONTEXT}"
-        $exitCode | Should -Be 0
-
-        $exitCode, $stdout, $stderr = Run-Program 'docker' "run --detach --tty --name $global:CONTAINERNAME $customImageName -Cmd $global:CONTAINERSHELL"
-        $exitCode | Should -Be 0
-        Is-ContainerRunning "$global:CONTAINERNAME" | Should -BeTrue
-    }
-
-    It "has the correct agent.jar version" {
-        $exitCode, $stdout, $stderr = Run-Program 'docker' "exec $global:CONTAINERNAME $global:CONTAINERSHELL -c `"java -cp C:/ProgramData/Jenkins/agent.jar hudson.remoting.jnlp.Main -version`""
-        $exitCode | Should -Be 0
-        $stdout | Should -Match $TEST_VERSION
-    }
-
-    AfterAll {
-        Cleanup($global:CONTAINERNAME)
-        Pop-Location -StackName 'agent'
     }
 }
 
