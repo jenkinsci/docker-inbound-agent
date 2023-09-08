@@ -19,9 +19,9 @@ if($global:WINDOWSFLAVOR -eq 'nanoserver') {
     $global:CONTAINERSHELL = "pwsh.exe"
 }
 
-# # Uncomment to help debugging when working on this script
-# Write-Host "= DEBUG: global vars"
-# Get-Variable -Scope Global | ForEach-Object { Write-Host "$($_.Name) = $($_.Value)" }
+# Uncomment to help debugging when working on this script
+Write-Host "= DEBUG: global vars"
+Get-Variable -Scope Global | ForEach-Object { Write-Host "$($_.Name) = $($_.Value)" }
 
 Cleanup($global:CONTAINERNAME)
 Cleanup("nmap")
