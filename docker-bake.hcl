@@ -11,6 +11,7 @@ group "linux-arm64" {
   targets = [
     "debian_jdk11",
     "debian_jdk17",
+    "alpine_jdk21",
   ]
 }
 
@@ -78,6 +79,21 @@ target "alpine_jdk17" {
     "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk17",
   ]
   platforms = ["linux/amd64"]
+}
+
+target "alpine_jdk21" {
+  dockerfile = "alpine/Dockerfile"
+  context = "."
+  args = {
+    JAVA_MAJOR_VERSION = "21"
+    version = "${PARENT_IMAGE_VERSION}"
+  }
+  tags = [
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk21": "",
+    "${REGISTRY}/${JENKINS_REPO}:alpine-jdk21",
+    "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk21",
+  ]
+  platforms = ["linux/amd64, linux/arm64"]
 }
 
 target "debian_jdk11" {
