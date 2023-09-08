@@ -1,3 +1,16 @@
+def agentSelector(String imageType) {
+    // Image type running on a Linux agent
+    if (imageType == 'linux') {
+        return 'linux'
+    }
+    // Image types running on a Windows Server Core 2022 agent
+    if (imageType.contains('2022')) {
+        return 'windows-2022'
+    }
+    // Remaining image types running on a Windows Server Core 2019 agent: (nanoserver|windowservercore)-(1809|2019)
+    return 'windows-2019'
+}
+
 pipeline {
     agent none
 
@@ -7,18 +20,17 @@ pipeline {
 
     stages {
         stage('docker-inbound-agent') {
-            failFast true
             matrix {
                 axes {
                     axis {
-                        name 'AGENT_TYPE'
-                        values 'linux', 'windows-2019', 'windows-2022'
+                        name 'IMAGE_TYPE'
+                        values 'linux', 'nanoserver-1809', 'nanoserver-ltsc2019', 'nanoserver-ltsc2022', 'windowsservercore-1809', 'windowsservercore-ltsc2019', 'windowsservercore-ltsc2022'
                     }
                 }
                 stages {
                     stage('Main') {
                         agent {
-                            label env.AGENT_TYPE
+                            label agentSelector(env.IMAGE_TYPE)
                         }
                         options {
                             timeout(time: 30, unit: 'MINUTES')
@@ -29,7 +41,7 @@ pipeline {
                         stages {
                             stage('Prepare Docker') {
                                 when {
-                                    environment name: 'AGENT_TYPE', value: 'linux'
+                                    environment name: 'IMAGE_TYPE', value: 'linux'
                                 }
                                 steps {
                                     sh '''
