@@ -2,8 +2,10 @@ group "linux" {
   targets = [
     "alpine_jdk11",
     "alpine_jdk17",
+    "alpine_jdk21",
     "debian_jdk11",
     "debian_jdk17",
+    "debian_jdk21",
   ]
 }
 
@@ -11,6 +13,8 @@ group "linux-arm64" {
   targets = [
     "debian_jdk11",
     "debian_jdk17",
+    "debian_jdk21",
+    "alpine_jdk21",
   ]
 }
 
@@ -80,6 +84,21 @@ target "alpine_jdk17" {
   platforms = ["linux/amd64"]
 }
 
+target "alpine_jdk21" {
+  dockerfile = "alpine/Dockerfile-jdk21"
+  context = "."
+  args = {
+    JAVA_MAJOR_VERSION = "21"
+    version = "${PARENT_IMAGE_VERSION}"
+  }
+  tags = [
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk21-preview": "",
+    "${REGISTRY}/${JENKINS_REPO}:alpine-jdk21-preview",
+    "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk21-preview",
+  ]
+  platforms = ["linux/amd64", "linux/arm64"]
+}
+
 target "debian_jdk11" {
   dockerfile = "debian/Dockerfile"
   context = "."
@@ -110,4 +129,19 @@ target "debian_jdk17" {
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk17",
   ]
   platforms = ["linux/amd64", "linux/arm64", "linux/arm/v7", "linux/ppc64le"]
+}
+
+target "debian_jdk21" {
+  dockerfile = "debian/Dockerfile-jdk21"
+  context = "."
+  args = {
+    JAVA_MAJOR_VERSION = "21"
+    version = "${PARENT_IMAGE_VERSION}"
+  }
+  tags = [
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk21-preview": "",
+    "${REGISTRY}/${JENKINS_REPO}:jdk21-preview",
+    "${REGISTRY}/${JENKINS_REPO}:latest-jdk21-preview",
+  ]
+  platforms = ["linux/amd64", "linux/arm64"]
 }
