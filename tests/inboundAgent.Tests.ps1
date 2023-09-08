@@ -22,6 +22,8 @@ if($global:WINDOWSFLAVOR -eq 'nanoserver') {
 # Uncomment to help debugging when working on this script
 Write-Host "= DEBUG: global vars"
 Get-Variable -Scope Global | ForEach-Object { Write-Host "$($_.Name) = $($_.Value)" }
+Write-Host "= DEBUG: env vars"
+Get-ChildItem Env: | ForEach-Object { Write-Host "$($_.Name) = $($_.Value)" }
 
 Cleanup($global:CONTAINERNAME)
 Cleanup("nmap")
