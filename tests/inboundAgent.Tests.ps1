@@ -19,6 +19,9 @@ if($global:WINDOWSFLAVOR -eq 'nanoserver') {
     $global:CONTAINERSHELL = "pwsh.exe"
 }
 
+# Test fix "exadecimal value 0x1B, is an invalid character." ref https://github.com/PowerShell/PowerShell/issues/10809
+$env:__SuppressAnsiEscapeSequences = 1
+
 # Uncomment to help debugging when working on this script
 Write-Host "= DEBUG: global vars"
 Get-Variable -Scope Global | ForEach-Object { Write-Host "$($_.Name) = $($_.Value)" }
