@@ -42,6 +42,16 @@ conditions:
       architecture: amd64
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-alpine-jdk17'
+  checkJdk21AlpineDockerImage:
+    kind: dockerimage
+    name: Check if the container image "jenkins/agent:<lastVersion>-alpine-jdk21-preview" for linux/amd64 is available
+    disablesourceinput: true
+    spec:
+      architectures:
+        - amd64
+        - arm64
+      image: jenkins/agent
+      tag: '{{source "lastVersion" }}-alpine-jdk21-preview'
   checkJdk11DebianDockerImages:
     kind: dockerimage
     name: Check if the container image "jenkins/agent:<lastVersion>-jdk11" for linux/amd64 is available
@@ -66,6 +76,16 @@ conditions:
         - arm/v7
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-jdk17'
+  checkJdk21DebianDockerImages:
+    kind: dockerimage
+    name: Check if the container image "jenkins/agent:<lastVersion>-jdk21-preview" for linux/amd64 is available
+    disablesourceinput: true
+    spec:
+      architectures:
+        - amd64
+        - arm64
+      image: jenkins/agent
+      tag: '{{source "lastVersion" }}-jdk21-preview'
   checkJdk11WindowsNanoserver1809DockerImage:
     kind: dockerimage
     name: Check if the container image "jenkins/agent:<lastVersion>-jdk11-nanoserver-1809" for windows/amd64 is available
