@@ -2,6 +2,7 @@ group "linux" {
   targets = [
     "alpine_jdk11",
     "alpine_jdk17",
+    "alpine_jdk21",
     "debian_jdk11",
     "debian_jdk17",
   ]
@@ -33,7 +34,7 @@ variable "IMAGE_TAG" {
 
 #### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_VERSION>-<base-os>)
 variable "PARENT_IMAGE_VERSION" {
-  default = "3148.v532a_7e715ee3-1"
+  default = "3148.v532a_7e715ee3-4"
 }
 
 variable "REGISTRY" {
@@ -82,7 +83,7 @@ target "alpine_jdk17" {
 }
 
 target "alpine_jdk21" {
-  dockerfile = "alpine/Dockerfile"
+  dockerfile = "alpine/Dockerfile-jdk21"
   context = "."
   args = {
     JAVA_MAJOR_VERSION = "21"
@@ -93,7 +94,7 @@ target "alpine_jdk21" {
     "${REGISTRY}/${JENKINS_REPO}:alpine-jdk21",
     "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk21",
   ]
-  platforms = ["linux/amd64, linux/arm64"]
+  platforms = ["linux/amd64", "linux/arm64"]
 }
 
 target "debian_jdk11" {
