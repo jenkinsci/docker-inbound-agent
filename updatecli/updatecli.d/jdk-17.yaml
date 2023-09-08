@@ -1,5 +1,4 @@
----
-name: Bump the parent image `jenkins/agent` version
+name: Bump the parent image `jenkins/agent` version for JDK17
 
 scms:
   default:
@@ -26,14 +25,6 @@ sources:
         kind: latest
 
 conditions:
-  checkJdk11AlpineDockerImage:
-    kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-alpine-jdk11" for linux/amd64 is available
-    disablesourceinput: true
-    spec:
-      architecture: amd64
-      image: jenkins/agent
-      tag: '{{source "lastVersion" }}-alpine-jdk11'
   checkJdk17AlpineDockerImage:
     kind: dockerimage
     name: Check if the container image "jenkins/agent:<lastVersion>-alpine-jdk17" for linux/amd64 is available
@@ -42,29 +33,6 @@ conditions:
       architecture: amd64
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-alpine-jdk17'
-  checkJdk21AlpineDockerImage:
-    kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-alpine-jdk21-preview" for linux/amd64 is available
-    disablesourceinput: true
-    spec:
-      architectures:
-        - amd64
-        - arm64
-      image: jenkins/agent
-      tag: '{{source "lastVersion" }}-alpine-jdk21-preview'
-  checkJdk11DebianDockerImages:
-    kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk11" for linux/amd64 is available
-    disablesourceinput: true
-    spec:
-      architectures:
-        - amd64
-        - arm64
-        - arm/v7
-        - s390x
-        - ppc64le
-      image: jenkins/agent
-      tag: '{{source "lastVersion" }}-jdk11'
   checkJdk17DebianDockerImages:
     kind: dockerimage
     name: Check if the container image "jenkins/agent:<lastVersion>-jdk17" for linux/amd64 is available
@@ -76,24 +44,6 @@ conditions:
         - arm/v7
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-jdk17'
-  checkJdk21DebianDockerImages:
-    kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk21-preview" for linux/amd64 is available
-    disablesourceinput: true
-    spec:
-      architectures:
-        - amd64
-        - arm64
-      image: jenkins/agent
-      tag: '{{source "lastVersion" }}-jdk21-preview'
-  checkJdk11WindowsNanoserver1809DockerImage:
-    kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk11-nanoserver-1809" for windows/amd64 is available
-    disablesourceinput: true
-    spec:
-      architecture: amd64
-      image: jenkins/agent
-      tag: '{{source "lastVersion" }}-jdk11-nanoserver-1809'
   checkJdk17WindowsNanoserver1809DockerImage:
     kind: dockerimage
     name: Check if the container image "jenkins/agent:<lastVersion>-jdk17-nanoserver-1809" for windows/amd64 is available
@@ -102,14 +52,6 @@ conditions:
       architecture: amd64
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-jdk17-nanoserver-1809'
-  checkJdk11WindowsServer2019DockerImage:
-    kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk11-windowsservercore-ltsc2019" for windows/amd64 is available
-    disablesourceinput: true
-    spec:
-      architecture: amd64
-      image: jenkins/agent
-      tag: '{{source "lastVersion" }}-jdk11-windowsservercore-ltsc2019'
   checkJdk17WindowsServer2019DockerImage:
     kind: dockerimage
     name: Check if the container image "jenkins/agent:<lastVersion>-jdk17-windowsservercore-ltsc2019" for windows/amd64 is available
@@ -178,7 +120,7 @@ actions:
   default:
     kind: github/pullrequest
     scmid: default
-    title: Bump the parent image `jenkins/agent` version to {{ source "lastVersion" }}
+    title: Bump the parent image `jenkins/agent` version to {{ source "lastVersion" }} for JDK17
     spec:
       labels:
         - dependencies
