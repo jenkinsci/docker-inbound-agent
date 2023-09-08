@@ -1,36 +1,18 @@
 services:
-  jdk11-nanoserver:
-    image: jdk11-nanoserver-${NANOSERVER_VERSION_NAME}
+  jdk11:
+    image: jdk11-${WINDOWS_FLAVOR}-${WINDOWS_VERSION_TAG}
     build:
       context: ./
-      dockerfile: ./windows/nanoserver/Dockerfile
-      args:
-        JAVA_MAJOR_VERSION: 11
-        version: ${PARENT_IMAGE_VERSION}
-        WINDOWS_VERSION_TAG: ${NANOSERVER_VERSION_TAG}
-  jdk17-nanoserver:
-    image: jdk17-nanoserver-${NANOSERVER_VERSION_NAME}
-    build:
-      context: ./
-      dockerfile: ./windows/nanoserver/Dockerfile
-      args:
-        JAVA_MAJOR_VERSION: 17
-        version: ${PARENT_IMAGE_VERSION}
-        WINDOWS_VERSION_TAG: ${NANOSERVER_VERSION_TAG}
-  jdk11-windowsservercore:
-    image: jdk11-windowsservercore-${WINDOWS_VERSION_NAME}
-    build:
-      context: ./
-      dockerfile: ./windows/windowsservercore/Dockerfile
+      dockerfile: ./windows/${WINDOWS_FLAVOR}/Dockerfile
       args:
         JAVA_MAJOR_VERSION: 11
         version: ${PARENT_IMAGE_VERSION}
         WINDOWS_VERSION_TAG: ${WINDOWS_VERSION_TAG}
-  jdk17-windowsservercore:
-    image: jdk17-windowsservercore-${WINDOWS_VERSION_NAME}
+  jdk17:
+    image: jdk17-${WINDOWS_FLAVOR}-${WINDOWS_VERSION_TAG}
     build:
       context: ./
-      dockerfile: ./windows/windowsservercore/Dockerfile
+      dockerfile: ./windows/${WINDOWS_FLAVOR}/Dockerfile
       args:
         JAVA_MAJOR_VERSION: 17
         version: ${PARENT_IMAGE_VERSION}

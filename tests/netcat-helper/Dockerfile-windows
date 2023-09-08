@@ -22,6 +22,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+# Available tags: https://mcr.microsoft.com/v2/windows/servercore/tags/list
 ARG WINDOWS_VERSION_TAG=1809
 FROM mcr.microsoft.com/windows/servercore:"${WINDOWS_VERSION_TAG}"
 
