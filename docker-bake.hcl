@@ -36,7 +36,7 @@ variable "IMAGE_TAG" {
 
 #### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_VERSION>-<base-os>)
 variable "PARENT_IMAGE_VERSION" {
-  default = "3148.v532a_7e715ee3-4"
+  default = "3148.v532a_7e715ee3-5"
 }
 
 variable "REGISTRY" {
@@ -53,14 +53,14 @@ variable "ON_TAG" {
 
 target "alpine_jdk11" {
   dockerfile = "alpine/Dockerfile"
-  context = "."
+  context    = "."
   args = {
     JAVA_MAJOR_VERSION = "11"
-    version = "${PARENT_IMAGE_VERSION}"
+    version            = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine": "",
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk11": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine" : "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk11" : "",
     "${REGISTRY}/${JENKINS_REPO}:alpine",
     "${REGISTRY}/${JENKINS_REPO}:alpine-jdk11",
     "${REGISTRY}/${JENKINS_REPO}:latest-alpine",
@@ -71,13 +71,13 @@ target "alpine_jdk11" {
 
 target "alpine_jdk17" {
   dockerfile = "alpine/Dockerfile"
-  context = "."
+  context    = "."
   args = {
     JAVA_MAJOR_VERSION = "17"
-    version = "${PARENT_IMAGE_VERSION}"
+    version            = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk17": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk17" : "",
     "${REGISTRY}/${JENKINS_REPO}:alpine-jdk17",
     "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk17",
   ]
@@ -86,13 +86,13 @@ target "alpine_jdk17" {
 
 target "alpine_jdk21" {
   dockerfile = "alpine/Dockerfile-jdk21"
-  context = "."
+  context    = "."
   args = {
     JAVA_MAJOR_VERSION = "21"
-    version = "${PARENT_IMAGE_VERSION}"
+    version            = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk21-preview": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk21-preview" : "",
     "${REGISTRY}/${JENKINS_REPO}:alpine-jdk21-preview",
     "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk21-preview",
   ]
@@ -101,14 +101,14 @@ target "alpine_jdk21" {
 
 target "debian_jdk11" {
   dockerfile = "debian/Dockerfile"
-  context = "."
+  context    = "."
   args = {
     JAVA_MAJOR_VERSION = "11"
-    version = "${PARENT_IMAGE_VERSION}"
+    version            = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}": "",
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk11": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}" : "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk11" : "",
     "${REGISTRY}/${JENKINS_REPO}:jdk11",
     "${REGISTRY}/${JENKINS_REPO}:latest",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk11",
@@ -118,13 +118,13 @@ target "debian_jdk11" {
 
 target "debian_jdk17" {
   dockerfile = "debian/Dockerfile"
-  context = "."
+  context    = "."
   args = {
     JAVA_MAJOR_VERSION = "17"
-    version = "${PARENT_IMAGE_VERSION}"
+    version            = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk17": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk17" : "",
     "${REGISTRY}/${JENKINS_REPO}:jdk17",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk17",
   ]
@@ -133,13 +133,13 @@ target "debian_jdk17" {
 
 target "debian_jdk21" {
   dockerfile = "debian/Dockerfile-jdk21"
-  context = "."
+  context    = "."
   args = {
     JAVA_MAJOR_VERSION = "21"
-    version = "${PARENT_IMAGE_VERSION}"
+    version            = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk21-preview": "",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk21-preview" : "",
     "${REGISTRY}/${JENKINS_REPO}:jdk21-preview",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk21-preview",
   ]
