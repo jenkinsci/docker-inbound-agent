@@ -26,6 +26,7 @@ group "linux-ppc64le" {
   targets = [
     "debian_jdk11",
     "debian_jdk17",
+    "debian_jdk21",
   ]
 }
 
@@ -143,5 +144,5 @@ target "debian_jdk21" {
     "${REGISTRY}/${JENKINS_REPO}:jdk21-preview",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk21-preview",
   ]
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64", "linux/arm64", "linux/ppc64le"]
 }
