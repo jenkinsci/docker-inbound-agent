@@ -60,7 +60,7 @@ conditions:
       architectures:
         - amd64
         - arm64
-        - arm/v7
+        - linux/arm/v7
         - s390x
         - ppc64le
       image: jenkins/agent
@@ -73,7 +73,7 @@ conditions:
       architectures:
         - amd64
         - arm64
-        - arm/v7
+        - linux/arm/v7
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-jdk17'
   checkJdk21DebianDockerImages:
