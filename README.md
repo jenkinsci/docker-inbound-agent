@@ -13,9 +13,30 @@ This agent is powered by the [Jenkins Remoting library](https://github.com/jenki
 
 See [Using Agents](https://www.jenkins.io/doc/book/using/using-agents/) for more info.
 
-## Running
+## Configuring agents with this container image
+
+### Setup the agent on Jenkins
+
+1. Go to your Jenkins dashboard
+2. Go to `Manage Jenkins` option in main menu
+3. Go to `Nodes` item in `System Configuration`
+  ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/f3451996-ee56-4346-9713-9379c26ebeba)
+4. Go to `New Node` option in side menu
+5. Fill the Node(agent) name and select the type; (e.g. Name: agent1, Type: Permanent Agent)
+6. Now fill the fields like remote root directory, labels, # of executors, etc.
+  * **`Launch method` is `Launch agent by connecting it to the controller`**
+    ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/602f39cf-873d-4709-b1ac-a5f337bd7975)
+7. Press the `Save` button and the agent1 will be registered, but offline for the time being. Click on it.
+  ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/dc03bb20-4e4d-4766-8dae-495f2016e761)
+8. You should now see the secret. Use the secret value to pass it to the argument of container, or set to `JENKINS_SECRET` as environment variable.
+  ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/969d658d-d772-429e-a2b6-89afe3b70f88)
+
+### Running this container
 
 To run a Docker container
+  > **Note**  
+  > Remember to replace the `<secret>` and `<agent name>` for secret and agent name, which can be you can get(and set) from [above section](#Setup-the-agent-on-Jenkins).  
+  > Your agent node should be possible to connect to Jenkins controller with agent port (not Jenkins server's port like 80, 443, 8080), which can be set in `Manage Jenkins` > `Security` > `Agent`. Default port is 50000.  
 
   Linux agent:
 
@@ -42,13 +63,20 @@ Optional environment variables:
 * `JENKINS_JAVA_OPTS` : Java Options to use for the remoting process, otherwise obtained from JAVA_OPTS, **Warning** :exclamation: For more information on Windows usage, please see the **Windows Jenkins Java Opts** [section below](#windows-jenkins-java-opts).
 * `JENKINS_URL`: url for the Jenkins server, can be used as a replacement to `-url` option, or to set alternate jenkins URL
 * `JENKINS_TUNNEL`: (`HOST:PORT`) connect to this agent host and port instead of Jenkins server, assuming this one do route TCP traffic to Jenkins master. Useful when when Jenkins runs behind a load balancer, reverse proxy, etc.
-* `JENKINS_SECRET`: agent secret, if not set as an argument
-* `JENKINS_AGENT_NAME`: agent name, if not set as an argument
+* `JENKINS_SECRET`: (use only if not set as an argument) the secret as shown on the master after creating the agent
+* `JENKINS_AGENT_NAME`: (use only if not set as an argument) the name of the agent, it should match the name you specified when creating the agent on the master
 * `JENKINS_AGENT_WORKDIR`: agent work directory, if not set by optional parameter `-workDir`
 * `JENKINS_WEB_SOCKET`: `true` if the connection should be made via WebSocket rather than TCP
 * `JENKINS_DIRECT_CONNECTION`: (`HOST:PORT`) Connect directly to this TCP agent port, skipping the HTTP(S) connection parameter download.
 * `JENKINS_INSTANCE_IDENTITY`: The base64 encoded InstanceIdentity byte array of the Jenkins master. When this is set, the agent skips connecting to an HTTP(S) port for connection info.
 * `JENKINS_PROTOCOLS`: Specify the remoting protocols to attempt when `JENKINS_INSTANCE_IDENTITY` is provided.
+
+#### Example
+
+1. Enter the command above.
+  ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/98354cd0-a1df-42a8-afff-4c20cb9259e9)
+2. Check the Jenkins dashboard if the agent is connected well.
+  ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/639344cf-9c90-4cfa-87aa-17d6f8bf0e58)
 
 
 ## Windows Jenkins Java Opts
