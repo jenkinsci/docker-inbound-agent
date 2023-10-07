@@ -20,16 +20,16 @@ See [Using Agents](https://www.jenkins.io/doc/book/using/using-agents/) for more
 1. Go to your Jenkins dashboard
 2. Go to `Manage Jenkins` option in main menu
 3. Go to `Nodes` item in `System Configuration`
-  ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/f3451996-ee56-4346-9713-9379c26ebeba)
+  ![image](images/screen-4.png)
 4. Go to `New Node` option in side menu
 5. Fill the Node(agent) name and select the type; (e.g. Name: agent1, Type: Permanent Agent)
 6. Now fill the fields like remote root directory, labels, # of executors, etc.
   * **`Launch method` is `Launch agent by connecting it to the controller`**
-    ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/602f39cf-873d-4709-b1ac-a5f337bd7975)
+    ![image](images/screen-1.png)
 7. Press the `Save` button and the agent1 will be registered, but offline for the time being. Click on it.
-  ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/dc03bb20-4e4d-4766-8dae-495f2016e761)
+  ![image](images/screen-2.png)
 8. You should now see the secret. Use the secret value to pass it to the argument of container, or set to `JENKINS_SECRET` as environment variable.
-  ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/969d658d-d772-429e-a2b6-89afe3b70f88)
+  ![image](images/screen-3.png)
 
 ### Running this container
 
@@ -74,9 +74,9 @@ Optional environment variables:
 #### Example
 
 1. Enter the command above.
-  ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/98354cd0-a1df-42a8-afff-4c20cb9259e9)
+  ![image](images/screen-5.png)
 2. Check the Jenkins dashboard if the agent is connected well.
-  ![image](https://github.com/jenkinsci/docker-inbound-agent/assets/16630665/639344cf-9c90-4cfa-87aa-17d6f8bf0e58)
+  ![image](images/screen-6.png)
 
 
 ## Windows Jenkins Java Opts
