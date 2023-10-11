@@ -17,3 +17,12 @@ services:
         JAVA_MAJOR_VERSION: 17
         version: ${PARENT_IMAGE_VERSION}
         WINDOWS_VERSION_TAG: ${WINDOWS_VERSION_TAG}
+  jdk21:
+    image: jdk21-${WINDOWS_FLAVOR}-${WINDOWS_VERSION_TAG}
+    build:
+      context: ./
+      dockerfile: ./windows/${WINDOWS_FLAVOR}/Dockerfile
+      args:
+        JAVA_MAJOR_VERSION: 21
+        version: ${PARENT_IMAGE_VERSION}
+        WINDOWS_VERSION_TAG: ${WINDOWS_VERSION_TAG}
