@@ -1,0 +1,19 @@
+name: Update Docker Hub Description
+on:
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+jobs:
+  dockerHubDescription:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update Docker Hub description
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          enable-url-completion: true
+          short-description: ${{ github.event.repository.description }}
+          repository: jenkins/inbound-agent

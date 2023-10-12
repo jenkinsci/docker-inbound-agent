@@ -21,12 +21,10 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-ARG version=3131.vf2b_b_798b_ce99-4
+ARG version=3160.vd76b_9ddd10cc-2
 ARG JAVA_MAJOR_VERSION=17
-FROM jenkins/agent:"${version}"-jdk"${JAVA_MAJOR_VERSION}"-windowsservercore-ltsc2019
-
-ARG version=3131.vf2b_b_798b_ce99-4
-LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$version"
+ARG WINDOWS_VERSION_TAG=1809
+FROM jenkins/agent:"${version}"-jdk"${JAVA_MAJOR_VERSION}"-nanoserver-"${WINDOWS_VERSION_TAG}"
 
 COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
-ENTRYPOINT ["powershell.exe", "-f", "C:/ProgramData/Jenkins/jenkins-agent.ps1"]
+ENTRYPOINT ["pwsh.exe", "-f", "C:/ProgramData/Jenkins/jenkins-agent.ps1"]

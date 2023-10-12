@@ -1,7 +1,6 @@
-# escape=`
 # The MIT License
 #
-#  Copyright (c) 2019, Alex Earl
+#  Copyright (c) 2015-2020, CloudBees, Inc. and other Jenkins contributors
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -21,12 +20,16 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-ARG version=3131.vf2b_b_798b_ce99-4
-ARG JAVA_MAJOR_VERSION=17
-FROM jenkins/agent:"${version}"-jdk"${JAVA_MAJOR_VERSION}"-nanoserver-1809
+ARG version=3148.v532a_7e715ee3-5
+ARG JAVA_MAJOR_VERSION=21
+FROM jenkins/agent:"${version}"-alpine-jdk"${JAVA_MAJOR_VERSION}"-preview
 
-ARG version=3131.vf2b_b_798b_ce99-4
-LABEL Description="This is a base image, which allows connecting Jenkins agents via JNLP protocols on Windows" Vendor="Jenkins Project" Version="$version"
+ARG user=jenkins
 
-COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
-ENTRYPOINT ["pwsh.exe", "-f", "C:/ProgramData/Jenkins/jenkins-agent.ps1"]
+USER root
+COPY ../../jenkins-agent /usr/local/bin/jenkins-agent
+RUN chmod +x /usr/local/bin/jenkins-agent &&\
+    ln -s /usr/local/bin/jenkins-agent /usr/local/bin/jenkins-slave
+USER ${user}
+
+ENTRYPOINT ["/usr/local/bin/jenkins-agent"]

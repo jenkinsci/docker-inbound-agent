@@ -1,8 +1,7 @@
 # escape=`
-
 # The MIT License
 #
-#  Copyright (c) 2019-2020, Alex Earl and other Jenkins Contributors
+#  Copyright (c) 2019, Alex Earl
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a copy
 #  of this software and associated documentation files (the "Software"), to deal
@@ -22,19 +21,10 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-# Available tags: https://mcr.microsoft.com/v2/windows/servercore/tags/list
-ARG WINDOWS_VERSION_TAG=1809
-FROM mcr.microsoft.com/windows/servercore:"${WINDOWS_VERSION_TAG}"
+ARG version=3160.vd76b_9ddd10cc-2
+ARG JAVA_MAJOR_VERSION=17
+ARG WINDOWS_VERSION_TAG=ltsc2019
+FROM jenkins/agent:"${version}"-jdk"${JAVA_MAJOR_VERSION}"-windowsservercore-"${WINDOWS_VERSION_TAG}"
 
-SHELL ["powershell.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
-
-ARG NMAP_VERSION=7.80
-ENV NMAP_VERSION $NMAP_VERSION
-
-RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; `
-    $url = $('https://nmap.org/dist/nmap-{0}-setup.exe' -f $env:NMAP_VERSION) ; `
-    Write-Host "Retrieving $url..." ; `
-    Invoke-WebRequest $url -OutFile 'nmap-install.exe' -UseBasicParsing ; `
-    $proc = Start-Process "C:\nmap-install.exe" -PassThru -ArgumentList '/S' ; `
-    $proc.WaitForExit() ; `
-    Remove-Item -Path nmap-install.exe
+COPY jenkins-agent.ps1 C:/ProgramData/Jenkins
+ENTRYPOINT ["powershell.exe", "-f", "C:/ProgramData/Jenkins/jenkins-agent.ps1"]
