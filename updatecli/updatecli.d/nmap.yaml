@@ -20,6 +20,9 @@ sources:
     spec:
       file: https://nmap.org/dist/
       matchpattern: 'The latest Nmap release is version (.*)\.'
+    transformers:
+      - findsubmatch:
+          pattern: 'version (.*)\.'
 
 targets:
   setNmapVersion:
