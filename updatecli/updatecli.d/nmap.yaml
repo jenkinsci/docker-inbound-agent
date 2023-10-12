@@ -19,7 +19,7 @@ sources:
     name: Get the latest `nmap` version from https://nmap.org/dist/ HTML
     spec:
       file: https://nmap.org/dist/
-      matchpattern: '<p>The latest Nmap release is version (.*)\.</p>'
+      matchpattern: 'The latest Nmap release is version (.*)\.'
 
 targets:
   setNmapVersion:
