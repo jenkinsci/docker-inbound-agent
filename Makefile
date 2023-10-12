@@ -22,7 +22,7 @@ check_image = make --silent list | grep -w '$(1)' >/dev/null 2>&1 || { echo "Err
 ## Base "docker buildx base" command to be reused everywhere
 bake_base_cli := docker buildx bake -f docker-bake.hcl --load
 
-.PHONY: build test test-alpine test-debian test-jdk11 test-jdk11-alpine
+.PHONY: build test test-alpine test-debian test-jdk17 test-jdk17-alpine
 
 check-reqs:
 ## Build requirements
