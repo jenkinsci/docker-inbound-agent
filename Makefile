@@ -1,11 +1,5 @@
 ROOT:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
-IMAGE_NAME:=jenkins4eval/inbound-agent
-IMAGE_ALPINE:=${IMAGE_NAME}:alpine
-IMAGE_ALPINE_JDK11:=${IMAGE_NAME}:alpine-jdk11
-IMAGE_DEBIAN:=${IMAGE_NAME}:test
-IMAGE_JDK11:=${IMAGE_NAME}:jdk11
-
 ## For Docker <=20.04
 export DOCKER_BUILDKIT=1
 ## For Docker <=20.04
