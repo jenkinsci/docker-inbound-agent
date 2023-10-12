@@ -37,7 +37,7 @@ variable "IMAGE_TAG" {
 
 #### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_VERSION>-<base-os>)
 variable "PARENT_IMAGE_VERSION" {
-  default = "3160.vd76b_9ddd10cc-1"
+  default = "3160.vd76b_9ddd10cc-2"
 }
 
 variable "REGISTRY" {
