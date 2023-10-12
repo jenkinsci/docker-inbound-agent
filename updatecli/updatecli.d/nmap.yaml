@@ -23,6 +23,7 @@ sources:
     transformers:
       - findsubmatch:
           pattern: 'version (.*)\.'
+          captureindex: 1
 
 targets:
   setNmapVersion:
