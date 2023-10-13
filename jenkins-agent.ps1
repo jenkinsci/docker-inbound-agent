@@ -104,7 +104,7 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
         $AgentArguments += Invoke-Expression "echo $JenkinsJavaOpts"
     }
 
-    $AgentArguments += @("-cp", "C:/ProgramData/Jenkins/agent.jar", "hudson.remoting.jnlp.Main", "-headless")
+    $AgentArguments += @("-cp", "C:/ProgramData/Jenkins/agent.jar", "hudson.remoting.jnlp.Main")
 
     if(![System.String]::IsNullOrWhiteSpace($Tunnel)) {
         $AgentArguments += @("-tunnel", "`"$Tunnel`"")
