@@ -33,7 +33,7 @@ pipeline {
                             label agentSelector(env.IMAGE_TYPE)
                         }
                         options {
-                            timeout(time: 30, unit: 'MINUTES')
+                            timeout(time: 60, unit: 'MINUTES')
                         }
                         environment {
                             DOCKERHUB_ORGANISATION = "${infra.isTrusted() ? 'jenkins' : 'jenkins4eval'}"
