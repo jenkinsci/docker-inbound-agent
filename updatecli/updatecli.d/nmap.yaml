@@ -1,0 +1,47 @@
+---
+name: Bump `nmap` version
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: "{{ .github.user }}"
+      email: "{{ .github.email }}"
+      owner: "{{ .github.owner }}"
+      repository: "{{ .github.repository }}"
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      branch: "{{ .github.branch }}"
+
+sources:
+  lastVersion:
+    kind: file
+    name: Get the latest `nmap` version from https://nmap.org/dist/ HTML
+    spec:
+      file: https://nmap.org/dist/
+      matchpattern: 'The latest Nmap release is version (.*)\.'
+    transformers:
+      - findsubmatch:
+          pattern: 'version (.*)\.'
+          captureindex: 1
+
+targets:
+  setNmapVersion:
+    name: Bump `nmap` version in tests/netcat-helper/Dockerfile-windows used for Windows tests
+    kind: dockerfile
+    spec:
+      file: tests/netcat-helper/Dockerfile-windows
+      instruction:
+        keyword: ARG
+        matcher: NMAP_VERSION
+    scmid: default
+
+actions:
+  default:
+    kind: github/pullrequest
+    scmid: default
+    title: Bump `nmap` version to {{ source "lastVersion" }} in Windows tests
+    spec:
+      labels:
+        - dependencies
+        - nmap
