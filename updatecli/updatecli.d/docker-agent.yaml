@@ -44,17 +44,17 @@ conditions:
       tag: '{{source "lastVersion" }}-alpine-jdk17'
   checkJdk21AlpineDockerImage:
     kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-alpine-jdk21-preview" for linux/amd64 is available
+    name: Check if the container image "jenkins/agent:<lastVersion>-alpine-jdk21" for linux/amd64 is available
     disablesourceinput: true
     spec:
       architectures:
         - amd64
         - arm64
       image: jenkins/agent
-      tag: '{{source "lastVersion" }}-alpine-jdk21-preview'
+      tag: '{{source "lastVersion" }}-alpine-jdk21'
   checkJdk11DebianDockerImages:
     kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk11" for linux/amd64 is available
+    name: Check if the container image "jenkins/agent:<lastVersion>-jdk11" for linux/amd64, linux/arm64, linux/arm/v7, s390x and ppc64le is available
     disablesourceinput: true
     spec:
       architectures:
@@ -67,7 +67,7 @@ conditions:
       tag: '{{source "lastVersion" }}-jdk11'
   checkJdk17DebianDockerImages:
     kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk17" for linux/amd64 is available
+    name: Check if the container image "jenkins/agent:<lastVersion>-jdk17" for linux/amd64, linux/arm64 & linux/arm/v7 is available
     disablesourceinput: true
     spec:
       architectures:
@@ -78,12 +78,21 @@ conditions:
       tag: '{{source "lastVersion" }}-jdk17'
   checkJdk21DebianDockerImages:
     kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk21-preview" for linux/amd64 is available
+    name: Check if the container image "jenkins/agent:<lastVersion>-jdk21-preview" for linux/amd64 & linux/arm64 is available
     disablesourceinput: true
     spec:
       architectures:
         - amd64
         - arm64
+      image: jenkins/agent
+      tag: '{{source "lastVersion" }}-jdk21'
+  checkJdk21DebianPreviewDockerImages:
+    kind: dockerimage
+    name: Check if the container image "jenkins/agent:<lastVersion>-jdk21-preview" for ppc64le is available
+    disablesourceinput: true
+    spec:
+      architectures:
+        - ppc64le
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-jdk21-preview'
   checkJdk11WindowsNanoserver1809DockerImage:
