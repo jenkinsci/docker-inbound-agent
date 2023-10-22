@@ -6,17 +6,15 @@ group "linux" {
     "debian_jdk11",
     "debian_jdk17",
     "debian_jdk21",
-    "debian_jdk21_preview",
   ]
 }
 
 group "linux-arm64" {
   targets = [
+    "alpine_jdk21",
     "debian_jdk11",
     "debian_jdk17",
     "debian_jdk21",
-    "alpine_jdk21",
-    "debian_jdk21_preview",
   ]
 }
 
