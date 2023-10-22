@@ -159,5 +159,5 @@ target "debian_jdk21_preview" {
     "${REGISTRY}/${JENKINS_REPO}:jdk21-preview",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk21-preview",
   ]
-  platforms = ["linux/ppc64le", "linux/s390x", "linux/arm/v7"]
+  platforms = ["linux/amd64", "linux/arm64", "linux/ppc64le", "linux/s390x", "linux/arm/v7"]
 }
