@@ -164,6 +164,8 @@ targets:
       instruction:
         keyword: ARG
         matcher: version
+    transformers:
+      - addsuffix: "-preview"
     scmid: default
   setDebianDockerImage:
     name: Bump the parent image `jenkins/agent` version on Debian
@@ -182,6 +184,8 @@ targets:
       instruction:
         keyword: ARG
         matcher: version
+    transformers:
+      - addsuffix: "-preview"
     scmid: default
   setsNanoserverDockerImage:
     name: Bump the parent image `jenkins/agent` version on Windows Nanoserver
