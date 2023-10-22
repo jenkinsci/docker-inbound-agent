@@ -165,7 +165,7 @@ target "debian_jdk21_preview" {
   context    = "."
   args = {
     JAVA_MAJOR_VERSION = "21"
-    version            = "${PARENT_IMAGE_VERSION}"
+    version            = "${PARENT_IMAGE_VERSION}-preview"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk21-preview" : "",
