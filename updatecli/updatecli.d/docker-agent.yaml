@@ -88,11 +88,13 @@ conditions:
       tag: '{{source "lastVersion" }}-jdk21'
   checkJdk21DebianPreviewDockerImages:
     kind: dockerimage
-    name: Check if the container image "jenkins/agent:<lastVersion>-jdk21-preview" for ppc64le is available
+    name: Check if the container image "jenkins/agent:<lastVersion>-jdk21-preview" for ppc64le, linux/arm/v7 and s390x is available
     disablesourceinput: true
     spec:
       architectures:
         - ppc64le
+        - linux/arm/v7
+        - s390x
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-jdk21-preview'
   checkJdk11WindowsNanoserver1809DockerImage:
