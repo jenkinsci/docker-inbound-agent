@@ -16,18 +16,30 @@ group "linux-arm64" {
     "debian_jdk17",
     "debian_jdk21",
     "alpine_jdk21",
+    "debian_jdk21_preview",
+  ]
+}
+
+group "linux-arm32" {
+  targets = [
+    "debian_jdk11",,
+    "debian_jdk17",,
+    "debian_jdk21_preview",
   ]
 }
 
 group "linux-s390x" {
-  targets = []
+  targets = [
+    "debian_jdk11"
+    "debian_jdk21_preview"
+  ]
 }
 
 group "linux-ppc64le" {
   targets = [
     "debian_jdk11",
     "debian_jdk17",
-    "debian_jdk21",
+    "debian_jdk21_preview",
   ]
 }
 
