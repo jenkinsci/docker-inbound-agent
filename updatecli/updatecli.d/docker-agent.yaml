@@ -156,17 +156,6 @@ targets:
         keyword: ARG
         matcher: version
     scmid: default
-  setAlpine21PreviewDockerImage:
-    name: Bump the parent image `jenkins/agent` version on Alpine
-    kind: dockerfile
-    spec:
-      file: alpine/Dockerfile-jdk21
-      instruction:
-        keyword: ARG
-        matcher: version
-    transformers:
-      - addsuffix: "-preview"
-    scmid: default
   setDebianDockerImage:
     name: Bump the parent image `jenkins/agent` version on Debian
     kind: dockerfile
@@ -180,7 +169,7 @@ targets:
     name: Bump the parent image `jenkins/agent` version on Debian
     kind: dockerfile
     spec:
-      file: debian/Dockerfile-jdk21
+      file: debian/preview/Dockerfile
       instruction:
         keyword: ARG
         matcher: version

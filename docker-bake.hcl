@@ -11,22 +11,33 @@ group "linux" {
 
 group "linux-arm64" {
   targets = [
+    "alpine_jdk21",
     "debian_jdk11",
     "debian_jdk17",
     "debian_jdk21",
-    "alpine_jdk21",
+  ]
+}
+
+group "linux-arm32" {
+  targets = [
+    "debian_jdk11",
+    "debian_jdk17",
+    "debian_jdk21_preview",
   ]
 }
 
 group "linux-s390x" {
-  targets = []
+  targets = [
+    "debian_jdk11",
+    "debian_jdk21_preview",
+  ]
 }
 
 group "linux-ppc64le" {
   targets = [
     "debian_jdk11",
     "debian_jdk17",
-    "debian_jdk21",
+    "debian_jdk21_preview",
   ]
 }
 
@@ -37,7 +48,7 @@ variable "IMAGE_TAG" {
 
 #### This is for the "parent" image version to use (jenkins/agent:<PARENT_IMAGE_VERSION>-<base-os>)
 variable "PARENT_IMAGE_VERSION" {
-  default = "3180.v3dd999d24861-1"
+  default = "3180.v3dd999d24861-2"
 }
 
 variable "REGISTRY" {
@@ -86,16 +97,16 @@ target "alpine_jdk17" {
 }
 
 target "alpine_jdk21" {
-  dockerfile = "alpine/Dockerfile-jdk21"
+  dockerfile = "alpine/Dockerfile"
   context    = "."
   args = {
     JAVA_MAJOR_VERSION = "21"
     version            = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
-    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk21-preview" : "",
-    "${REGISTRY}/${JENKINS_REPO}:alpine-jdk21-preview",
-    "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk21-preview",
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-alpine-jdk21" : "",
+    "${REGISTRY}/${JENKINS_REPO}:alpine-jdk21",
+    "${REGISTRY}/${JENKINS_REPO}:latest-alpine-jdk21",
   ]
   platforms = ["linux/amd64", "linux/arm64"]
 }
@@ -133,16 +144,31 @@ target "debian_jdk17" {
 }
 
 target "debian_jdk21" {
-  dockerfile = "debian/Dockerfile-jdk21"
+  dockerfile = "debian/Dockerfile"
   context    = "."
   args = {
     JAVA_MAJOR_VERSION = "21"
     version            = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
+    equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk21" : "",
+    "${REGISTRY}/${JENKINS_REPO}:jdk21",
+    "${REGISTRY}/${JENKINS_REPO}:latest-jdk21",
+  ]
+  platforms = ["linux/amd64", "linux/arm64"]
+}
+
+target "debian_jdk21_preview" {
+  dockerfile = "debian/preview/Dockerfile"
+  context    = "."
+  args = {
+    JAVA_MAJOR_VERSION = "21"
+    version            = "${PARENT_IMAGE_VERSION}-preview"
+  }
+  tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk21-preview" : "",
     "${REGISTRY}/${JENKINS_REPO}:jdk21-preview",
     "${REGISTRY}/${JENKINS_REPO}:latest-jdk21-preview",
   ]
-  platforms = ["linux/amd64", "linux/arm64", "linux/ppc64le"]
+  platforms = ["linux/ppc64le", "linux/s390x", "linux/arm/v7"]
 }
