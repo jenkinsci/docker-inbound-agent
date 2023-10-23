@@ -6,6 +6,7 @@ group "linux" {
     "debian_jdk11",
     "debian_jdk17",
     "debian_jdk21",
+    "debian_jdk21_preview",
   ]
 }
 
