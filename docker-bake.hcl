@@ -6,6 +6,7 @@ group "linux" {
     "debian_jdk11",
     "debian_jdk17",
     "debian_jdk21",
+    "debian_jdk21_preview",
   ]
 }
 
@@ -163,7 +164,7 @@ target "debian_jdk21_preview" {
   context    = "."
   args = {
     JAVA_MAJOR_VERSION = "21"
-    version            = "${PARENT_IMAGE_VERSION}-preview"
+    version            = "${PARENT_IMAGE_VERSION}"
   }
   tags = [
     equal(ON_TAG, "true") ? "${REGISTRY}/${JENKINS_REPO}:${PARENT_IMAGE_VERSION}-jdk21-preview" : "",
