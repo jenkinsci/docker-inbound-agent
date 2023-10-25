@@ -104,7 +104,9 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
         $AgentArguments += Invoke-Expression "echo $JenkinsJavaOpts"
     }
 
-    $AgentArguments += @("-cp", "C:/ProgramData/Jenkins/agent.jar", "hudson.remoting.jnlp.Main")
+    $AgentArguments += @("-jar", "C:/ProgramData/Jenkins/agent.jar")
+    $AgentArguments += @("-secret", $Secret)
+    $AgentArguments += @("-name", $Name)
 
     if(![System.String]::IsNullOrWhiteSpace($Tunnel)) {
         $AgentArguments += @("-tunnel", "`"$Tunnel`"")
@@ -135,10 +137,6 @@ if(![System.String]::IsNullOrWhiteSpace($Cmd)) {
     if(![System.String]::IsNullOrWhiteSpace($Protocols)) {
         $AgentArguments += @('-protocols', $Protocols)
     }
-
-    # these need to be the last things added since they are positional
-    # parameters to agent.jar
-    $AgentArguments += @($Secret, $Name)
 
     if(![System.String]::IsNullOrWhiteSpace($JenkinsJavaBin)) {
         $JAVA_BIN = $JenkinsJavaBin
