@@ -22,7 +22,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-# Usage jenkins-agent.sh [options] -url http://jenkins [SECRET] [AGENT_NAME]
+# Usage jenkins-agent.sh [options] -url http://jenkins -secret [SECRET] -name [AGENT_NAME]
 # Optional environment variables :
 # * JENKINS_JAVA_BIN : Java executable to use instead of the default in PATH or obtained from JAVA_HOME
 # * JENKINS_JAVA_OPTS : Java Options to use for the remoting process, otherwise obtained from JAVA_OPTS
@@ -107,27 +107,25 @@ else
 	fi
 
 	# if both required options are defined, do not pass the parameters
-	OPT_JENKINS_SECRET=""
 	if [ -n "$JENKINS_SECRET" ]; then
 		case "$@" in
 			*"${JENKINS_SECRET}"*) echo "Warning: SECRET is defined twice in command-line arguments and the environment variable" ;;
 			*)
-			OPT_JENKINS_SECRET="${JENKINS_SECRET}" ;;
+			SECRET="-secret ${JENKINS_SECRET}" ;;
 		esac
 	fi
 	
-	OPT_JENKINS_AGENT_NAME=""
 	if [ -n "$JENKINS_AGENT_NAME" ]; then
 		case "$@" in
 			*"${JENKINS_AGENT_NAME}"*) echo "Warning: AGENT_NAME is defined twice in command-line arguments and the environment variable" ;;
 			*)
-			OPT_JENKINS_AGENT_NAME="${JENKINS_AGENT_NAME}" ;;
+			AGENT_NAME="-name ${JENKINS_AGENT_NAME}" ;;
 		esac
 	fi
 
 	#TODO: Handle the case when the command-line and Environment variable contain different values.
 	#It is fine it blows up for now since it should lead to an error anyway.
 
-        exec $JAVA_BIN $JAVA_OPTIONS -cp /usr/share/jenkins/agent.jar hudson.remoting.jnlp.Main $TUNNEL $URL $WORKDIR $WEB_SOCKET $DIRECT $PROTOCOLS $INSTANCE_IDENTITY $OPT_JENKINS_SECRET $OPT_JENKINS_AGENT_NAME "$@"
+        exec $JAVA_BIN $JAVA_OPTIONS -jar /usr/share/jenkins/agent.jar $SECRET $AGENT_NAME $TUNNEL $URL $WORKDIR $WEB_SOCKET $DIRECT $PROTOCOLS $INSTANCE_IDENTITY "$@"
 
 fi

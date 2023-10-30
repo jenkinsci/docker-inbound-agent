@@ -49,8 +49,8 @@ SUT_IMAGE="$(get_sut_image)"
 
   # Old version used to test overriding the build arguments.
   # This old version must have the same tag suffixes as the ones defined in the docker-bake file (`-jdk17`, `jdk11`, etc.)
-  TEST_VERSION="3148.v532a_7e715ee3"
-  PARENT_IMAGE_VERSION_SUFFIX="4"
+  TEST_VERSION="3180.v3dd999d24861"
+  PARENT_IMAGE_VERSION_SUFFIX="2"
 
   ARG_TEST_VERSION="${TEST_VERSION}-${PARENT_IMAGE_VERSION_SUFFIX}"
   TEST_USER="root"
