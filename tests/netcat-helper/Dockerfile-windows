@@ -28,7 +28,7 @@ FROM mcr.microsoft.com/windows/servercore:"${WINDOWS_VERSION_TAG}"
 
 SHELL ["powershell.exe", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-ARG NMAP_VERSION=7.80
+ARG NMAP_VERSION=7.94
 ENV NMAP_VERSION $NMAP_VERSION
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 ; `
