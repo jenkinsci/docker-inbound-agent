@@ -62,13 +62,13 @@ Optional environment variables:
 * `JENKINS_JAVA_BIN`: Path to Java executable to use instead of the default in PATH or obtained from JAVA_HOME
 * `JENKINS_JAVA_OPTS` : Java Options to use for the remoting process, otherwise obtained from JAVA_OPTS, **Warning** :exclamation: For more information on Windows usage, please see the **Windows Jenkins Java Opts** [section below](#windows-jenkins-java-opts).
 * `JENKINS_URL`: url for the Jenkins server, can be used as a replacement to `-url` option, or to set alternate jenkins URL
-* `JENKINS_TUNNEL`: (`HOST:PORT`) connect to this agent host and port instead of Jenkins server, assuming this one do route TCP traffic to Jenkins master. Useful when when Jenkins runs behind a load balancer, reverse proxy, etc.
-* `JENKINS_SECRET`: (use only if not set as an argument) the secret as shown on the master after creating the agent
-* `JENKINS_AGENT_NAME`: (use only if not set as an argument) the name of the agent, it should match the name you specified when creating the agent on the master
+* `JENKINS_TUNNEL`: (`HOST:PORT`) connect to this agent host and port instead of Jenkins server, assuming this one do route TCP traffic to Jenkins controller. Useful when when Jenkins runs behind a load balancer, reverse proxy, etc.
+* `JENKINS_SECRET`: (use only if not set as an argument) the secret as shown on the controller after creating the agent
+* `JENKINS_AGENT_NAME`: (use only if not set as an argument) the name of the agent, it should match the name you specified when creating the agent on the controller
 * `JENKINS_AGENT_WORKDIR`: agent work directory, if not set by optional parameter `-workDir`
 * `JENKINS_WEB_SOCKET`: `true` if the connection should be made via WebSocket rather than TCP
 * `JENKINS_DIRECT_CONNECTION`: (`HOST:PORT`) Connect directly to this TCP agent port, skipping the HTTP(S) connection parameter download.
-* `JENKINS_INSTANCE_IDENTITY`: The base64 encoded InstanceIdentity byte array of the Jenkins master. When this is set, the agent skips connecting to an HTTP(S) port for connection info.
+* `JENKINS_INSTANCE_IDENTITY`: The base64 encoded InstanceIdentity byte array of the Jenkins controller. When this is set, the agent skips connecting to an HTTP(S) port for connection info.
 * `JENKINS_PROTOCOLS`: Specify the remoting protocols to attempt when `JENKINS_INSTANCE_IDENTITY` is provided.
 
 #### Example
