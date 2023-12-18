@@ -145,6 +145,14 @@ conditions:
       architecture: amd64
       image: jenkins/agent
       tag: '{{source "lastVersion" }}-jdk21-windowsservercore-ltsc2019'
+  checkJdk21Nanoserver2019DockerImage:
+    kind: dockerimage
+    name: Check if the container image "jenkins/agent:<lastVersion>-jdk21-nanoserver-ltsc2019" for windows/amd64 is available
+    disablesourceinput: true
+    spec:
+      architecture: amd64
+      image: jenkins/agent
+      tag: '{{source "lastVersion" }}-jdk21-nanoserver-ltsc2019'
 
 targets:
   setAlpineDockerImage:
