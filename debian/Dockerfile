@@ -1,4 +1,4 @@
-ARG version=3192.v713e3b_039fb_e-5
+ARG version=3192.v713e3b_039fb_e-6
 ARG JAVA_MAJOR_VERSION=17
 FROM jenkins/agent:"${version}"-jdk"${JAVA_MAJOR_VERSION}"
 
