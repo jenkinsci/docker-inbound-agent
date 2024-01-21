@@ -1,5 +1,14 @@
 # Docker image for inbound Jenkins agents
 
+> [!IMPORTANT]
+> This repository is deprecated, its content is now included in https://github.com/jenkinsci/docker-agent/.
+> 
+> Since https://github.com/jenkinsci/docker-agent/pull/570 both `agent` and `inbound-agent` images are built from https://github.com/jenkinsci/docker-agent/ repository, thanks to the use of [multi-stage Dockerfiles](https://docs.docker.com/build/building/multi-stage/) and to the use of targets.
+>
+> See https://github.com/jenkinsci/docker-agent/issues/569 for more details.
+>
+> Note that it doesn't change anything on the Docker hub side, these images still have their own Docker repositories `jenkins/agent` and `jenkins/inbound-agent`.
+
 [![Join the chat at https://gitter.im/jenkinsci/docker](https://badges.gitter.im/jenkinsci/docker.svg)](https://gitter.im/jenkinsci/docker?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GitHub stars](https://img.shields.io/github/stars/jenkinsci/docker-inbound-agent?label=GitHub%20stars)](https://github.com/jenkinsci/docker-inbound-agent)
 [![Docker Pulls](https://img.shields.io/docker/pulls/jenkins/inbound-agent.svg)](https://hub.docker.com/r/jenkins/inbound-agent/)
